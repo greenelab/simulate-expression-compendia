@@ -1,6 +1,4 @@
-#----------------------------------------------------------------------------------------------------------------
 # Helper functions for running autoencoder
-#----------------------------------------------------------------------------------------------------------------
 
 import os
 import argparse
@@ -57,13 +55,11 @@ from keras.models import Model, Sequential
 from keras import metrics, optimizers
 from keras.callbacks import Callback
 
-# --------------------------------------------------------------------------------------------------------------------
 # Functions
 #
-# Based on publication by Greg et. al.
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5728678/
-# https://github.com/greenelab/tybalt/blob/master/scripts/vae_pancancer.py
-# --------------------------------------------------------------------------------------------------------------------
+# Based on publication by Way et. al. (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5728678/)
+# Github repo (https://github.com/greenelab/tybalt/blob/master/scripts/vae_pancancer.py)
+
 
 # Function for reparameterization trick to make model differentiable
 
@@ -103,9 +99,11 @@ class CustomVariationalLayer(Layer):
     def vae_loss(self, x_input, x_decoded):
         reconstruction_loss = self.original_dim * \
             metrics.binary_crossentropy(x_input, x_decoded)
-        kl_loss = - 0.5 * K.sum(1 + self.z_log_var_encoded -
-                                K.square(self.z_mean_encoded) -
-                                K.exp(self.z_log_var_encoded), axis=-1)
+        
+        kl_loss = - 0.5 * K.sum(1 + self.z_log_var_encoded 
+                                - K.square(self.z_mean_encoded) 
+                                - K.exp(self.z_log_var_encoded), axis=-1)
+        
         return K.mean(reconstruction_loss + (K.get_value(self.beta) * kl_loss))
 
     def call(self, inputs):
