@@ -16,6 +16,9 @@ import random
 import glob
 import umap
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings(action='once')
+
 from ggplot import *
 
 from numpy.random import seed
@@ -25,12 +28,12 @@ seed(randomState)
 
 # ## Data
 # 
-# Data downloaded from ADAGE repository [ADAGE](https://github.com/greenelab/adage).  
+# Two datasets were downloaded from ADAGE repository [ADAGE](https://github.com/greenelab/adage).  Below is a description of the two datasets and how they were generated:  
 # 
 # ```
 # data 
 # ```
-# 1. Raw data was downloaded from ArrayExpress using Affymetrix GeneChip
+# 1. Gene expression quantification raw data based on Affymetrix GeneChip was downloaded from ArrayExpress.
 # 2. Use [RMA](https://www.rdocumentation.org/packages/affy/versions/1.50.0/topics/rma) bioconductor library to convert raw array data to log 2 gene expression data.
 # 3. Only keep PA genes, remove control genes
 # 
@@ -95,7 +98,12 @@ data.head(5)
 
 
 # Read in data
-normalized_data = pd.read_table(normalized_data_file, header=0, sep='\t', index_col=0).T
+normalized_data = pd.read_table(
+    normalized_data_file, 
+    header=0, 
+    sep='\t', 
+    index_col=0).T
+
 normalized_data.head(5)
 
 
@@ -103,8 +111,13 @@ normalized_data.head(5)
 
 
 # Read in metadata
-metadata = pd.read_table(metadata_file, header=0, sep='\t', index_col='ml_data_source')
-metadata
+metadata = pd.read_table(
+    metadata_file, 
+    header=0, 
+    sep='\t', 
+    index_col='ml_data_source')
+
+metadata.head(10)
 
 
 # ## Select metadata field
@@ -231,7 +244,12 @@ metadata_selected.head(10)
 # In[11]:
 
 
-data_labeled = data.merge(metadata_selected_labeled, left_index=True, right_index=True, how='inner')
+data_labeled = data.merge(
+    metadata_selected_labeled,
+    left_index=True, 
+    right_index=True, 
+    how='inner')
+
 print(data_labeled.shape)
 data_labeled.head(5)
 
@@ -260,7 +278,12 @@ ggplot(aes(x='1',y='2', color='metadata'), data=embedding_df) +         geom_poi
 # In[14]:
 
 
-normalized_data_labeled = normalized_data.merge(metadata_selected_labeled, left_index=True, right_index=True, how='inner')
+normalized_data_labeled = normalized_data.merge(
+    metadata_selected_labeled, 
+    left_index=True, 
+    right_index=True,
+    how='inner')
+
 print(normalized_data_labeled.shape)
 normalized_data_labeled.head(5)
 
