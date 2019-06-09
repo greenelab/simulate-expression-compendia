@@ -1,10 +1,9 @@
-# -----------------------------------------------------------------------------------------------------------------------
 # By Alexandra Lee
 # (updated October 2018)
 #
 # Encode gene expression data into low dimensional latent space using
 # Tybalt with 2-hidden layers
-# --------------------------------------------------------------------------------------------------------------------
+
 import os
 import argparse
 import pandas as pd
@@ -34,11 +33,23 @@ def tybalt_2layer_model(
         epsilon_std,
         base_dir,
         analysis_name):
+    
     """
     Train 2-layer Tybalt model using input dataset
+    
+    Arguments:
+    -- learning_rate: step size used for gradient descent. In other words, its how quickly the  methods is learning
+    -- batch_size: Training is performed in batches. So this determines the number of samples to consider at a given time.
+    -- epochs: The number of times to train over the entire input dataset.
+    -- kappa: How fast to linearly ramp up KL loss 
+    -- intermediate_dim: Size of the hidden layer
+    -- latent_dim: Size of the bottleneck layer
+    -- epsilon_std: standard deviation of Normal distribution to sample latent space
+    -- base_dir: parent directory where data/, scripts/, models/ are subdirectories
+    -- analysis_name: string that will be used to create a subdirectory where results and models will be stored
 
     Output:
-     Encoding and decoding neural networks to use in downstream analysis
+        Encoding and decoding neural networks to use in downstream analysis
     """
 
     # The below is necessary in Python 3.2.3 onwards to
@@ -79,51 +90,64 @@ def tybalt_2layer_model(
     sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
-    # --------------------------------------------------------------------------------------------------------------------
     # Files
-    # --------------------------------------------------------------------------------------------------------------------
     data_file = os.path.join(
-        base_dir, "data", "train_set_normalized.pcl")
+        base_dir,
+        "data", 
+        "train_set_normalized.pcl")
+    
     rnaseq = pd.read_table(data_file, index_col=0, header=0).T
 
-    # --------------------------------------------------------------------------------------------------------------------
+
     # Initialize hyper parameters
-    #
-    # learning rate:
-    # batch size: Total number of training examples present in a single batch
-    #             Iterations is the number of batches needed to complete one epoch
-    # epochs: One Epoch is when an ENTIRE dataset is passed forward and backward through the neural network only ONCE
-    # kappa: warmup
-    # original dim: dimensions of the raw data
-    # latent dim: dimensiosn of the latent space (fixed by the user)
-    #   Note: intrinsic latent space dimension unknown
-    # epsilon std:
-    # beta: Threshold value for ReLU?
-    # --------------------------------------------------------------------------------------------------------------------
 
     original_dim = rnaseq.shape[1]
     beta = K.variable(0)
 
-    stat_file = os.path.join(base_dir, "stats", analysis_name,
-                             "tybalt_2layer_{}latent_stats.tsv".format(latent_dim))
+    stat_file = os.path.join(
+        base_dir,
+        "stats", 
+        analysis_name,
+        "tybalt_2layer_{}latent_stats.tsv".format(latent_dim))
+    
     hist_plot_file = os.path.join(
-        base_dir, "stats", analysis_name, "tybalt_2layer_{}latent_hist.png".format(latent_dim))
+        base_dir,
+        "stats",
+        analysis_name,
+        "tybalt_2layer_{}latent_hist.png".format(latent_dim))
 
-    encoded_file = os.path.join(base_dir, "encoded", analysis_name,
-                                "train_input_2layer_{}latent_encoded.txt".format(latent_dim))
+    encoded_file = os.path.join(
+        base_dir,
+        "encoded",
+        analysis_name,
+        "train_input_2layer_{}latent_encoded.txt".format(latent_dim))
 
-    model_encoder_file = os.path.join(base_dir, "models", analysis_name,
-                                      "tybalt_2layer_{}latent_encoder_model.h5".format(latent_dim))
-    weights_encoder_file = os.path.join(base_dir, "models", analysis_name,
-                                        "tybalt_2layer_{}latent_encoder_weights.h5".format(latent_dim))
-    model_decoder_file = os.path.join(base_dir, "models", analysis_name,
-                                      "tybalt_2layer_{}latent_decoder_model.h5".format(latent_dim))
-    weights_decoder_file = os.path.join(base_dir, "models", analysis_name,
-                                        "tybalt_2layer_{}latent_decoder_weights.h5".format(latent_dim))
+    model_encoder_file = os.path.join(
+        base_dir, 
+        "models", 
+        analysis_name,
+        "tybalt_2layer_{}latent_encoder_model.h5".format(latent_dim))
+    
+    weights_encoder_file = os.path.join(
+        base_dir, 
+        "models", 
+        analysis_name,
+        "tybalt_2layer_{}latent_encoder_weights.h5".format(latent_dim))
+    
+    model_decoder_file = os.path.join(
+        base_dir, 
+        "models", 
+        analysis_name,
+        "tybalt_2layer_{}latent_decoder_model.h5".format(latent_dim))
+    
+    weights_decoder_file = os.path.join(
+        base_dir, 
+        "models", 
+        analysis_name,
+        "tybalt_2layer_{}latent_decoder_weights.h5".format(latent_dim))
 
-    # --------------------------------------------------------------------------------------------------------------------
+    
     # Data initalizations
-    # --------------------------------------------------------------------------------------------------------------------
 
     # Split 10% test set randomly
     test_set_percent = 0.1
@@ -134,9 +158,8 @@ def tybalt_2layer_model(
     # Create a placeholder for an encoded (original-dimensional)
     rnaseq_input = Input(shape=(original_dim, ))
 
-    # --------------------------------------------------------------------------------------------------------------------
+    
     # Architecture of VAE
-    # --------------------------------------------------------------------------------------------------------------------
 
     # ENCODER
 
@@ -212,19 +235,20 @@ def tybalt_2layer_model(
     vae = Model(rnaseq_input, vae_layer)
     vae.compile(optimizer=adam, loss=None, loss_weights=[beta])
 
-    # --------------------------------------------------------------------------------------------------------------------
+    
     # Training
-    # --------------------------------------------------------------------------------------------------------------------
 
     # fit Model
     # hist: record of the training loss at each epoch
-    hist = vae.fit(np.array(rnaseq_train_df), shuffle=True, epochs=epochs, batch_size=batch_size,
-                   validation_data=(np.array(rnaseq_test_df), None),
-                   callbacks=[WarmUpCallback(beta, kappa)])
+    hist = vae.fit(
+        np.array(rnaseq_train_df), 
+        shuffle=True, 
+        epochs=epochs, 
+        batch_size=batch_size,
+        validation_data=(np.array(rnaseq_test_df), None),
+        callbacks=[WarmUpCallback(beta, kappa)])
 
-    # --------------------------------------------------------------------------------------------------------------------
     # Use trained model to make predictions
-    # --------------------------------------------------------------------------------------------------------------------
     encoder = Model(rnaseq_input, z_mean_encoded)
 
     encoded_rnaseq_df = encoder.predict_on_batch(rnaseq)
@@ -233,9 +257,8 @@ def tybalt_2layer_model(
     encoded_rnaseq_df.columns.name = 'sample_id'
     encoded_rnaseq_df.columns = encoded_rnaseq_df.columns + 1
 
-    # --------------------------------------------------------------------------------------------------------------------
+    
     # Visualize training performance
-    # --------------------------------------------------------------------------------------------------------------------
     history_df = pd.DataFrame(hist.history)
     ax = history_df.plot()
     ax.set_xlabel('Epochs')
@@ -245,9 +268,8 @@ def tybalt_2layer_model(
 
     del ax, fig
 
-    # --------------------------------------------------------------------------------------------------------------------
+
     # Output
-    # --------------------------------------------------------------------------------------------------------------------
 
     # Save training performance
     history_df = pd.DataFrame(hist.history)
@@ -299,7 +321,10 @@ def tybalt_2layer_model(
     abstracted_weight_df.columns = rnaseq.columns
 
     weight_file = os.path.join(
-        base_dir, "data", analysis_name, "VAE_weight_matrix.txt")
+        base_dir, 
+        "data", 
+        analysis_name, 
+        "VAE_weight_matrix.txt")
 
     abstracted_weight_df.to_csv(weight_file, sep='\t')
 
