@@ -93,7 +93,8 @@ def tybalt_2layer_model(
     # Files
     data_file = os.path.join(
         base_dir,
-        "data", 
+        "data",
+        "input",
         "train_set_normalized.pcl")
     
     rnaseq = pd.read_table(data_file, index_col=0, header=0).T
@@ -106,18 +107,21 @@ def tybalt_2layer_model(
 
     stat_file = os.path.join(
         base_dir,
+        "output",
         "stats", 
         analysis_name,
         "tybalt_2layer_{}latent_stats.tsv".format(latent_dim))
     
     hist_plot_file = os.path.join(
         base_dir,
-        "stats",
+        "output",
+        "viz",
         analysis_name,
         "tybalt_2layer_{}latent_hist.png".format(latent_dim))
 
     encoded_file = os.path.join(
         base_dir,
+        "data",
         "encoded",
         analysis_name,
         "train_input_2layer_{}latent_encoded.txt".format(latent_dim))
@@ -313,18 +317,18 @@ def tybalt_2layer_model(
         weights.append(layer.get_weights())
 
     # Multiply hidden layers together to obtain a single representation of gene weights
-    intermediate_weight_df = pd.DataFrame(weights[1][0])
-    hidden_weight_df = pd.DataFrame(weights[1][2])
-    abstracted_weight_df = intermediate_weight_df.dot(hidden_weight_df)
+    #intermediate_weight_df = pd.DataFrame(weights[1][0])
+    #hidden_weight_df = pd.DataFrame(weights[1][2])
+    #abstracted_weight_df = intermediate_weight_df.dot(hidden_weight_df)
 
-    abstracted_weight_df.index = range(0, latent_dim)
-    abstracted_weight_df.columns = rnaseq.columns
+    #abstracted_weight_df.index = range(0, latent_dim)
+    #abstracted_weight_df.columns = rnaseq.columns
 
-    weight_file = os.path.join(
-        base_dir, 
-        "data", 
-        analysis_name, 
-        "VAE_weight_matrix.txt")
+    #weight_file = os.path.join(
+     #   base_dir, 
+     #   "data", 
+     #   analysis_name, 
+     #   "VAE_weight_matrix.txt")
 
-    abstracted_weight_df.to_csv(weight_file, sep='\t')
+    #abstracted_weight_df.to_csv(weight_file, sep='\t')
 
