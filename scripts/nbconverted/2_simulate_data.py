@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 import random
 import glob
+import pickle
 from keras.models import model_from_json, load_model
 from ggplot import *
 import umap
@@ -113,6 +114,12 @@ simulated_data_file = os.path.join(
     analysis_name,
     "simulated_data.txt")
 
+umap_model_file = os.path.join(
+    os.path.dirname(os.getcwd()),
+    "models",  
+    NN_architecture,
+    "umap_model.pkl")
+
 
 # In[5]:
 
@@ -135,9 +142,9 @@ normalized_data.head(10)
 
 # UMAP embedding
 
-# Get model
+# Get and save model
 model = umap.UMAP(random_state=randomState).fit(normalized_data)
-
+pickle.dump(model, open(umap_model_file, 'wb'))
 
 input_data_UMAPencoded = model.transform(normalized_data)
 input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
@@ -188,15 +195,30 @@ new_data_decoded_df = pd.DataFrame(data=new_data_decoded)
 new_data_decoded_df.head(10)
 
 
-# ## Plot simulated data using UMAP
-# 
-# Note: we will use the same UMAP mapping for the input and simulated data to ensure they are plotted on the same space.
+# ## Plot encoded input data using UMAP
 
 # In[8]:
 
 
+latent_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_encoded_df)
+latent_data_UMAPencoded_df = pd.DataFrame(data=latent_data_UMAPencoded,
+                                         index=data_encoded_df.index,
+                                         columns=['1','2'])
+
+
+g = ggplot(aes(x='1',y='2'), data=latent_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             scale_x_continuous(limits=(-15,20)) +            scale_y_continuous(limits=(-15,15)) +             ggtitle("Encoded input data")
+
+print(g)
+
+
+# ## Plot simulated data using UMAP
+# 
+# Note: we will use the same UMAP mapping for the input and simulated data to ensure they are plotted on the same space.
+
+# In[9]:
+
+
 # UMAP embedding
-#input_data_UMAPencoded = umap.UMAP().fit_transform(normalized_data)
 simulated_data_UMAPencoded = model.transform(new_data_decoded_df)
 simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          index=new_data_decoded_df.index,
@@ -208,9 +230,9 @@ g = ggplot(aes(x='1',y='2'), data=simulated_data_UMAPencoded_df) +             g
 print(g)
 
 
-# In[9]:
+# In[10]:
 
 
 # Output
-new_data_decoded_df.to_csv(simulated_data_file, sep='\t')
+#new_data_decoded_df.to_csv(simulated_data_file, sep='\t')
 

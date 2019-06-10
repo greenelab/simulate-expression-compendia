@@ -52,6 +52,30 @@ for each_dir in base_dirs:
 # In[3]:
 
 
+# Load arguments
+normalized_data_file = os.path.join(
+    os.path.dirname(os.getcwd()),
+    "data",
+    "input",
+    "train_set_normalized.pcl")
+
+
+# In[4]:
+
+
+# Read data
+normalized_data = pd.read_table(
+    normalized_data_file,
+    header=0,
+    sep='\t',
+    index_col=0).T
+
+print(normalized_data.shape)
+
+
+# In[5]:
+
+
 # Parameters 
 learning_rate = 0.001
 batch_size = 100
@@ -64,7 +88,7 @@ num_PCs = latent_dim
 train_architecture = "NN_{}_{}".format(intermediate_dim, latent_dim)
 
 
-# In[4]:
+# In[6]:
 
 
 # Create output directories
@@ -87,7 +111,7 @@ for each_dir in output_dirs:
     os.makedirs(new_dir, exist_ok=True)
 
 
-# In[5]:
+# In[7]:
 
 
 # Train nonlinear (VAE)

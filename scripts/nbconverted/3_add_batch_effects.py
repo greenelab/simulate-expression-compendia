@@ -24,6 +24,9 @@ import numpy as np
 import random
 import glob
 import umap
+import pickle
+import warnings
+warnings.filterwarnings(action='once')
 
 from ggplot import *
 from sklearn.decomposition import PCA
@@ -36,7 +39,8 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'treatment'
+analysis_name = 'full_dataset'
+NN_architecture = 'NN_2500_300'
 num_simulations = 10
 num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
 
@@ -45,7 +49,10 @@ num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
 
 
 # Create directories
-new_dir = os.path.join(os.path.dirname(os.getcwd()), "data", "batch_simulated")
+new_dir = os.path.join(
+    os.path.dirname(os.getcwd()),
+    "data",
+    "batch_simulated")
 
 analysis_dir = os.path.join(new_dir, analysis_name)
 
@@ -67,16 +74,36 @@ simulated_data_file = os.path.join(
     analysis_name,
     "simulated_data.txt")
 
+umap_model_file = umap_model_file = os.path.join(
+    os.path.dirname(os.getcwd()),
+    "models",  
+    NN_architecture,
+    "umap_model.pkl")
+
 
 # In[5]:
 
 
-# Read in metadata
-simulated_data = pd.read_table(simulated_data_file, header=0, index_col=0, sep='\t')
-simulated_data.head(10)
+# Read in UMAP model
+infile = open(umap_model_file, 'rb')
+umap_model = pickle.load(infile)
+infile.close()
 
 
 # In[6]:
+
+
+# Read in metadata
+simulated_data = pd.read_table(
+    simulated_data_file,
+    header=0, 
+    index_col=0,
+    sep='\t')
+
+simulated_data.head(10)
+
+
+# In[7]:
 
 
 # Add batch effects
@@ -86,7 +113,7 @@ num_genes = simulated_data.shape[1]
 subset_genes_to_change = np.random.RandomState(randomState).choice([0, 1], size=(num_genes), p=[1./3, 2./3])
     
 for i in num_batches:
-    print(i)
+    print('Creating simulated data with {} batches..'.format(i))
     
     batch_file = os.path.join(
             os.path.dirname(os.getcwd()),
@@ -104,15 +131,7 @@ for i in num_batches:
         batch_data_df = pd.DataFrame()
         for j in range(i):
             
-            # CLEAN UP
-            #print('batch number: {}'.format(j))
-            #if j == 0:
-                # Randomly select samples
-            #   batch_df = new_data_decoded_df.sample(n=num_samples_per_batch, frac=None, replace=False)
-            #   batch_data_df = batch_data_df.append(batch_df)    
-            #else:
-            
-            stretch_factor = np.random.uniform(0,1)
+            stretch_factor = np.random.uniform(0.5,1)
             
             # Randomly select samples
             batch_df = simulated_data.sample(n=num_samples_per_batch, frac=None, replace=False)
@@ -145,7 +164,7 @@ for i in num_batches:
 
 # ## Plot batch data using UMAP
 
-# In[7]:
+# In[8]:
 
 
 # Plot generated data 
@@ -165,20 +184,20 @@ for i in num_batches:
         index_col=0)
     
     # UMAP embedding of decoded batch data
-    batch_data_UMAPencoded = umap.UMAP().fit_transform(batch_data)
+    batch_data_UMAPencoded = umap_model.transform(batch_data)
     batch_data_UMAPencoded_df = pd.DataFrame(data=batch_data_UMAPencoded,
                                              index=batch_data.index,
                                              columns=['1','2'])
     
         
-    g = ggplot(aes(x='1',y='2'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set2') +                 ggtitle("{} Batches".format(i))
+    g = ggplot(aes(x='1',y='2'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set2') +                 scale_x_continuous(limits=(-15,20)) +                scale_y_continuous(limits=(-15,15)) +                 ggtitle("{} Batches".format(i))
     
     print(g)
 
 
 # ## Plot batch data using PCA
 
-# In[8]:
+# In[9]:
 
 
 # Plot generated data 

@@ -23,6 +23,9 @@ import numpy as np
 import random
 import glob
 import umap
+import pickle
+import warnings
+warnings.filterwarnings(action='once')
 
 from ggplot import *
 from functions import cca_core
@@ -36,7 +39,8 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'treatment'
+analysis_name = 'full_dataset'
+NN_architecture = 'NN_2500_300'
 num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
 
 
@@ -50,16 +54,31 @@ batch_dir = os.path.join(
     "batch_simulated",
     analysis_name)
 
+umap_model_file = umap_model_file = os.path.join(
+    os.path.dirname(os.getcwd()),
+    "models",  
+    NN_architecture,
+    "umap_model.pkl")
+
 
 # In[4]:
 
 
-# Calculate Similarity
+# Read in UMAP model
+infile = open(umap_model_file, 'rb')
+umap_model = pickle.load(infile)
+infile.close()
+
+
+# In[5]:
+
+
+# Calculate Similarity using UMAP representation of batched data
 
 output_list = []
 
 for i in num_batches:
-    print(i)
+    print('Calculating SVCCA score for 1 batch vs {} batches..'.format(i))
     if i ==1:
         batch_data_file = os.path.join(
             batch_dir,
@@ -72,7 +91,7 @@ for i in num_batches:
             index_col=0)
 
         # UMAP embedding of decoded batch data
-        original_data_UMAPencoded = umap.UMAP().fit_transform(batch_data)
+        original_data_UMAPencoded = umap_model.transform(batch_data)
         original_data_UMAPencoded_df = pd.DataFrame(data=original_data_UMAPencoded,
                                                  index=batch_data.index,
                                                  columns=['1','2'])
@@ -95,7 +114,7 @@ for i in num_batches:
     # SVCCA
     svcca_results = cca_core.get_cca_similarity(original_data_UMAPencoded_df.T,
                                           batch_data_UMAPencoded_df.T,
-                                          verbose=True)
+                                          verbose=False)
     
     output_list.append(np.mean(svcca_results["cca_coef1"]))
 
@@ -104,16 +123,15 @@ svcca_umap_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], ind
 svcca_umap_df
 
 
-# In[5]:
+# In[6]:
 
 
-# Calculate Similarity
+# Calculate Similarity using PCA projection of batched data
 
 output_list = []
 
 for i in num_batches:
-    print(i)
-    # 1 batch
+    print('Calculating SVCCA score for 1 batch vs {} batches..'.format(i))
     if i ==1:
         batch_data_file = os.path.join(
             batch_dir,
@@ -163,7 +181,7 @@ for i in num_batches:
     # SVCCA
     svcca_results = cca_core.get_cca_similarity(original_data_PCAencoded_df.T,
                                           batch_data_PCAencoded_df.T,
-                                          verbose=True)
+                                          verbose=False)
     
     output_list.append(np.mean(svcca_results["cca_coef1"]))
 
