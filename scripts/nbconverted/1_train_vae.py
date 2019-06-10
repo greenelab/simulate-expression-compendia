@@ -13,6 +13,8 @@ import os
 import pandas as pd
 import numpy as np
 import random
+import warnings
+warnings.filterwarnings(action='once')
 
 from functions import vae
 
