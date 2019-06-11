@@ -40,9 +40,9 @@ seed(randomState)
 
 # Parameters
 analysis_name = 'full_dataset'
-NN_architecture = 'NN_2500_300'
+NN_architecture = 'NN_2500_10'
 num_simulations = 10
-num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
+num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
 
 # In[3]:
@@ -131,7 +131,7 @@ for i in num_batches:
         batch_data_df = pd.DataFrame()
         for j in range(i):
             
-            stretch_factor = np.random.uniform(0.5,1)
+            stretch_factor = np.random.uniform(0,1)
             
             # Randomly select samples
             batch_df = simulated_data.sample(n=num_samples_per_batch, frac=None, replace=False)
@@ -190,7 +190,7 @@ for i in num_batches:
                                              columns=['1','2'])
     
         
-    g = ggplot(aes(x='1',y='2'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set2') +                 scale_x_continuous(limits=(-15,20)) +                scale_y_continuous(limits=(-15,15)) +                 ggtitle("{} Batches".format(i))
+    g = ggplot(aes(x='1',y='2'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set2') +                 ggtitle("{} Batches".format(i))
     
     print(g)
 

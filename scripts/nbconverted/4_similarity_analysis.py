@@ -40,8 +40,9 @@ seed(randomState)
 
 # Parameters
 analysis_name = 'full_dataset'
-NN_architecture = 'NN_2500_300'
-num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
+NN_architecture = 'NN_2500_10'
+#num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
+num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
 
 # In[3]:

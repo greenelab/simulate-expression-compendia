@@ -39,7 +39,7 @@ seed(randomState)
 
 # Parameters
 analysis_name = 'full_dataset'
-NN_architecture = 'NN_2500_300'
+NN_architecture = 'NN_300_10'
 num_simulated_samples = 1000
 
 
@@ -157,11 +157,53 @@ g = ggplot(aes(x='1',y='2'), data=input_data_UMAPencoded_df) +             geom_
 print(g)
 
 
+# ## Plot encoded input data using UMAP
+
+# In[7]:
+
+
+# Encode data into latent space
+data_encoded = loaded_model.predict_on_batch(normalized_data)
+data_encoded_df = pd.DataFrame(data_encoded, index=normalized_data.index)
+
+# Plot
+latent_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_encoded_df)
+latent_data_UMAPencoded_df = pd.DataFrame(data=latent_data_UMAPencoded,
+                                         index=data_encoded_df.index,
+                                         columns=['1','2'])
+
+
+g = ggplot(aes(x='1',y='2'), data=latent_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Encoded input data")
+
+print(g)
+
+
+# ## Plot decoded input data using UMAP
+
+# In[8]:
+
+
+# Decode data back into gene space
+data_decoded = loaded_decode_model.predict_on_batch(data_encoded_df)
+data_decoded_df = pd.DataFrame(data_decoded, index=data_encoded_df)
+
+# Plot
+data_decoded_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_decoded_df)
+data_decoded_UMAPencoded_df = pd.DataFrame(data=data_decoded_UMAPencoded,
+                                         index=data_decoded_df.index,
+                                         columns=['1','2'])
+
+
+g = ggplot(aes(x='1',y='2'), data=data_decoded_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Decoded input data")
+
+print(g)
+
+
 # ## Simulate data
 # 
 # Generate new simulated data by sampling from the distribution of latent space features.  In other words, for each latent space feature get the mean and standard deviation.  Then we can generate a new sample by sampling from a distribution with this mean and standard deviation.
 
-# In[7]:
+# In[9]:
 
 
 # Simulate data
@@ -181,10 +223,10 @@ encoded_stds = data_encoded_df.std(axis=0)
 new_data = np.zeros([num_simulated_samples,latent_dim])
 for j in range(latent_dim):
     # Use mean and std for feature
-    #new_data[:,j] = np.random.normal(encoded_means[j], encoded_stds[j], num_simulated_samples) 
+    new_data[:,j] = np.random.normal(encoded_means[j], encoded_stds[j], num_simulated_samples) 
     
     # Use standard normal
-    new_data[:,j] = np.random.normal(0, 1, num_simulated_samples)
+    #new_data[:,j] = np.random.normal(0, 1, num_simulated_samples)
     
 new_data_df = pd.DataFrame(data=new_data)
 
@@ -195,27 +237,11 @@ new_data_decoded_df = pd.DataFrame(data=new_data_decoded)
 new_data_decoded_df.head(10)
 
 
-# ## Plot encoded input data using UMAP
-
-# In[8]:
-
-
-latent_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_encoded_df)
-latent_data_UMAPencoded_df = pd.DataFrame(data=latent_data_UMAPencoded,
-                                         index=data_encoded_df.index,
-                                         columns=['1','2'])
-
-
-g = ggplot(aes(x='1',y='2'), data=latent_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             scale_x_continuous(limits=(-15,20)) +            scale_y_continuous(limits=(-15,15)) +             ggtitle("Encoded input data")
-
-print(g)
-
-
 # ## Plot simulated data using UMAP
 # 
 # Note: we will use the same UMAP mapping for the input and simulated data to ensure they are plotted on the same space.
 
-# In[9]:
+# In[10]:
 
 
 # UMAP embedding
@@ -225,12 +251,12 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-g = ggplot(aes(x='1',y='2'), data=simulated_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             scale_x_continuous(limits=(-15,20)) +            scale_y_continuous(limits=(-15,15)) +             ggtitle("Simulated data")
+g = ggplot(aes(x='1',y='2'), data=simulated_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Simulated data")
 
 print(g)
 
 
-# In[10]:
+# In[11]:
 
 
 # Output
