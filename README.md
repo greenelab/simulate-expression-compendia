@@ -4,7 +4,7 @@
 In general, datasets tend to be processed in batches where subsets of samples are processed together.  When the data is processed in batches, each batch shares the same technical details such as the same technician, array platform, time of day, lab and study.  These factors are referred to as batch effects and introduce technical variation into the dataset that is separate from the biological variation in the data.  For example, say we were interested in identifying differentially expressed genes between disease versus normal samples.  However, we have gene expression measurements that were generated from two different lab technicians which can introduce variation between samples that are not due to disease state but rather slight differences in data handling between the two technicians.  We want to be able to normalize out this technical variation in the data in order to detect the variation that is due to disease versus normal.  
 
 **Question:**
-Batch effects are expected to obscure the biological signal that unsupervised analyses extrac.  
+Batch effects are expected to obscure the biological signal that unsupervised analyses extract.  
 
 If we have a compendium comprised of a collection of gene expression experiments, would we want a small or large number of experiments?
 
