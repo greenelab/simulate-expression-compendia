@@ -28,7 +28,7 @@ seed(randomState)
 
 # ## Data
 # 
-# Two datasets were downloaded from ADAGE repository [ADAGE](https://github.com/greenelab/adage).  Below is a description of the two datasets and how they were generated:  
+# Two datasets were downloaded from ADAGE repository [ADAGE](https://github.com/greenelab/adage) based on work from [Tan et. al.](https://msystems.asm.org/content/1/1/e00025-15).  Below is a description of the two datasets and how they were generated:  
 # 
 # ```
 # data 
