@@ -1,0 +1,39 @@
+name: batch_effects
+channels:
+- anaconda
+- conda-forge
+- defaults
+dependencies:
+- conda-forge::python=3.5.5
+- conda-forge::keras=2.1.6
+- conda-forge::tensorboard=1.10.0
+- conda-forge::tensorflow=1.10.0
+- conda-forge::pandas=0.22.0
+- conda-forge::numpy=1.15.2
+- conda-forge::numexpr=2.6.4
+- conda-forge::scikit-learn=0.19.1
+- conda-forge::scipy=1.1.0
+- conda-forge::hdf5=1.10.1
+- conda-forge::umap-learn
+- conda-forge::ggplot=0.11.5
+- conda-forge::graphviz=2.38.0
+- conda-forge::python-graphviz=0.8.4
+- conda-forge::ipykernel=4.8.1
+- conda-forge::ipywidgets=6.0.0
+- conda-forge::widgetsnbextension=2.0.0
+- conda-forge::nb_conda_kernels=2.1.0
+- conda-forge::r-irdisplay=0.6.2
+- conda-forge::r-irkernel=0.8.11
+- conda-forge::r-ggplot2=2.2.1
+- conda-forge::r-dplyr=0.7.6
+- conda-forge::r-tidyr=0.8.0
+- conda-forge::r-readr=1.1.1
+- conda-forge::r-readxl=1.1.0
+- conda-forge::r-cowplot=0.9.3
+- conda-forge::r-heatmap3=1.1.1
+- conda-forge::r-ggrepel=0.8.0
+- conda-forge::r-optparse=1.6.0
+- pip:
+  - torch>=0.4.0
+  - matplotlib==3.0.0
+  - pillow
