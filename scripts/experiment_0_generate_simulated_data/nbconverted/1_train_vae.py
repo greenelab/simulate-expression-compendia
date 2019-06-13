@@ -28,14 +28,14 @@ seed(randomState)
 
 # Create list of base directories
 
-base_dir = os.path.dirname(os.getcwd())
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
 
-base_dirs = [os.path.join(os.path.dirname(os.getcwd()), "data"),
-             os.path.join(os.path.dirname(os.getcwd()), "models"),
-             os.path.join(os.path.dirname(os.getcwd()), "output"),
-             os.path.join(os.path.dirname(os.getcwd()), "data", "encoded"),
-             os.path.join(os.path.dirname(os.getcwd()), "output", "stats"),
-             os.path.join(os.path.dirname(os.getcwd()), "output", "viz")
+base_dirs = [os.path.join(base_dir, "data"),
+             os.path.join(base_dir, "models"),
+             os.path.join(base_dir, "output"),
+             os.path.join(base_dir, "data", "encoded"),
+             os.path.join(base_dir, "output", "stats"),
+             os.path.join(base_dir, "output", "viz")
              ]
 
 # Check if analysis directory exist otherwise create
@@ -54,7 +54,7 @@ for each_dir in base_dirs:
 
 # Load arguments
 normalized_data_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    os.path.abspath(os.path.join(os.getcwd(),"../..")),
     "data",
     "input",
     "train_set_normalized.pcl")
@@ -82,7 +82,7 @@ batch_size = 100
 epochs = 100
 kappa = 0.01
 intermediate_dim = 300
-latent_dim = 10
+latent_dim = 2
 epsilon_std = 1.0
 num_PCs = latent_dim
 train_architecture = "NN_{}_{}".format(intermediate_dim, latent_dim)
@@ -93,10 +93,10 @@ train_architecture = "NN_{}_{}".format(intermediate_dim, latent_dim)
 
 # Create output directories
 
-output_dirs = [os.path.join(os.path.dirname(os.getcwd()), "data", "encoded"),
-             os.path.join(os.path.dirname(os.getcwd()), "models"),
-             os.path.join(os.path.dirname(os.getcwd()), "output", "stats"),
-             os.path.join(os.path.dirname(os.getcwd()), "output", "viz")
+output_dirs = [os.path.join(base_dir, "data", "encoded"),
+             os.path.join(base_dir, "models"),
+             os.path.join(base_dir, "output", "stats"),
+             os.path.join(base_dir, "output", "viz")
              ]
 
 # Check if analysis directory exist otherwise create

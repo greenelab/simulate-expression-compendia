@@ -39,8 +39,8 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'full_dataset'
-NN_architecture = 'NN_2500_10'
+analysis_name = 'experiment_test'
+NN_architecture = 'NN_300_2'
 num_simulations = 10
 num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
@@ -49,8 +49,10 @@ num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
 
 # Create directories
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+
 new_dir = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "batch_simulated")
 
@@ -68,14 +70,14 @@ os.makedirs(analysis_dir, exist_ok=True)
 
 # Load arguments
 simulated_data_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "simulated",
     analysis_name,
     "simulated_data.txt")
 
 umap_model_file = umap_model_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models",  
     NN_architecture,
     "umap_model.pkl")
@@ -116,7 +118,7 @@ for i in num_batches:
     print('Creating simulated data with {} batches..'.format(i))
     
     batch_file = os.path.join(
-            os.path.dirname(os.getcwd()),
+            base_dir,
             "data",
             "batch_simulated",
             analysis_name,
@@ -171,7 +173,7 @@ for i in num_batches:
 
 for i in num_batches:
     batch_data_file = os.path.join(
-        os.path.dirname(os.getcwd()),
+        base_dir,
         "data",
         "batch_simulated",
         analysis_name,
@@ -197,14 +199,14 @@ for i in num_batches:
 
 # ## Plot batch data using PCA
 
-# In[9]:
+# In[ ]:
 
 
 # Plot generated data 
 
 for i in num_batches:
     batch_data_file = os.path.join(
-        os.path.dirname(os.getcwd()),
+        base_dir,
         "data",
         "batch_simulated",
         analysis_name,

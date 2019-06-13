@@ -38,16 +38,18 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'full_dataset'
-NN_architecture = 'NN_300_10'
-num_simulated_samples = 1000
+analysis_name = 'experiment_test'
+NN_architecture = 'NN_300_2'
+num_simulated_samples = 10
 
 
 # In[3]:
 
 
 # Create directories
-new_dir = os.path.join(os.path.dirname(os.getcwd()), "data", "simulated")
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+
+new_dir = os.path.join(base_dir, "data", "simulated")
 
 analysis_dir = os.path.join(new_dir, analysis_name)
 
@@ -63,38 +65,38 @@ os.makedirs(analysis_dir, exist_ok=True)
 
 # Load arguments
 normalized_data_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "input",
     "train_set_normalized.pcl")
 
 metadata_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "metadata",
     "sample_annotations.tsv")
 
 model_encoder_file = glob.glob(os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models",
     NN_architecture,
     "*_encoder_model.h5"))[0]
 
 weights_encoder_file = glob.glob(os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models",
     NN_architecture,
     "*_encoder_weights.h5"))[0]
 
 model_decoder_file = glob.glob(os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models", 
     NN_architecture,
     "*_decoder_model.h5"))[0]
 
 
 weights_decoder_file = glob.glob(os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models",  
     NN_architecture,
     "*_decoder_weights.h5"))[0]
@@ -108,14 +110,14 @@ loaded_decode_model.load_weights(weights_decoder_file)
 
 # Output
 simulated_data_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "simulated",
     analysis_name,
     "simulated_data.txt")
 
 umap_model_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models",  
     NN_architecture,
     "umap_model.pkl")
@@ -260,5 +262,5 @@ print(g)
 
 
 # Output
-#new_data_decoded_df.to_csv(simulated_data_file, sep='\t')
+new_data_decoded_df.to_csv(simulated_data_file, sep='\t')
 

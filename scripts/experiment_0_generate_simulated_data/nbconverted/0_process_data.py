@@ -67,20 +67,22 @@ seed(randomState)
 
 
 # Load arguments
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+
 data_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "input",
     "Pa_compendium_02.22.2014.pcl")
 
 normalized_data_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "input",
     "train_set_normalized.pcl")
 
 metadata_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "metadata",
     "sample_annotations.tsv")
@@ -130,7 +132,7 @@ metadata.head(10)
 #           strain
 #           growth_setting_1
 #           experiment
-metadata_field = 'growth_setting_1'
+metadata_field = 'strain'
 metadata_selected = metadata[metadata_field].to_frame()
 
 metadata_selected.head(5)
@@ -269,7 +271,7 @@ embedding_df.head(5)
 
 
 # Plot
-ggplot(aes(x='1',y='2', color='metadata'), data=embedding_df) +         geom_point(alpha=0.5) +         scale_color_brewer(type='qual', palette='Set2')
+ggplot(aes(x='1',y='2', color='metadata'), data=embedding_df) +         geom_point(alpha=0.5) +         scale_color_brewer(type='qual', palette='Set1')
 #ggMarginal(fig, type='histogram')
 
 
@@ -303,5 +305,5 @@ embedding_normalized_df.head(5)
 
 
 # Plot
-ggplot(aes(x='1',y='2', color='metadata'), data=embedding_normalized_df) +     geom_point(alpha=0.5) +     scale_color_brewer(type='qual', palette='Set2')
+ggplot(aes(x='1',y='2', color='metadata'), data=embedding_normalized_df) +     geom_point(alpha=0.5) +     scale_color_brewer(type='qual', palette='Set1')
 
