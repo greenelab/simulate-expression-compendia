@@ -1,4 +1,4 @@
 *.pcl filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
-data/batch_simulated/full_dataset/*.txt filter=lfs diff=lfs merge=lfs -text
+data/batch_simulated/full_dataset/* filter=lfs diff=lfs merge=lfs -text
 data/simulated/full_dataset/* filter=lfs diff=lfs merge=lfs -text
