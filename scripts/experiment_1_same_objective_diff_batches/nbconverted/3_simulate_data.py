@@ -38,9 +38,10 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'experiment_test'
-NN_architecture = 'NN_300_2'
-num_simulated_samples = 10
+analysis_name = 'experiment_1'
+NN_architecture = 'NN_2500_20'
+metadata_field = 'strain'
+num_simulated_samples = 1000
 
 
 # In[3]:
@@ -64,17 +65,26 @@ os.makedirs(analysis_dir, exist_ok=True)
 
 
 # Load arguments
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+
+mapping_file = os.path.join(
+    base_dir,
+    "data",
+    "metadata",
+    "mapping_{}.txt".format(metadata_field))
+
 normalized_data_file = os.path.join(
     base_dir,
     "data",
     "input",
     "train_set_normalized.pcl")
 
-metadata_file = os.path.join(
+encoded_data_file = glob.glob(os.path.join(
     base_dir,
     "data",
-    "metadata",
-    "sample_annotations.tsv")
+    "encoded",
+    NN_architecture,
+    "*encoded.txt"))[0]
 
 model_encoder_file = glob.glob(os.path.join(
     base_dir,
@@ -101,13 +111,6 @@ weights_decoder_file = glob.glob(os.path.join(
     NN_architecture,
     "*_decoder_weights.h5"))[0]
 
-# Saved models
-loaded_model = load_model(model_encoder_file)
-loaded_decode_model = load_model(model_decoder_file)
-
-loaded_model.load_weights(weights_encoder_file)
-loaded_decode_model.load_weights(weights_decoder_file)
-
 # Output
 simulated_data_file = os.path.join(
     base_dir,
@@ -116,6 +119,12 @@ simulated_data_file = os.path.join(
     analysis_name,
     "simulated_data.txt")
 
+simulated_data_mapping_file = os.path.join(
+    base_dir,
+    "data",
+    "metadata",
+    "mapping_simulated_data.txt")
+
 umap_model_file = os.path.join(
     base_dir,
     "models",  
@@ -123,7 +132,27 @@ umap_model_file = os.path.join(
     "umap_model.pkl")
 
 
+# In[ ]:
+
+
+# Read in VAE models
+loaded_model = load_model(model_encoder_file)
+loaded_decode_model = load_model(model_decoder_file)
+
+loaded_model.load_weights(weights_encoder_file)
+loaded_decode_model.load_weights(weights_decoder_file)
+
+
 # In[5]:
+
+
+# Read in UMAP model
+infile = open(umap_model_file, 'rb')
+model = pickle.load(infile)
+infile.close()
+
+
+# In[6]:
 
 
 # Read data
@@ -137,130 +166,164 @@ print(normalized_data.shape)
 normalized_data.head(10)
 
 
-# ## Plot input data using UMAP
-
-# In[6]:
-
-
-# UMAP embedding
-
-# Get and save model
-model = umap.UMAP(random_state=randomState).fit(normalized_data)
-pickle.dump(model, open(umap_model_file, 'wb'))
-
-input_data_UMAPencoded = model.transform(normalized_data)
-input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
-                                         index=normalized_data.index,
-                                         columns=['1','2'])
-
-
-g = ggplot(aes(x='1',y='2'), data=input_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             scale_x_continuous(limits=(-15,20)) +            scale_y_continuous(limits=(-15,15)) +             ggtitle("Input data")
-
-print(g)
-
-
-# ## Plot encoded input data using UMAP
-
 # In[7]:
 
 
-# Encode data into latent space
-data_encoded = loaded_model.predict_on_batch(normalized_data)
-data_encoded_df = pd.DataFrame(data_encoded, index=normalized_data.index)
+# Read encoded data
+encoded_data = pd.read_table(
+    encoded_data_file,
+    header=0,
+    sep='\t',
+    index_col=0)
 
-# Plot
-latent_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_encoded_df)
-latent_data_UMAPencoded_df = pd.DataFrame(data=latent_data_UMAPencoded,
-                                         index=data_encoded_df.index,
-                                         columns=['1','2'])
+print(encoded_data.shape)
+encoded_data.head(10)
 
-
-g = ggplot(aes(x='1',y='2'), data=latent_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Encoded input data")
-
-print(g)
-
-
-# ## Plot decoded input data using UMAP
 
 # In[8]:
 
 
-# Decode data back into gene space
-data_decoded = loaded_decode_model.predict_on_batch(data_encoded_df)
-data_decoded_df = pd.DataFrame(data_decoded, index=data_encoded_df)
+# Read in metadata
+metadata = pd.read_table(
+    mapping_file, 
+    header=0, 
+    sep='\t', 
+    index_col=0)
 
-# Plot
-data_decoded_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_decoded_df)
-data_decoded_UMAPencoded_df = pd.DataFrame(data=data_decoded_UMAPencoded,
-                                         index=data_decoded_df.index,
-                                         columns=['1','2'])
+metadata.head(10)
 
 
-g = ggplot(aes(x='1',y='2'), data=data_decoded_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Decoded input data")
+# In[9]:
 
-print(g)
+
+# Replace NaN with string "NA"
+metadata[metadata_field] = metadata[metadata_field].fillna('NA')
+
+
+# In[10]:
+
+
+# Get possible values in metadata field
+grps = list(metadata[metadata_field].unique())
+print(grps)
 
 
 # ## Simulate data
 # 
 # Generate new simulated data by sampling from the distribution of latent space features.  In other words, for each latent space feature get the mean and standard deviation.  Then we can generate a new sample by sampling from a distribution with this mean and standard deviation.
 
-# In[9]:
+# In[11]:
 
-
-# Simulate data
 
 # Encode into latent space
 data_encoded = loaded_model.predict_on_batch(normalized_data)
 data_encoded_df = pd.DataFrame(data_encoded, index=normalized_data.index)
 
+
+# In[12]:
+
+
+# Merge encoded gene expression data and metadata
+data_encoded_labeled = encoded_data.merge(
+    metadata,
+    left_index=True, 
+    right_index=True, 
+    how='inner')
+
+print(data_encoded_labeled.shape)
+data_encoded_labeled.head(5)
+
+
+# In[13]:
+
+
+# Init variables
+num_samples_per_grp = int(num_simulated_samples/len(grps))
 latent_dim = data_encoded_df.shape[1]
+new_data = pd.DataFrame(columns=normalized_data.columns)
+new_data_encoded = pd.DataFrame(columns=encoded_data.columns)
 
-# Get mean and standard deviation per encoded feature
-encoded_means = data_encoded_df.mean(axis=0)
-
-encoded_stds = data_encoded_df.std(axis=0)
-
-# Generate samples 
-new_data = np.zeros([num_simulated_samples,latent_dim])
-for j in range(latent_dim):
-    # Use mean and std for feature
-    new_data[:,j] = np.random.normal(encoded_means[j], encoded_stds[j], num_simulated_samples) 
+# Get mean and standard deviation for each group per encoded feature
+for g in range(len(grps)):
+    grp_name = grps[g]
+    data_labeled_grped = data_encoded_labeled[data_encoded_labeled[metadata_field]== grps[g]]
     
-    # Use standard normal
-    #new_data[:,j] = np.random.normal(0, 1, num_simulated_samples)
+    print('simulating data for {}...'.format(grp_name))
     
-new_data_df = pd.DataFrame(data=new_data)
+    # Calculate mean and stdev
+    encoded_means = data_labeled_grped.mean(axis=0)
+    encoded_stds = data_labeled_grped.std(axis=0)
 
-# Decode N samples
-new_data_decoded = loaded_decode_model.predict_on_batch(new_data_df)
-new_data_decoded_df = pd.DataFrame(data=new_data_decoded)
+    # Generate samples 
+    new_data_tmp = np.zeros([num_samples_per_grp,latent_dim])
+    for j in range(latent_dim):
+        
+        # Use mean and std for feature
+        new_data_tmp[:,j] = np.random.normal(encoded_means[j], encoded_stds[j], num_samples_per_grp) 
+        
+        # Use standard normal
+        #new_data[:,j] = np.random.normal(0, 1, num_simulated_samples)
+        
+    new_data_tmp_df = pd.DataFrame(data=new_data_tmp, columns=encoded_data.columns)
+    new_data_encoded = new_data_encoded.append(new_data_tmp_df, ignore_index=True)
+    
 
-new_data_decoded_df.head(10)
+    # Decode N samples
+    new_data_decoded = loaded_decode_model.predict_on_batch(new_data_tmp_df)
+    new_data_decoded_df = pd.DataFrame(data=new_data_decoded, columns=normalized_data.columns)
+    
+    new_data = new_data.append(new_data_decoded_df, ignore_index=True)
+
+print(new_data.shape)
+new_data.head(10)
 
 
-# ## Plot simulated data using UMAP
+# In[14]:
+
+
+# Create labels for new data
+grps_series = pd.Series(grps)
+new_metadata = pd.DataFrame(grps_series.repeat(num_samples_per_grp), columns=['metadata'])
+new_metadata.index = new_data.index
+
+
+# In[15]:
+
+
+# Merge gene expression data and metadata
+new_data_labeled = new_data.merge(
+    new_metadata,
+    left_index=True, 
+    right_index=True, 
+    how='inner')
+
+print(new_data_labeled.shape)
+new_data_labeled.head(5)
+
+
+# ## Plot simulated input data using UMAP
 # 
 # Note: we will use the same UMAP mapping for the input and simulated data to ensure they are plotted on the same space.
 
-# In[10]:
+# In[16]:
 
 
 # UMAP embedding
-simulated_data_UMAPencoded = model.transform(new_data_decoded_df)
-simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
-                                         index=new_data_decoded_df.index,
+simulated_data_UMAP = model.transform(new_data_labeled.iloc[:,:-1])
+simulated_data_UMAP_df = pd.DataFrame(data=simulated_data_UMAP,
+                                         index=new_data_labeled.index,
                                          columns=['1','2'])
+simulated_data_UMAP_df['metadata'] = list(new_data_labeled['metadata'])
 
-
-g = ggplot(aes(x='1',y='2'), data=simulated_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Simulated data")
+g = ggplot(aes(x='1',y='2', color='metadata'), data=simulated_data_UMAP_df) +             geom_point(alpha=0.7) +             scale_color_brewer(type='qual', palette='Set1') +             ggtitle("Simulated data")
 
 print(g)
 
 
-# In[11]:
+# In[17]:
 
 
 # Output
-new_data_decoded_df.to_csv(simulated_data_file, sep='\t')
+new_data.to_csv(simulated_data_file, sep='\t')
+new_metadata.to_csv(simulated_data_mapping_file, sep='\t')
 
