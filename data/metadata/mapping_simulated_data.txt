@@ -1,0 +1,1001 @@
+	metadata
+0	PAO1
+1	PAO1
+2	PAO1
+3	PAO1
+4	PAO1
+5	PAO1
+6	PAO1
+7	PAO1
+8	PAO1
+9	PAO1
+10	PAO1
+11	PAO1
+12	PAO1
+13	PAO1
+14	PAO1
+15	PAO1
+16	PAO1
+17	PAO1
+18	PAO1
+19	PAO1
+20	PAO1
+21	PAO1
+22	PAO1
+23	PAO1
+24	PAO1
+25	PAO1
+26	PAO1
+27	PAO1
+28	PAO1
+29	PAO1
+30	PAO1
+31	PAO1
+32	PAO1
+33	PAO1
+34	PAO1
+35	PAO1
+36	PAO1
+37	PAO1
+38	PAO1
+39	PAO1
+40	PAO1
+41	PAO1
+42	PAO1
+43	PAO1
+44	PAO1
+45	PAO1
+46	PAO1
+47	PAO1
+48	PAO1
+49	PAO1
+50	PAO1
+51	PAO1
+52	PAO1
+53	PAO1
+54	PAO1
+55	PAO1
+56	PAO1
+57	PAO1
+58	PAO1
+59	PAO1
+60	PAO1
+61	PAO1
+62	PAO1
+63	PAO1
+64	PAO1
+65	PAO1
+66	PAO1
+67	PAO1
+68	PAO1
+69	PAO1
+70	PAO1
+71	PAO1
+72	PAO1
+73	PAO1
+74	PAO1
+75	PAO1
+76	PAO1
+77	PAO1
+78	PAO1
+79	PAO1
+80	PAO1
+81	PAO1
+82	PAO1
+83	PAO1
+84	PAO1
+85	PAO1
+86	PAO1
+87	PAO1
+88	PAO1
+89	PAO1
+90	PAO1
+91	PAO1
+92	PAO1
+93	PAO1
+94	PAO1
+95	PAO1
+96	PAO1
+97	PAO1
+98	PAO1
+99	PAO1
+100	PAO1
+101	PAO1
+102	PAO1
+103	PAO1
+104	PAO1
+105	PAO1
+106	PAO1
+107	PAO1
+108	PAO1
+109	PAO1
+110	PAO1
+111	PAO1
+112	PAO1
+113	PAO1
+114	PAO1
+115	PAO1
+116	PAO1
+117	PAO1
+118	PAO1
+119	PAO1
+120	PAO1
+121	PAO1
+122	PAO1
+123	PAO1
+124	PAO1
+125	PAO1
+126	PAO1
+127	PAO1
+128	PAO1
+129	PAO1
+130	PAO1
+131	PAO1
+132	PAO1
+133	PAO1
+134	PAO1
+135	PAO1
+136	PAO1
+137	PAO1
+138	PAO1
+139	PAO1
+140	PAO1
+141	PAO1
+142	PAO1
+143	PAO1
+144	PAO1
+145	PAO1
+146	PAO1
+147	PAO1
+148	PAO1
+149	PAO1
+150	PAO1
+151	PAO1
+152	PAO1
+153	PAO1
+154	PAO1
+155	PAO1
+156	PAO1
+157	PAO1
+158	PAO1
+159	PAO1
+160	PAO1
+161	PAO1
+162	PAO1
+163	PAO1
+164	PAO1
+165	PAO1
+166	PAO1
+167	PAO1
+168	PAO1
+169	PAO1
+170	PAO1
+171	PAO1
+172	PAO1
+173	PAO1
+174	PAO1
+175	PAO1
+176	PAO1
+177	PAO1
+178	PAO1
+179	PAO1
+180	PAO1
+181	PAO1
+182	PAO1
+183	PAO1
+184	PAO1
+185	PAO1
+186	PAO1
+187	PAO1
+188	PAO1
+189	PAO1
+190	PAO1
+191	PAO1
+192	PAO1
+193	PAO1
+194	PAO1
+195	PAO1
+196	PAO1
+197	PAO1
+198	PAO1
+199	PAO1
+200	PAO1
+201	PAO1
+202	PAO1
+203	PAO1
+204	PAO1
+205	PAO1
+206	PAO1
+207	PAO1
+208	PAO1
+209	PAO1
+210	PAO1
+211	PAO1
+212	PAO1
+213	PAO1
+214	PAO1
+215	PAO1
+216	PAO1
+217	PAO1
+218	PAO1
+219	PAO1
+220	PAO1
+221	PAO1
+222	PAO1
+223	PAO1
+224	PAO1
+225	PAO1
+226	PAO1
+227	PAO1
+228	PAO1
+229	PAO1
+230	PAO1
+231	PAO1
+232	PAO1
+233	PAO1
+234	PAO1
+235	PAO1
+236	PAO1
+237	PAO1
+238	PAO1
+239	PAO1
+240	PAO1
+241	PAO1
+242	PAO1
+243	PAO1
+244	PAO1
+245	PAO1
+246	PAO1
+247	PAO1
+248	PAO1
+249	PAO1
+250	PA14
+251	PA14
+252	PA14
+253	PA14
+254	PA14
+255	PA14
+256	PA14
+257	PA14
+258	PA14
+259	PA14
+260	PA14
+261	PA14
+262	PA14
+263	PA14
+264	PA14
+265	PA14
+266	PA14
+267	PA14
+268	PA14
+269	PA14
+270	PA14
+271	PA14
+272	PA14
+273	PA14
+274	PA14
+275	PA14
+276	PA14
+277	PA14
+278	PA14
+279	PA14
+280	PA14
+281	PA14
+282	PA14
+283	PA14
+284	PA14
+285	PA14
+286	PA14
+287	PA14
+288	PA14
+289	PA14
+290	PA14
+291	PA14
+292	PA14
+293	PA14
+294	PA14
+295	PA14
+296	PA14
+297	PA14
+298	PA14
+299	PA14
+300	PA14
+301	PA14
+302	PA14
+303	PA14
+304	PA14
+305	PA14
+306	PA14
+307	PA14
+308	PA14
+309	PA14
+310	PA14
+311	PA14
+312	PA14
+313	PA14
+314	PA14
+315	PA14
+316	PA14
+317	PA14
+318	PA14
+319	PA14
+320	PA14
+321	PA14
+322	PA14
+323	PA14
+324	PA14
+325	PA14
+326	PA14
+327	PA14
+328	PA14
+329	PA14
+330	PA14
+331	PA14
+332	PA14
+333	PA14
+334	PA14
+335	PA14
+336	PA14
+337	PA14
+338	PA14
+339	PA14
+340	PA14
+341	PA14
+342	PA14
+343	PA14
+344	PA14
+345	PA14
+346	PA14
+347	PA14
+348	PA14
+349	PA14
+350	PA14
+351	PA14
+352	PA14
+353	PA14
+354	PA14
+355	PA14
+356	PA14
+357	PA14
+358	PA14
+359	PA14
+360	PA14
+361	PA14
+362	PA14
+363	PA14
+364	PA14
+365	PA14
+366	PA14
+367	PA14
+368	PA14
+369	PA14
+370	PA14
+371	PA14
+372	PA14
+373	PA14
+374	PA14
+375	PA14
+376	PA14
+377	PA14
+378	PA14
+379	PA14
+380	PA14
+381	PA14
+382	PA14
+383	PA14
+384	PA14
+385	PA14
+386	PA14
+387	PA14
+388	PA14
+389	PA14
+390	PA14
+391	PA14
+392	PA14
+393	PA14
+394	PA14
+395	PA14
+396	PA14
+397	PA14
+398	PA14
+399	PA14
+400	PA14
+401	PA14
+402	PA14
+403	PA14
+404	PA14
+405	PA14
+406	PA14
+407	PA14
+408	PA14
+409	PA14
+410	PA14
+411	PA14
+412	PA14
+413	PA14
+414	PA14
+415	PA14
+416	PA14
+417	PA14
+418	PA14
+419	PA14
+420	PA14
+421	PA14
+422	PA14
+423	PA14
+424	PA14
+425	PA14
+426	PA14
+427	PA14
+428	PA14
+429	PA14
+430	PA14
+431	PA14
+432	PA14
+433	PA14
+434	PA14
+435	PA14
+436	PA14
+437	PA14
+438	PA14
+439	PA14
+440	PA14
+441	PA14
+442	PA14
+443	PA14
+444	PA14
+445	PA14
+446	PA14
+447	PA14
+448	PA14
+449	PA14
+450	PA14
+451	PA14
+452	PA14
+453	PA14
+454	PA14
+455	PA14
+456	PA14
+457	PA14
+458	PA14
+459	PA14
+460	PA14
+461	PA14
+462	PA14
+463	PA14
+464	PA14
+465	PA14
+466	PA14
+467	PA14
+468	PA14
+469	PA14
+470	PA14
+471	PA14
+472	PA14
+473	PA14
+474	PA14
+475	PA14
+476	PA14
+477	PA14
+478	PA14
+479	PA14
+480	PA14
+481	PA14
+482	PA14
+483	PA14
+484	PA14
+485	PA14
+486	PA14
+487	PA14
+488	PA14
+489	PA14
+490	PA14
+491	PA14
+492	PA14
+493	PA14
+494	PA14
+495	PA14
+496	PA14
+497	PA14
+498	PA14
+499	PA14
+500	NA
+501	NA
+502	NA
+503	NA
+504	NA
+505	NA
+506	NA
+507	NA
+508	NA
+509	NA
+510	NA
+511	NA
+512	NA
+513	NA
+514	NA
+515	NA
+516	NA
+517	NA
+518	NA
+519	NA
+520	NA
+521	NA
+522	NA
+523	NA
+524	NA
+525	NA
+526	NA
+527	NA
+528	NA
+529	NA
+530	NA
+531	NA
+532	NA
+533	NA
+534	NA
+535	NA
+536	NA
+537	NA
+538	NA
+539	NA
+540	NA
+541	NA
+542	NA
+543	NA
+544	NA
+545	NA
+546	NA
+547	NA
+548	NA
+549	NA
+550	NA
+551	NA
+552	NA
+553	NA
+554	NA
+555	NA
+556	NA
+557	NA
+558	NA
+559	NA
+560	NA
+561	NA
+562	NA
+563	NA
+564	NA
+565	NA
+566	NA
+567	NA
+568	NA
+569	NA
+570	NA
+571	NA
+572	NA
+573	NA
+574	NA
+575	NA
+576	NA
+577	NA
+578	NA
+579	NA
+580	NA
+581	NA
+582	NA
+583	NA
+584	NA
+585	NA
+586	NA
+587	NA
+588	NA
+589	NA
+590	NA
+591	NA
+592	NA
+593	NA
+594	NA
+595	NA
+596	NA
+597	NA
+598	NA
+599	NA
+600	NA
+601	NA
+602	NA
+603	NA
+604	NA
+605	NA
+606	NA
+607	NA
+608	NA
+609	NA
+610	NA
+611	NA
+612	NA
+613	NA
+614	NA
+615	NA
+616	NA
+617	NA
+618	NA
+619	NA
+620	NA
+621	NA
+622	NA
+623	NA
+624	NA
+625	NA
+626	NA
+627	NA
+628	NA
+629	NA
+630	NA
+631	NA
+632	NA
+633	NA
+634	NA
+635	NA
+636	NA
+637	NA
+638	NA
+639	NA
+640	NA
+641	NA
+642	NA
+643	NA
+644	NA
+645	NA
+646	NA
+647	NA
+648	NA
+649	NA
+650	NA
+651	NA
+652	NA
+653	NA
+654	NA
+655	NA
+656	NA
+657	NA
+658	NA
+659	NA
+660	NA
+661	NA
+662	NA
+663	NA
+664	NA
+665	NA
+666	NA
+667	NA
+668	NA
+669	NA
+670	NA
+671	NA
+672	NA
+673	NA
+674	NA
+675	NA
+676	NA
+677	NA
+678	NA
+679	NA
+680	NA
+681	NA
+682	NA
+683	NA
+684	NA
+685	NA
+686	NA
+687	NA
+688	NA
+689	NA
+690	NA
+691	NA
+692	NA
+693	NA
+694	NA
+695	NA
+696	NA
+697	NA
+698	NA
+699	NA
+700	NA
+701	NA
+702	NA
+703	NA
+704	NA
+705	NA
+706	NA
+707	NA
+708	NA
+709	NA
+710	NA
+711	NA
+712	NA
+713	NA
+714	NA
+715	NA
+716	NA
+717	NA
+718	NA
+719	NA
+720	NA
+721	NA
+722	NA
+723	NA
+724	NA
+725	NA
+726	NA
+727	NA
+728	NA
+729	NA
+730	NA
+731	NA
+732	NA
+733	NA
+734	NA
+735	NA
+736	NA
+737	NA
+738	NA
+739	NA
+740	NA
+741	NA
+742	NA
+743	NA
+744	NA
+745	NA
+746	NA
+747	NA
+748	NA
+749	NA
+750	CF sputum isolate
+751	CF sputum isolate
+752	CF sputum isolate
+753	CF sputum isolate
+754	CF sputum isolate
+755	CF sputum isolate
+756	CF sputum isolate
+757	CF sputum isolate
+758	CF sputum isolate
+759	CF sputum isolate
+760	CF sputum isolate
+761	CF sputum isolate
+762	CF sputum isolate
+763	CF sputum isolate
+764	CF sputum isolate
+765	CF sputum isolate
+766	CF sputum isolate
+767	CF sputum isolate
+768	CF sputum isolate
+769	CF sputum isolate
+770	CF sputum isolate
+771	CF sputum isolate
+772	CF sputum isolate
+773	CF sputum isolate
+774	CF sputum isolate
+775	CF sputum isolate
+776	CF sputum isolate
+777	CF sputum isolate
+778	CF sputum isolate
+779	CF sputum isolate
+780	CF sputum isolate
+781	CF sputum isolate
+782	CF sputum isolate
+783	CF sputum isolate
+784	CF sputum isolate
+785	CF sputum isolate
+786	CF sputum isolate
+787	CF sputum isolate
+788	CF sputum isolate
+789	CF sputum isolate
+790	CF sputum isolate
+791	CF sputum isolate
+792	CF sputum isolate
+793	CF sputum isolate
+794	CF sputum isolate
+795	CF sputum isolate
+796	CF sputum isolate
+797	CF sputum isolate
+798	CF sputum isolate
+799	CF sputum isolate
+800	CF sputum isolate
+801	CF sputum isolate
+802	CF sputum isolate
+803	CF sputum isolate
+804	CF sputum isolate
+805	CF sputum isolate
+806	CF sputum isolate
+807	CF sputum isolate
+808	CF sputum isolate
+809	CF sputum isolate
+810	CF sputum isolate
+811	CF sputum isolate
+812	CF sputum isolate
+813	CF sputum isolate
+814	CF sputum isolate
+815	CF sputum isolate
+816	CF sputum isolate
+817	CF sputum isolate
+818	CF sputum isolate
+819	CF sputum isolate
+820	CF sputum isolate
+821	CF sputum isolate
+822	CF sputum isolate
+823	CF sputum isolate
+824	CF sputum isolate
+825	CF sputum isolate
+826	CF sputum isolate
+827	CF sputum isolate
+828	CF sputum isolate
+829	CF sputum isolate
+830	CF sputum isolate
+831	CF sputum isolate
+832	CF sputum isolate
+833	CF sputum isolate
+834	CF sputum isolate
+835	CF sputum isolate
+836	CF sputum isolate
+837	CF sputum isolate
+838	CF sputum isolate
+839	CF sputum isolate
+840	CF sputum isolate
+841	CF sputum isolate
+842	CF sputum isolate
+843	CF sputum isolate
+844	CF sputum isolate
+845	CF sputum isolate
+846	CF sputum isolate
+847	CF sputum isolate
+848	CF sputum isolate
+849	CF sputum isolate
+850	CF sputum isolate
+851	CF sputum isolate
+852	CF sputum isolate
+853	CF sputum isolate
+854	CF sputum isolate
+855	CF sputum isolate
+856	CF sputum isolate
+857	CF sputum isolate
+858	CF sputum isolate
+859	CF sputum isolate
+860	CF sputum isolate
+861	CF sputum isolate
+862	CF sputum isolate
+863	CF sputum isolate
+864	CF sputum isolate
+865	CF sputum isolate
+866	CF sputum isolate
+867	CF sputum isolate
+868	CF sputum isolate
+869	CF sputum isolate
+870	CF sputum isolate
+871	CF sputum isolate
+872	CF sputum isolate
+873	CF sputum isolate
+874	CF sputum isolate
+875	CF sputum isolate
+876	CF sputum isolate
+877	CF sputum isolate
+878	CF sputum isolate
+879	CF sputum isolate
+880	CF sputum isolate
+881	CF sputum isolate
+882	CF sputum isolate
+883	CF sputum isolate
+884	CF sputum isolate
+885	CF sputum isolate
+886	CF sputum isolate
+887	CF sputum isolate
+888	CF sputum isolate
+889	CF sputum isolate
+890	CF sputum isolate
+891	CF sputum isolate
+892	CF sputum isolate
+893	CF sputum isolate
+894	CF sputum isolate
+895	CF sputum isolate
+896	CF sputum isolate
+897	CF sputum isolate
+898	CF sputum isolate
+899	CF sputum isolate
+900	CF sputum isolate
+901	CF sputum isolate
+902	CF sputum isolate
+903	CF sputum isolate
+904	CF sputum isolate
+905	CF sputum isolate
+906	CF sputum isolate
+907	CF sputum isolate
+908	CF sputum isolate
+909	CF sputum isolate
+910	CF sputum isolate
+911	CF sputum isolate
+912	CF sputum isolate
+913	CF sputum isolate
+914	CF sputum isolate
+915	CF sputum isolate
+916	CF sputum isolate
+917	CF sputum isolate
+918	CF sputum isolate
+919	CF sputum isolate
+920	CF sputum isolate
+921	CF sputum isolate
+922	CF sputum isolate
+923	CF sputum isolate
+924	CF sputum isolate
+925	CF sputum isolate
+926	CF sputum isolate
+927	CF sputum isolate
+928	CF sputum isolate
+929	CF sputum isolate
+930	CF sputum isolate
+931	CF sputum isolate
+932	CF sputum isolate
+933	CF sputum isolate
+934	CF sputum isolate
+935	CF sputum isolate
+936	CF sputum isolate
+937	CF sputum isolate
+938	CF sputum isolate
+939	CF sputum isolate
+940	CF sputum isolate
+941	CF sputum isolate
+942	CF sputum isolate
+943	CF sputum isolate
+944	CF sputum isolate
+945	CF sputum isolate
+946	CF sputum isolate
+947	CF sputum isolate
+948	CF sputum isolate
+949	CF sputum isolate
+950	CF sputum isolate
+951	CF sputum isolate
+952	CF sputum isolate
+953	CF sputum isolate
+954	CF sputum isolate
+955	CF sputum isolate
+956	CF sputum isolate
+957	CF sputum isolate
+958	CF sputum isolate
+959	CF sputum isolate
+960	CF sputum isolate
+961	CF sputum isolate
+962	CF sputum isolate
+963	CF sputum isolate
+964	CF sputum isolate
+965	CF sputum isolate
+966	CF sputum isolate
+967	CF sputum isolate
+968	CF sputum isolate
+969	CF sputum isolate
+970	CF sputum isolate
+971	CF sputum isolate
+972	CF sputum isolate
+973	CF sputum isolate
+974	CF sputum isolate
+975	CF sputum isolate
+976	CF sputum isolate
+977	CF sputum isolate
+978	CF sputum isolate
+979	CF sputum isolate
+980	CF sputum isolate
+981	CF sputum isolate
+982	CF sputum isolate
+983	CF sputum isolate
+984	CF sputum isolate
+985	CF sputum isolate
+986	CF sputum isolate
+987	CF sputum isolate
+988	CF sputum isolate
+989	CF sputum isolate
+990	CF sputum isolate
+991	CF sputum isolate
+992	CF sputum isolate
+993	CF sputum isolate
+994	CF sputum isolate
+995	CF sputum isolate
+996	CF sputum isolate
+997	CF sputum isolate
+998	CF sputum isolate
+999	CF sputum isolate
