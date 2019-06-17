@@ -25,6 +25,7 @@ import random
 import glob
 import umap
 import pickle
+from keras.models import model_from_json, load_model
 import warnings
 warnings.filterwarnings(action='once')
 
@@ -88,8 +89,51 @@ umap_model_file = umap_model_file = os.path.join(
     NN_architecture,
     "umap_model.pkl")
 
+encoded_data_file = glob.glob(os.path.join(
+    base_dir,
+    "data",
+    "encoded",
+    NN_architecture,
+    "*encoded.txt"))[0]
+
+model_encoder_file = glob.glob(os.path.join(
+    base_dir,
+    "models",
+    NN_architecture,
+    "*_encoder_model.h5"))[0]
+
+weights_encoder_file = glob.glob(os.path.join(
+    base_dir,
+    "models",
+    NN_architecture,
+    "*_encoder_weights.h5"))[0]
+
+model_decoder_file = glob.glob(os.path.join(
+    base_dir,
+    "models", 
+    NN_architecture,
+    "*_decoder_model.h5"))[0]
+
+
+weights_decoder_file = glob.glob(os.path.join(
+    base_dir,
+    "models",  
+    NN_architecture,
+    "*_decoder_weights.h5"))[0]
+
 
 # In[5]:
+
+
+# Read in VAE models
+loaded_model = load_model(model_encoder_file)
+loaded_decode_model = load_model(model_decoder_file)
+
+loaded_model.load_weights(weights_encoder_file)
+loaded_decode_model.load_weights(weights_decoder_file)
+
+
+# In[6]:
 
 
 # Read in UMAP model
@@ -98,7 +142,7 @@ umap_model = pickle.load(infile)
 infile.close()
 
 
-# In[6]:
+# In[7]:
 
 
 # Read in data
@@ -111,7 +155,7 @@ simulated_data = pd.read_table(
 simulated_data.head(10)
 
 
-# In[7]:
+# In[8]:
 
 
 # Read in metadata
@@ -124,14 +168,14 @@ metadata = pd.read_table(
 metadata.head(10)
 
 
-# In[8]:
+# In[9]:
 
 
 # Replace NaN with string "NA"
 metadata['metadata'] = metadata['metadata'].fillna('NA')
 
 
-# In[9]:
+# In[10]:
 
 
 # Add batch effects
@@ -193,7 +237,7 @@ for i in num_batches:
 
 # ## Plot batch data using UMAP
 
-# In[10]:
+# In[11]:
 
 
 # Plot generated data in UMAP 
@@ -223,6 +267,51 @@ for i in num_batches:
     
     # UMAP embedding of decoded batch data
     batch_data_UMAPencoded = umap_model.transform(batch_data_labeled.iloc[:,:-1])
+    batch_data_UMAPencoded_df = pd.DataFrame(data=batch_data_UMAPencoded,
+                                             index=batch_data_labeled.index,
+                                             columns=['1','2'])
+    batch_data_UMAPencoded_df['metadata'] = list(batch_data_labeled['metadata'])
+    
+        
+    g = ggplot(aes(x='1',y='2', color='metadata'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set1') +                 ggtitle("{} Batches".format(i))
+    
+    print(g)
+
+
+# ## Plot encoded batch data using UMAP
+
+# In[14]:
+
+
+# Plot generated data in UMAP 
+
+for i in num_batches:
+    batch_data_file = os.path.join(
+        base_dir,
+        "data",
+        "batch_simulated",
+        analysis_name,
+        "Batch_"+str(i)+".txt")
+    
+    batch_data = pd.read_table(
+        batch_data_file,
+        header=0,
+        sep='\t',
+        index_col=0)
+
+    # Encode data using VAE model
+    batch_data_encoded = loaded_model.predict_on_batch(batch_data)
+    batch_data_encoded_df = pd.DataFrame(batch_data_encoded, index=batch_data.index)
+
+    # Merge gene expression data and metadata
+    batch_data_labeled = batch_data_encoded_df.merge(
+        metadata,
+        left_index=True, 
+        right_index=True, 
+        how='inner')
+    
+    # UMAP embedding of decoded batch data
+    batch_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(batch_data_labeled.iloc[:,:-1])
     batch_data_UMAPencoded_df = pd.DataFrame(data=batch_data_UMAPencoded,
                                              index=batch_data_labeled.index,
                                              columns=['1','2'])
