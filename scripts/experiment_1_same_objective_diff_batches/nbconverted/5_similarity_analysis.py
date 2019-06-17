@@ -168,7 +168,7 @@ svcca_umap_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], ind
 svcca_umap_df
 
 
-# In[ ]:
+# In[7]:
 
 
 # Calculate Similarity using PCA projection of batched data
