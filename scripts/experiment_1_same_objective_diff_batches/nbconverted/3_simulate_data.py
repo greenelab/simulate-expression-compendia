@@ -132,7 +132,7 @@ umap_model_file = os.path.join(
     "umap_model.pkl")
 
 
-# In[ ]:
+# In[5]:
 
 
 # Read in VAE models
@@ -143,7 +143,7 @@ loaded_model.load_weights(weights_encoder_file)
 loaded_decode_model.load_weights(weights_decoder_file)
 
 
-# In[5]:
+# In[6]:
 
 
 # Read in UMAP model
@@ -152,7 +152,7 @@ model = pickle.load(infile)
 infile.close()
 
 
-# In[6]:
+# In[7]:
 
 
 # Read data
@@ -166,7 +166,7 @@ print(normalized_data.shape)
 normalized_data.head(10)
 
 
-# In[7]:
+# In[8]:
 
 
 # Read encoded data
@@ -180,7 +180,7 @@ print(encoded_data.shape)
 encoded_data.head(10)
 
 
-# In[8]:
+# In[9]:
 
 
 # Read in metadata
@@ -193,18 +193,19 @@ metadata = pd.read_table(
 metadata.head(10)
 
 
-# In[9]:
+# In[10]:
 
 
 # Replace NaN with string "NA"
 metadata[metadata_field] = metadata[metadata_field].fillna('NA')
 
 
-# In[10]:
+# In[11]:
 
 
 # Get possible values in metadata field
-grps = list(metadata[metadata_field].unique())
+#grps = list(metadata[metadata_field].unique())  #Want a specific signal, test if this works
+grps = ['PAO1', 'PA14']
 print(grps)
 
 
@@ -212,7 +213,7 @@ print(grps)
 # 
 # Generate new simulated data by sampling from the distribution of latent space features.  In other words, for each latent space feature get the mean and standard deviation.  Then we can generate a new sample by sampling from a distribution with this mean and standard deviation.
 
-# In[11]:
+# In[12]:
 
 
 # Encode into latent space
@@ -220,7 +221,7 @@ data_encoded = loaded_model.predict_on_batch(normalized_data)
 data_encoded_df = pd.DataFrame(data_encoded, index=normalized_data.index)
 
 
-# In[12]:
+# In[13]:
 
 
 # Merge encoded gene expression data and metadata
@@ -234,7 +235,7 @@ print(data_encoded_labeled.shape)
 data_encoded_labeled.head(5)
 
 
-# In[13]:
+# In[14]:
 
 
 # Init variables
@@ -278,7 +279,7 @@ print(new_data.shape)
 new_data.head(10)
 
 
-# In[14]:
+# In[15]:
 
 
 # Create labels for new data
@@ -287,7 +288,7 @@ new_metadata = pd.DataFrame(grps_series.repeat(num_samples_per_grp), columns=['m
 new_metadata.index = new_data.index
 
 
-# In[15]:
+# In[16]:
 
 
 # Merge gene expression data and metadata
@@ -305,7 +306,7 @@ new_data_labeled.head(5)
 # 
 # Note: we will use the same UMAP mapping for the input and simulated data to ensure they are plotted on the same space.
 
-# In[16]:
+# In[17]:
 
 
 # UMAP embedding
@@ -320,7 +321,7 @@ g = ggplot(aes(x='1',y='2', color='metadata'), data=simulated_data_UMAP_df) +   
 print(g)
 
 
-# In[17]:
+# In[18]:
 
 
 # Output
