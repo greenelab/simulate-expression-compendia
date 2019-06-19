@@ -42,6 +42,7 @@ seed(randomState)
 # Parameters
 analysis_name = 'experiment_1'
 NN_architecture = 'NN_2500_20'
+num_PCs = 5
 num_simulations = 10
 num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
@@ -278,9 +279,9 @@ for i in num_batches:
     print(g)
 
 
-# ## Plot encoded batch data using UMAP
+# ## Plot VAE encoded batch data using UMAP
 
-# In[14]:
+# In[12]:
 
 
 # Plot generated data in UMAP 
@@ -319,6 +320,63 @@ for i in num_batches:
     
         
     g = ggplot(aes(x='1',y='2', color='metadata'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set1') +                 ggtitle("{} Batches".format(i))
+    
+    print(g)
+
+
+# ## Plot PCA encoded batched data using PCs
+
+# In[13]:
+
+
+# Plot generated data in UMAP 
+
+for i in num_batches:
+    batch_data_file = os.path.join(
+        base_dir,
+        "data",
+        "batch_simulated",
+        analysis_name,
+        "Batch_"+str(i)+".txt")
+    
+    batch_data = pd.read_table(
+        batch_data_file,
+        header=0,
+        sep='\t',
+        index_col=0)
+
+    # PCA projection
+    pca = PCA(n_components=num_PCs)
+
+    # Use trained model to encode expression data into SAME latent space
+    batch_data_PCAencoded = pca.fit_transform(batch_data)
+    
+    
+    # Select pairwise PC's to plot
+    pc1 = 0
+    pc2 = 1
+    
+    # Encode data using PCA model
+    batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded[:,[pc1,pc2]],
+                                         index=batch_data.index,
+                                         columns=[str(pc1), str(pc2)])
+
+    # Merge gene expression data and metadata
+    batch_data_labeled = batch_data_PCAencoded_df.merge(
+        metadata,
+        left_index=True, 
+        right_index=True, 
+        how='inner')
+    
+    # UMAP embedding of decoded batch data
+    #batch_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(batch_data_labeled.iloc[:,:-1])
+    #batch_data_UMAPencoded_df = pd.DataFrame(data=batch_data_UMAPencoded,
+    #                                         index=batch_data_labeled.index,
+    #                                         columns=['1','2'])
+    #batch_data_UMAPencoded_df['metadata'] = list(batch_data_labeled['metadata'])
+    
+        
+    g = ggplot(aes(x=str(pc1),y=str(pc2), color='metadata'), data=batch_data_labeled) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set1') +                 ggtitle("{} Batches".format(i))
     
     print(g)
 
