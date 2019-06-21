@@ -25,6 +25,7 @@ import random
 import glob
 import umap
 import pickle
+import seaborn as sns
 import warnings
 warnings.filterwarnings(action='once')
 
@@ -39,8 +40,9 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'experiment_test'
-NN_architecture = 'NN_300_2'
+analysis_name = 'experiment_0'
+NN_architecture = 'NN_2500_20'
+num_PCs = 10
 num_simulations = 10
 num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
@@ -169,6 +171,7 @@ for i in num_batches:
 # In[8]:
 
 
+"""
 # Plot generated data 
 
 for i in num_batches:
@@ -192,18 +195,20 @@ for i in num_batches:
                                              columns=['1','2'])
     
         
-    g = ggplot(aes(x='1',y='2'), data=batch_data_UMAPencoded_df) +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set2') +                 ggtitle("{} Batches".format(i))
+    g = ggplot(aes(x='1',y='2'), data=batch_data_UMAPencoded_df) + \
+                geom_point(alpha=0.5) + \
+                scale_color_brewer(type='qual', palette='Set2') + \
+                ggtitle("{} Batches".format(i))
     
-    print(g)
+    print(g)"""
 
 
 # ## Plot batch data using PCA
 
-# In[ ]:
+# In[9]:
 
 
 # Plot generated data 
-
 for i in num_batches:
     batch_data_file = os.path.join(
         base_dir,
@@ -217,19 +222,33 @@ for i in num_batches:
         header=0,
         sep='\t',
         index_col=0)
+    
+    print("Batch {}".format(i+1))
 
-    # PCA projection
-    num_PCs = 2
+    # PCA projection    
     pca = PCA(n_components=num_PCs)
-
-    # Use trained model to encode expression data into SAME latent space
     batch_data_PCAencoded = pca.fit_transform(batch_data)
     
-    
+    # Encode data using PCA model    
     batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded,
-                                         index=batch_data.index,
-                                         columns=['1', '2'])
+                                         index=batch_data.index
+                                         )
     
-    g = ggplot(aes(x='1',y='2'), data=batch_data_PCAencoded_df)  +                 geom_point(alpha=0.5) +                 scale_color_brewer(type='qual', palette='Set2') +                 ggtitle("{} Batches".format(i))
+    sns.pairplot(batch_data_PCAencoded_df)
+    """
+    # Select pairwise PC's to plot
+    pc1 = 0
+    pc2 = 2
+    
+    # Encode data using PCA model    
+    batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded[:,[pc1,pc2]],
+                                         index=batch_data.index,
+                                         columns=['PC {}'.format(pc1), 'PC {}'.format(pc2)])
+    
+    g = ggplot(aes(x='PC {}'.format(pc1),y='PC {}'.format(pc2)), data=batch_data_PCAencoded_df)  + \
+                geom_point(alpha=0.5) + \
+                scale_color_brewer(type='qual', palette='Set2') + \
+                ggtitle("{} Batches".format(i))
     print(g)
+    """
 

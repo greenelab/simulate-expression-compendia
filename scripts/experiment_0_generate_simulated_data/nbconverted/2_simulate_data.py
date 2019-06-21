@@ -38,9 +38,9 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'experiment_test'
-NN_architecture = 'NN_300_2'
-num_simulated_samples = 10
+analysis_name = 'experiment_0'
+NN_architecture = 'NN_2500_20'
+num_simulated_samples = 1000
 
 
 # In[3]:

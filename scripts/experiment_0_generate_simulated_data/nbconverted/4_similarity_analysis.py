@@ -39,8 +39,9 @@ seed(randomState)
 
 
 # Parameters
-analysis_name = 'full_dataset'
-NN_architecture = 'NN_2500_10'
+analysis_name = 'experiment_0'
+NN_architecture = 'NN_2500_20'
+num_PCs = 10
 #num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
 num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
@@ -49,14 +50,16 @@ num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
 
 
 # Load data
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+
 batch_dir = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "data",
     "batch_simulated",
     analysis_name)
 
 umap_model_file = umap_model_file = os.path.join(
-    os.path.dirname(os.getcwd()),
+    base_dir,
     "models",  
     NN_architecture,
     "umap_model.pkl")
@@ -72,59 +75,6 @@ infile.close()
 
 
 # In[5]:
-
-
-# Calculate Similarity using UMAP representation of batched data
-
-output_list = []
-
-for i in num_batches:
-    print('Calculating SVCCA score for 1 batch vs {} batches..'.format(i))
-    if i ==1:
-        batch_data_file = os.path.join(
-            batch_dir,
-            "Batch_"+str(i)+".txt")
-
-        batch_data = pd.read_table(
-            batch_data_file,
-            header=0,
-            sep='\t',
-            index_col=0)
-
-        # UMAP embedding of decoded batch data
-        original_data_UMAPencoded = umap_model.transform(batch_data)
-        original_data_UMAPencoded_df = pd.DataFrame(data=original_data_UMAPencoded,
-                                                 index=batch_data.index,
-                                                 columns=['1','2'])
-    batch_file = os.path.join(
-        batch_dir,
-        "Batch_"+str(i)+".txt")
-
-    batch_data = pd.read_table(
-        batch_data_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-
-    # UMAP embedding of decoded batch data
-    batch_data_UMAPencoded = umap.UMAP().fit_transform(batch_data)
-    batch_data_UMAPencoded_df = pd.DataFrame(data=batch_data_UMAPencoded,
-                                             index=batch_data.index,
-                                             columns=['1','2'])
-
-    # SVCCA
-    svcca_results = cca_core.get_cca_similarity(original_data_UMAPencoded_df.T,
-                                          batch_data_UMAPencoded_df.T,
-                                          verbose=False)
-    
-    output_list.append(np.mean(svcca_results["cca_coef1"]))
-
-# Convert output to pandas dataframe
-svcca_umap_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
-svcca_umap_df
-
-
-# In[6]:
 
 
 # Calculate Similarity using PCA projection of batched data
@@ -145,7 +95,6 @@ for i in num_batches:
             index_col=0)
 
         # PCA projection
-        num_PCs = 2
         pca = PCA(n_components=num_PCs)
 
         # Use trained model to encode expression data into SAME latent space
@@ -153,8 +102,8 @@ for i in num_batches:
 
 
         original_data_PCAencoded_df = pd.DataFrame(original_data_PCAencoded,
-                                             index=batch_data.index,
-                                             columns=['1', '2'])
+                                             index=batch_data.index
+                                             )
     
     # All batches
     batch_file = os.path.join(
@@ -167,17 +116,13 @@ for i in num_batches:
         sep='\t',
         index_col=0)
 
-    # PCA projection
-    num_PCs = 2
-    pca = PCA(n_components=num_PCs)
-
     # Use trained model to encode expression data into SAME latent space
     batch_data_PCAencoded = pca.fit_transform(batch_data)
     
     
     batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded,
-                                         index=batch_data.index,
-                                         columns=['1', '2'])
+                                         index=batch_data.index
+                                         )
 
     # SVCCA
     svcca_results = cca_core.get_cca_similarity(original_data_PCAencoded_df.T,
