@@ -39,7 +39,7 @@ seed(randomState)
 
 # Parameters
 analysis_name = 'experiment_0'
-NN_architecture = 'NN_2500_20'
+NN_architecture = 'NN_2500_30'
 num_simulated_samples = 1000
 
 
@@ -190,7 +190,7 @@ data_decoded = loaded_decode_model.predict_on_batch(data_encoded_df)
 data_decoded_df = pd.DataFrame(data_decoded, index=data_encoded_df)
 
 # Plot
-data_decoded_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(data_decoded_df)
+data_decoded_UMAPencoded = model.transform(data_decoded_df)
 data_decoded_UMAPencoded_df = pd.DataFrame(data=data_decoded_UMAPencoded,
                                          index=data_decoded_df.index,
                                          columns=['1','2'])
