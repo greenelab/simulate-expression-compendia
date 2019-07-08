@@ -40,7 +40,7 @@ seed(randomState)
 # Parameters
 analysis_name = 'experiment_0'
 NN_architecture = 'NN_2500_30'
-num_simulated_samples = 1000
+num_simulated_samples = 6000
 
 
 # In[3]:

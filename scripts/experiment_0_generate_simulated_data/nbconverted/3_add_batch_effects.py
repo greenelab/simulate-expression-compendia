@@ -41,10 +41,11 @@ seed(randomState)
 
 # Parameters
 analysis_name = 'experiment_0'
-NN_architecture = 'NN_2500_20'
-num_PCs = 10
+NN_architecture = 'NN_2500_30'
+num_PCs = 100
 num_simulations = 10
-num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800]
+num_batches = [1,2,5,10,20,50,100,500,1000,2000,3000,6000]
+#num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800,1000,2000,3000,4000,5000,6000]
 
 
 # In[3]:
@@ -97,7 +98,7 @@ infile.close()
 # In[6]:
 
 
-# Read in metadata
+# Read in data
 simulated_data = pd.read_table(
     simulated_data_file,
     header=0, 
@@ -114,7 +115,7 @@ simulated_data.head(10)
 # ADD MULTIPLE SIMULATION RUNS
 num_simulated_samples = simulated_data.shape[0]
 num_genes = simulated_data.shape[1]
-subset_genes_to_change = np.random.RandomState(randomState).choice([0, 1], size=(num_genes), p=[1./3, 2./3])
+subset_genes_to_change = np.random.RandomState(randomState).choice([0, 1], size=(num_genes), p=[3./4, 1./4])
     
 for i in num_batches:
     print('Creating simulated data with {} batches..'.format(i))
@@ -135,7 +136,7 @@ for i in num_batches:
         batch_data_df = pd.DataFrame()
         for j in range(i):
             
-            stretch_factor = np.random.uniform(0,1)
+            stretch_factor = np.random.uniform(1.0,1.5)
             
             # Randomly select samples
             batch_df = simulated_data.sample(n=num_samples_per_batch, frac=None, replace=False)
@@ -151,6 +152,8 @@ for i in num_batches:
             offset_vector = pd.DataFrame(subset_genes_to_change_tile*stretch_factor)
             offset_vector.columns = offset_vector.columns.astype(str)
             batch_df = batch_df + offset_vector
+            
+            #batch_df = batch_df*stretch_factor
 
             # if any exceed 1 then set to 1 since gene expression is normalized
             batch_df[batch_df>=1.0] = 1.0
@@ -208,7 +211,9 @@ for i in num_batches:
 # In[9]:
 
 
+
 # Plot generated data 
+
 for i in num_batches:
     batch_data_file = os.path.join(
         base_dir,
@@ -223,8 +228,6 @@ for i in num_batches:
         sep='\t',
         index_col=0)
     
-    print("Batch {}".format(i+1))
-
     # PCA projection    
     pca = PCA(n_components=num_PCs)
     batch_data_PCAencoded = pca.fit_transform(batch_data)
@@ -234,8 +237,10 @@ for i in num_batches:
                                          index=batch_data.index
                                          )
     
-    sns.pairplot(batch_data_PCAencoded_df)
-    """
+    g = sns.pairplot(batch_data_PCAencoded_df)
+    g.fig.suptitle("Batch {}".format(i))
+    
+"""    
     # Select pairwise PC's to plot
     pc1 = 0
     pc2 = 2
