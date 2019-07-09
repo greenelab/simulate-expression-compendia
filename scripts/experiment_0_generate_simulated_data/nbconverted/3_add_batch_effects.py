@@ -211,7 +211,6 @@ for i in num_batches:
 # In[9]:
 
 
-
 # Plot generated data 
 
 for i in num_batches:

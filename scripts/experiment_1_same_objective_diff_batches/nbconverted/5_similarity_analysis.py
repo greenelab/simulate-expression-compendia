@@ -172,6 +172,7 @@ svcca_umap_df
 
 
 # Calculate Similarity using PCA projection of batched data
+# FIX COMPARISON
 
 output_list = []
 
@@ -204,7 +205,7 @@ for i in num_batches:
         "Batch_"+str(i)+".txt")
 
     batch_data = pd.read_table(
-        batch_data_file,
+        batch_file,
         header=0,
         sep='\t',
         index_col=0)

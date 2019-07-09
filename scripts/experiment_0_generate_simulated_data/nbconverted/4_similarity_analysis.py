@@ -30,6 +30,7 @@ warnings.filterwarnings(action='once')
 from ggplot import *
 from functions import cca_core
 from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import CCA
 from numpy.random import seed
 randomState = 123
 seed(randomState)
@@ -95,10 +96,10 @@ simulated_data = pd.read_table(
 simulated_data.head(10)
 
 
+# ## Calculate Similarity using high dimensional (5K) batched data
+
 # In[6]:
 
-
-# Calculate Similarity using high dimensional batched data
 
 output_list = []
 
@@ -162,6 +163,9 @@ svcca_raw_df
 svcca_raw_df.plot()
 
 
+# ## Check positive control
+# We want to verify that SVCCA(input, input) = 1.  This does not seem to be the case, but I'm not sure why
+
 # In[8]:
 
 
@@ -201,7 +205,7 @@ batch_other.head(10)
 # In[10]:
 
 
-# Verify that batch 1 vs itself is 100% similar
+# Calculate SVCCA(batch_1, batch_1)
 svcca_results_batch1_itself = cca_core.get_cca_similarity(batch_1.T,
                                           batch_1.T,
                                           verbose=False)
@@ -211,17 +215,17 @@ np.mean(svcca_results_batch1_itself["cca_coef1"])
 # In[11]:
 
 
-# Verify that batch 1 vs itself is 100% similar
+# Caluclate SVCCA(batch_1, batch_1 variable)
 svcca_results_batch1_other = cca_core.get_cca_similarity(batch_1.T,
                                           batch_other.T,
                                           verbose=False)
 np.mean(svcca_results_batch1_other["cca_coef1"])
 
 
+# ## Calculate Similarity using PCA projection of batched data
+
 # In[24]:
 
-
-# Calculate Similarity using PCA projection of batched data
 
 output_list = []
 
@@ -240,7 +244,7 @@ for i in num_batches:
         index_col=0)
 
     # PCA projection
-    pca = PCA(n_components=1000)
+    pca = PCA(n_components=num_PCs)
 
     # Use trained model to encode expression data into SAME latent space
     original_data_PCAencoded = pca.fit_transform(batch_1)
@@ -295,11 +299,11 @@ svcca_pca_df
 svcca_pca_df.plot()
 
 
+# ## Manually compute similarity by applying CCA to PC batched data
+
 # In[18]:
 
 
-# Manually compute similarity by applying CCA to PCs
-from sklearn.cross_decomposition import CCA
 cca = CCA(n_components=1)
 
 output_list = []
@@ -319,7 +323,7 @@ for i in num_batches:
         index_col=0)
 
     # PCA projection
-    pca = PCA(n_components=1000)
+    pca = PCA(n_components=num_PCs)
 
     # Use trained model to encode expression data into SAME latent space
     original_data_PCAencoded = pca.fit_transform(batch_1)
@@ -371,11 +375,4 @@ pca_cca_df
 
 # Plot
 pca_cca_df.plot()
-
-
-# In[ ]:
-
-
-# svcca of original vs original 
-# Is there an issue with the VAE generated simulated data?
 
