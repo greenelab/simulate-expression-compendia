@@ -134,13 +134,18 @@ for i in num_batches:
         
     else:  
         batch_data_df = pd.DataFrame()
+        
+        simulated_data_draw = simulated_data
         for j in range(i):
-            
             stretch_factor = np.random.uniform(1.0,1.5)
             
             # Randomly select samples
-            batch_df = simulated_data.sample(n=num_samples_per_batch, frac=None, replace=False)
+            batch_df = simulated_data_draw.sample(n=num_samples_per_batch, frac=None, replace=False)
             batch_df.columns = batch_df.columns.astype(str)
+            
+            # Update df to remove selected samples
+            sampled_ids = list(batch_df.index)
+            simulated_data_draw = simulated_data_draw.drop(sampled_ids)
 
             # Add batch effect
             subset_genes_to_change_tile = pd.DataFrame(
@@ -171,7 +176,7 @@ for i in num_batches:
 
 # ## Plot batch data using UMAP
 
-# In[8]:
+# In[ ]:
 
 
 """
@@ -208,9 +213,10 @@ for i in num_batches:
 
 # ## Plot batch data using PCA
 
-# In[9]:
+# In[ ]:
 
 
+"""
 # Plot generated data 
 
 for i in num_batches:
@@ -238,8 +244,7 @@ for i in num_batches:
     
     g = sns.pairplot(batch_data_PCAencoded_df)
     g.fig.suptitle("Batch {}".format(i))
-    
-"""    
+       
     # Select pairwise PC's to plot
     pc1 = 0
     pc2 = 2
@@ -254,5 +259,6 @@ for i in num_batches:
                 scale_color_brewer(type='qual', palette='Set2') + \
                 ggtitle("{} Batches".format(i))
     print(g)
-    """
+
+"""
 
