@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Similarity analysis
@@ -18,6 +18,7 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 import os
+import ast
 import pandas as pd
 import numpy as np
 import random
@@ -39,16 +40,41 @@ seed(randomState)
 # In[2]:
 
 
-# Parameters
-analysis_name = 'experiment_0'
-NN_architecture = 'NN_2500_30'
-num_PCs = 100
-num_batches = [1,2,5,10,20,50,100,500,1000,2000,3000,6000]
-#num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,25,30,35,40,45,50]
-#num_batches = [1,2,3,4,5,6,7,8,9,10,15,20,50,100,500,800,1000]
+# Load config file
+config_file = os.path.join(
+    os.path.abspath(os.path.join(os.getcwd(),"../..")),
+    "data",
+    "metadata",
+    "config_exp_0.txt")
+
+d = {}
+float_params = ["learning_rate", "kappa", "epsilon_std"]
+str_params = ["analysis_name", "NN_architecture"]
+lst_params = ["num_batches"]
+with open(config_file) as f:
+    for line in f:
+        (name, val) = line.split()
+        if name in float_params:
+            d[name] = float(val)
+        elif name in str_params:
+            d[name] = str(val)
+        elif name in lst_params:
+            d[name] = ast.literal_eval(val)
+        else:
+            d[name] = int(val)
 
 
 # In[3]:
+
+
+# Parameters
+analysis_name = d["analysis_name"]
+NN_architecture = d["NN_architecture"]
+num_PCs = d["num_PCs"]
+num_batches = d["num_batches"]
+
+
+# In[4]:
 
 
 # Load data
@@ -74,7 +100,7 @@ umap_model_file = umap_model_file = os.path.join(
     "umap_model.pkl")
 
 
-# In[4]:
+# In[5]:
 
 
 # Read in UMAP model
@@ -83,7 +109,7 @@ umap_model = pickle.load(infile)
 infile.close()
 
 
-# In[5]:
+# In[9]:
 
 
 # Read in data
@@ -98,7 +124,7 @@ simulated_data.head(10)
 
 # ## Calculate Similarity using high dimensional (5K) batched data
 
-# In[6]:
+# In[7]:
 
 
 output_list = []
@@ -156,7 +182,7 @@ svcca_raw_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], inde
 svcca_raw_df
 
 
-# In[7]:
+# In[ ]:
 
 
 # Plot
@@ -166,7 +192,7 @@ svcca_raw_df.plot()
 # ## Check positive control
 # We want to verify that SVCCA(input, input) = 1.  This does not seem to be the case, but I'm not sure why
 
-# In[8]:
+# In[ ]:
 
 
 # Check datasets batch 1 and original are the same
@@ -184,7 +210,7 @@ batch_1 = pd.read_table(
 batch_1.head(10)
 
 
-# In[9]:
+# In[ ]:
 
 
 i = 1
@@ -202,7 +228,7 @@ batch_other = pd.read_table(
 batch_other.head(10)
 
 
-# In[10]:
+# In[ ]:
 
 
 # Calculate SVCCA(batch_1, batch_1)
@@ -212,7 +238,7 @@ svcca_results_batch1_itself = cca_core.get_cca_similarity(batch_1.T,
 np.mean(svcca_results_batch1_itself["cca_coef1"])
 
 
-# In[11]:
+# In[ ]:
 
 
 # Caluclate SVCCA(batch_1, batch_1 variable)
@@ -224,7 +250,7 @@ np.mean(svcca_results_batch1_other["cca_coef1"])
 
 # ## Calculate Similarity using PCA projection of batched data
 
-# In[24]:
+# In[ ]:
 
 
 output_list = []
@@ -292,7 +318,7 @@ svcca_pca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], inde
 svcca_pca_df
 
 
-# In[25]:
+# In[ ]:
 
 
 # Plot
@@ -301,7 +327,7 @@ svcca_pca_df.plot()
 
 # ## Manually compute similarity by applying CCA to PC batched data
 
-# In[18]:
+# In[ ]:
 
 
 cca = CCA(n_components=1)
@@ -370,7 +396,7 @@ pca_cca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=
 pca_cca_df
 
 
-# In[19]:
+# In[ ]:
 
 
 # Plot

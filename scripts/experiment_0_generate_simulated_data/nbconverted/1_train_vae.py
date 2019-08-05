@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Train VAE
@@ -10,6 +10,7 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 import os
+import ast
 import pandas as pd
 import numpy as np
 import random
@@ -52,6 +53,33 @@ for each_dir in base_dirs:
 # In[3]:
 
 
+# Load config params
+config_file = os.path.join(
+    os.path.abspath(os.path.join(os.getcwd(),"../..")),
+    "data",
+    "metadata",
+    "config_exp_0.txt")
+
+d = {}
+float_params = ["learning_rate", "kappa", "epsilon_std"]
+str_params = ["analysis_name", "NN_architecture"]
+lst_params = ["num_batches"]
+with open(config_file) as f:
+    for line in f:
+        (name, val) = line.split()
+        if name in float_params:
+            d[name] = float(val)
+        elif name in str_params:
+            d[name] = str(val)
+        elif name in lst_params:
+            d[name] = ast.literal_eval(val)
+        else:
+            d[name] = int(val)
+
+
+# In[4]:
+
+
 # Load arguments
 normalized_data_file = os.path.join(
     os.path.abspath(os.path.join(os.getcwd(),"../..")),
@@ -60,7 +88,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[4]:
+# In[5]:
 
 
 # Read data
@@ -73,22 +101,22 @@ normalized_data = pd.read_table(
 print(normalized_data.shape)
 
 
-# In[5]:
+# In[6]:
 
 
 # Parameters 
-learning_rate = 0.001
-batch_size = 100
-epochs = 100
-kappa = 0.01
-intermediate_dim = 300
-latent_dim = 2
-epsilon_std = 1.0
+learning_rate = d['learning_rate']
+batch_size = d['batch_size']
+epochs = d['epochs']
+kappa = d['kappa']
+intermediate_dim = d['intermediate_dim']
+latent_dim = d['latent_dim']
+epsilon_std = d['epsilon_std']
 num_PCs = latent_dim
 train_architecture = "NN_{}_{}".format(intermediate_dim, latent_dim)
 
 
-# In[6]:
+# In[7]:
 
 
 # Create output directories
@@ -111,7 +139,7 @@ for each_dir in output_dirs:
     os.makedirs(new_dir, exist_ok=True)
 
 
-# In[7]:
+# In[8]:
 
 
 # Train nonlinear (VAE)

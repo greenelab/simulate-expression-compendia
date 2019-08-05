@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Generate simulated data
@@ -18,6 +18,7 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 import os
+import ast
 import pandas as pd
 import numpy as np
 import random
@@ -34,13 +35,40 @@ randomState = 123
 seed(randomState)
 
 
+# In[ ]:
+
+
+# Load config file
+config_file = os.path.join(
+    os.path.abspath(os.path.join(os.getcwd(),"../..")),
+    "data",
+    "metadata",
+    "config_exp_0.txt")
+
+d = {}
+float_params = ["learning_rate", "kappa", "epsilon_std"]
+str_params = ["analysis_name", "NN_architecture"]
+lst_params = ["num_batches"]
+with open(config_file) as f:
+    for line in f:
+        (name, val) = line.split()
+        if name in float_params:
+            d[name] = float(val)
+        elif name in str_params:
+            d[name] = str(val)
+        elif name in lst_params:
+            d[name] = ast.literal_eval(val)
+        else:
+            d[name] = int(val)
+
+
 # In[2]:
 
 
 # Parameters
-analysis_name = 'experiment_0'
-NN_architecture = 'NN_2500_30'
-num_simulated_samples = 6000
+analysis_name = d["analysis_name"]
+NN_architecture = d["NN_architecture"]
+num_simulated_samples = d["num_simulated_samples"]
 
 
 # In[3]:
@@ -139,7 +167,7 @@ normalized_data.head(10)
 
 # ## Plot input data using UMAP
 
-# In[6]:
+# In[7]:
 
 
 # UMAP embedding
