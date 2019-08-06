@@ -290,5 +290,5 @@ print(g)
 
 
 # Output
-new_data_decoded_df.to_csv(simulated_data_file, sep='\t')
+new_data_decoded_df.to_csv(simulated_data_file, sep='\t', compression='xz')
 

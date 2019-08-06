@@ -197,7 +197,7 @@ for i in num_batches:
             np.random.shuffle(subset_genes_to_change)
             
         # Save
-        batch_data_df.to_csv(batch_file, sep='\t')
+        batch_data_df.to_csv(batch_file, sep='\t', compression='xz')
 
 
 # ## Plot batch data using UMAP
