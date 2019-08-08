@@ -3,7 +3,7 @@
 
 # # Generate simulated data
 # 
-# Generate simulated data by sampling from VAE latent sapce
+# Generate simulated data by sampling from VAE latent space
 # 
 # Workflow:
 # 1. Input gene expression data from 1 experiment (here we are assuming that there is only biological variation within this experiment)
@@ -28,7 +28,7 @@ from keras.models import model_from_json, load_model
 from ggplot import *
 import umap
 import warnings
-warnings.filterwarnings(action='once')
+warnings.filterwarnings(action='ignore')
 
 from numpy.random import seed
 randomState = 123
@@ -142,7 +142,7 @@ simulated_data_file = os.path.join(
     "data",
     "simulated",
     analysis_name,
-    "simulated_data.txt")
+    "simulated_data.txt.xz")
 
 umap_model_file = os.path.join(
     base_dir,

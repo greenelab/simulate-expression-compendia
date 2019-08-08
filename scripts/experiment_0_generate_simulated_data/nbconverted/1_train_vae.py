@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import random
 import warnings
-warnings.filterwarnings(action='once')
+warnings.filterwarnings(action='ignore')
 
 from functions import vae
 

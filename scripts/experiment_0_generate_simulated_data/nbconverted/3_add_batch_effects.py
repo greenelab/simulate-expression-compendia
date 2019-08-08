@@ -28,7 +28,7 @@ import umap
 import pickle
 import seaborn as sns
 import warnings
-warnings.filterwarnings(action='once')
+warnings.filterwarnings(action='ignore')
 
 from ggplot import *
 from sklearn.decomposition import PCA
@@ -37,7 +37,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[ ]:
+# In[2]:
 
 
 # Load config file
@@ -64,7 +64,7 @@ with open(config_file) as f:
             d[name] = int(val)
 
 
-# In[2]:
+# In[3]:
 
 
 # Parameters
@@ -74,7 +74,7 @@ num_PCs = d["num_PCs"]
 num_batches = d["num_batches"]
 
 
-# In[3]:
+# In[4]:
 
 
 # Create directories
@@ -94,7 +94,7 @@ else:
 os.makedirs(analysis_dir, exist_ok=True)
 
 
-# In[4]:
+# In[5]:
 
 
 # Load arguments
@@ -103,7 +103,7 @@ simulated_data_file = os.path.join(
     "data",
     "simulated",
     analysis_name,
-    "simulated_data.txt")
+    "simulated_data.txt.xz")
 
 umap_model_file = umap_model_file = os.path.join(
     base_dir,
@@ -112,7 +112,7 @@ umap_model_file = umap_model_file = os.path.join(
     "umap_model.pkl")
 
 
-# In[5]:
+# In[6]:
 
 
 # Read in UMAP model
@@ -121,7 +121,7 @@ umap_model = pickle.load(infile)
 infile.close()
 
 
-# In[6]:
+# In[7]:
 
 
 # Read in data
@@ -129,12 +129,13 @@ simulated_data = pd.read_table(
     simulated_data_file,
     header=0, 
     index_col=0,
+    compression='xz',
     sep='\t')
 
 simulated_data.head(10)
 
 
-# In[7]:
+# In[ ]:
 
 
 # Add batch effects
@@ -151,12 +152,12 @@ for i in num_batches:
             "data",
             "batch_simulated",
             analysis_name,
-            "Batch_"+str(i)+".txt")
+            "Batch_"+str(i)+".txt.xz")
     
     num_samples_per_batch = int(num_simulated_samples/i)
     
     if i == 1:        
-        simulated_data.to_csv(batch_file, sep='\t')
+        simulated_data.to_csv(batch_file, sep='\t', compression='xz')
         
     else:  
         batch_data_df = pd.DataFrame()
@@ -178,7 +179,8 @@ for i in num_batches:
                 pd.np.tile(
                     subset_genes_to_change,
                     (num_samples_per_batch, 1)),
-                index=batch_df.index)
+                index=batch_df.index,
+                columns=simulated_data.columns)
 
             offset_vector = pd.DataFrame(subset_genes_to_change_tile*stretch_factor)
             offset_vector.columns = offset_vector.columns.astype(str)
@@ -189,13 +191,12 @@ for i in num_batches:
             # if any exceed 1 then set to 1 since gene expression is normalized
             batch_df[batch_df>=1.0] = 1.0
 
-
             # Append batched together
             batch_data_df = batch_data_df.append(batch_df)
 
             # Select a new direction (i.e. a new subset of genes to change)
             np.random.shuffle(subset_genes_to_change)
-            
+        
         # Save
         batch_data_df.to_csv(batch_file, sep='\t', compression='xz')
 

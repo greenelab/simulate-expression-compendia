@@ -26,7 +26,7 @@ import glob
 import umap
 import pickle
 import warnings
-warnings.filterwarnings(action='once')
+warnings.filterwarnings(action='ignore')
 
 from ggplot import *
 from functions import cca_core
@@ -85,7 +85,7 @@ simulated_data_file = os.path.join(
     "data",
     "simulated",
     analysis_name,
-    "simulated_data.txt")
+    "simulated_data.txt.xz")
 
 batch_dir = os.path.join(
     base_dir,
@@ -109,7 +109,7 @@ umap_model = pickle.load(infile)
 infile.close()
 
 
-# In[9]:
+# In[6]:
 
 
 # Read in data
@@ -124,128 +124,29 @@ simulated_data.head(10)
 
 # ## Calculate Similarity using high dimensional (5K) batched data
 
-# In[7]:
+# In[13]:
 
 
-output_list = []
-
-for i in num_batches:
-    print('Calculating SVCCA score for 1 batch vs {} batches..'.format(i))
-    
-    # Get batch 1
-    batch_1_file = os.path.join(
-        batch_dir,
-        "Batch_1.txt")
-
-    batch_1 = pd.read_table(
-        batch_1_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-
-    # PCA projection
-    pca = PCA(n_components=num_PCs)
-
-    # Use trained model to encode expression data into SAME latent space
-    original_data_df =  batch_1
-    
-    # All batches
-    batch_other_file = os.path.join(
-        batch_dir,
-        "Batch_"+str(i)+".txt")
-
-    batch_other = pd.read_table(
-        batch_other_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-    
-    print("Using batch {}".format(i))
-    
-    # Use trained model to encode expression data into SAME latent space
-    batch_data_df =  batch_other
-    
-    # Check shape
-    if original_data_df.shape[0] != batch_data_df.shape[0]:
-        diff = original_data_df.shape[0] - batch_data_df.shape[0]
-        original_data_df = original_data_df.iloc[:-diff,:]
-    
-    # SVCCA
-    svcca_results = cca_core.get_cca_similarity(original_data_df.T,
-                                          batch_data_df.T,
-                                          verbose=False)
-    
-    output_list.append(np.mean(svcca_results["cca_coef1"]))
-
-# Convert output to pandas dataframe
-svcca_raw_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
-svcca_raw_df
+get_ipython().run_cell_magic('time', '', '# Calculate similarity using SVCCA\n\n# Store svcca scores\noutput_list = []\n\nfor i in num_batches:\n    print(\'Calculating SVCCA score for 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n\n    # Use trained model to encode expression data into SAME latent space\n    original_data_df =  batch_1\n    \n    # All batches\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    print("Using batch {}".format(i))\n    \n    # Use trained model to encode expression data into SAME latent space\n    batch_data_df =  batch_other\n    \n    # Check shape: ensure that the number of samples is the same between the two datasets\n    if original_data_df.shape[0] != batch_data_df.shape[0]:\n        diff = original_data_df.shape[0] - batch_data_df.shape[0]\n        original_data_df = original_data_df.iloc[:-diff,:]\n    \n    # SVCCA\n    svcca_results = cca_core.get_cca_similarity(original_data_df.T,\n                                          batch_data_df.T,\n                                          verbose=False)\n    \n    output_list.append(np.mean(svcca_results["cca_coef1"]))\n\n# Convert output to pandas dataframe\nsvcca_raw_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)\nsvcca_raw_df')
 
 
-# In[ ]:
+# In[8]:
+
+
+get_ipython().run_cell_magic('time', '', '# Permute simulated data\nshuffled_simulated_arr = []\nnum_samples = simulated_data.shape[0]\n\nfor i in range(num_samples):\n    row = list(simulated_data.values[i])\n    shuffled_simulated_row = random.sample(row, len(row))\n    shuffled_simulated_arr.append(shuffled_simulated_row)')
+
+
+# In[9]:
+
+
+get_ipython().run_cell_magic('time', '', '# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data.T,\n                                      shuffled_simulated_data.T,\n                                      verbose=False)\n\nprint(np.mean(svcca_results["cca_coef1"]))')
+
+
+# In[10]:
 
 
 # Plot
 svcca_raw_df.plot()
-
-
-# ## Check positive control
-# We want to verify that SVCCA(input, input) = 1.  This does not seem to be the case, but I'm not sure why
-
-# In[ ]:
-
-
-# Check datasets batch 1 and original are the same
-batch_1_file = os.path.join(
-    batch_dir,
-    "Batch_1.txt")
-print(batch_1_file)
-
-batch_1 = pd.read_table(
-    batch_1_file,
-    header=0,
-    sep='\t',
-    index_col=0)
-    
-batch_1.head(10)
-
-
-# In[ ]:
-
-
-i = 1
-batch_other_file = os.path.join(
-    batch_dir,
-    "Batch_"+str(i)+".txt")
-print(batch_other_file)
-
-batch_other = pd.read_table(
-    batch_other_file,
-    header=0,
-    sep='\t',
-    index_col=0)
-
-batch_other.head(10)
-
-
-# In[ ]:
-
-
-# Calculate SVCCA(batch_1, batch_1)
-svcca_results_batch1_itself = cca_core.get_cca_similarity(batch_1.T,
-                                          batch_1.T,
-                                          verbose=False)
-np.mean(svcca_results_batch1_itself["cca_coef1"])
-
-
-# In[ ]:
-
-
-# Caluclate SVCCA(batch_1, batch_1 variable)
-svcca_results_batch1_other = cca_core.get_cca_similarity(batch_1.T,
-                                          batch_other.T,
-                                          verbose=False)
-np.mean(svcca_results_batch1_other["cca_coef1"])
 
 
 # ## Calculate Similarity using PCA projection of batched data
@@ -253,6 +154,7 @@ np.mean(svcca_results_batch1_other["cca_coef1"])
 # In[ ]:
 
 
+"""
 output_list = []
 
 for i in num_batches:
@@ -316,13 +218,15 @@ for i in num_batches:
 # Convert output to pandas dataframe
 svcca_pca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
 svcca_pca_df
+"""
 
 
 # In[ ]:
 
 
+"""
 # Plot
-svcca_pca_df.plot()
+svcca_pca_df.plot()"""
 
 
 # ## Manually compute similarity by applying CCA to PC batched data
@@ -330,6 +234,7 @@ svcca_pca_df.plot()
 # In[ ]:
 
 
+"""
 cca = CCA(n_components=1)
 
 output_list = []
@@ -394,11 +299,13 @@ for i in num_batches:
 # Convert output to pandas dataframe
 pca_cca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
 pca_cca_df
+"""
 
 
 # In[ ]:
 
 
+"""
 # Plot
-pca_cca_df.plot()
+pca_cca_df.plot()"""
 
