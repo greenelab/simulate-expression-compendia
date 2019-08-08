@@ -23,8 +23,12 @@ Assist in designing experiments.
 
 # Experiments
 
-[Experiment_0](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_1_same_objective_diff_batches)  is an experiment to validate our approach.  Specifically we are checking:
+[Experiment_0](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_0)  is setting up the pipeline that follows the approach described above.  This experiment also examined different 2-layer VAE architectures and asked:
 
-1.  Does our simulated data represent realistic gene expression data?  By visual inspection between our original input data (Pa compendium) vs simulated data, the overall structure is maintained as seen in our [simulate_data.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_0_generate_simulated_data/2_simulate_data.ipynb)
-2.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect?  Does input dimensions affect the similarity calculation?  EXPLAIN MORE.
-3.  Is our defintion of batch effect accurate?  We want to make sure that our definition of batch effect reflects technical variations.  ADD CITATIONS AND EXPLAIN MORE.
+Does our simulated data represent realistic gene expression data?  By visual inspection between our original input data (Pa compendium) vs simulated data, the overall structure is maintained as seen in our [simulate_data.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_0/2_simulate_data.ipynb)
+
+[Experiment_1](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_1)is an experiment to validate SVCCA.  Specifically we are checking:
+
+1.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect?  
+2.  Does input dimensions affect the similarity calculation?
+
