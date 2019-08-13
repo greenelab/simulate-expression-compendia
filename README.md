@@ -29,6 +29,7 @@ Does our simulated data represent realistic gene expression data?  By visual ins
 
 [Experiment_1](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_1)is an experiment to validate SVCCA.  Specifically we are checking:
 
-1.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect?  
-2.  Does input dimensions affect the similarity calculation?
+1.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect? See [test_svcca_and_transformations.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/test_svcca_and_transformations.ipynb) 
+
+2.  Does input dimensions affect the similarity calculation? See [test_svcca_and_dimensionality.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/test_svcca_and_dimensionality.ipynb).  We also used the same set of scripts from Experiment 0 but modified the simulation script,[simulate_data_truncated.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/2_simulate_data_truncated.ipynb), in order to allow the user to subsample the number of genes from the simulated dataset and examine the SVCCA performance.  
 
