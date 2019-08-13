@@ -39,11 +39,7 @@ seed(randomState)
 
 
 # Load config file
-config_file = os.path.join(
-    os.path.abspath(os.path.join(os.getcwd(),"../..")),
-    "data",
-    "metadata",
-    "config_exp_0.txt")
+config_file = "config_exp_0.txt"
 
 d = {}
 float_params = ["learning_rate", "kappa", "epsilon_std"]
