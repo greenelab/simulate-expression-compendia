@@ -10,6 +10,7 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 import os
+import sys
 import ast
 import pandas as pd
 import numpy as np
@@ -17,6 +18,7 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
+sys.path.append("../functions")
 from functions import vae
 
 from numpy.random import seed
