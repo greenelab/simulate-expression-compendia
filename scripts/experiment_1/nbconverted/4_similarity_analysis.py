@@ -18,6 +18,7 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 import os
+import sys
 import ast
 import pandas as pd
 import numpy as np
@@ -28,10 +29,13 @@ import pickle
 import warnings
 warnings.filterwarnings(action='ignore')
 
-from ggplot import *
+sys.path.append("../functions")
 from functions import cca_core
+
+from ggplot import *
 from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import CCA
+
 from numpy.random import seed
 randomState = 123
 seed(randomState)
