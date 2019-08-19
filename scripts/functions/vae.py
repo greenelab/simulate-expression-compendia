@@ -37,20 +37,49 @@ def tybalt_2layer_model(
     """
     Train 2-layer Tybalt model using input dataset
 
-    Arguments:
-    -- learning_rate: step size used for gradient descent. In other words, its how quickly the  methods is learning
-    -- batch_size: Training is performed in batches. So this determines the number of samples to consider at a given time.
-    -- epochs: The number of times to train over the entire input dataset.
-    -- kappa: How fast to linearly ramp up KL loss 
-    -- intermediate_dim: Size of the hidden layer
-    -- latent_dim: Size of the bottleneck layer
-    -- epsilon_std: standard deviation of Normal distribution to sample latent space
-    -- rnaseq: dataframe of gene expression data
-    -- base_dir: parent directory where data/, scripts/, models/ are subdirectories
-    -- analysis_name: string that will be used to create a subdirectory where results and models will be stored
+    Arguments
+    ----------
+    learning_rate: float
+    	Step size used for gradient descent. In other words, it's how quickly the  methods is learning
+    
+    batch_size: int
+    	Training is performed in batches. So this determines the number of samples to consider at a given time.
+    
+    epochs: int
+    	The number of times to train over the entire input dataset.
+    
+    kappa: float
+    	How fast to linearly ramp up KL loss 
+    
+    intermediate_dim: int
+    	Size of the hidden layer
+    
+    latent_dim: int
+    	Size of the bottleneck layer
+    
+    epsilon_std: float
+    	Standard deviation of Normal distribution to sample latent space
+    
+    rnaseq: pandas.dataframe 
+    	Gene expression data
 
-    Output:
-        Encoding and decoding neural networks to use in downstream analysis
+    base_dir: str
+    	Parent directory where data/, scripts/, models/ are subdirectories
+    
+    analysis_name: str
+    	Name that will be used to create a subdirectory where results and models will be stored
+
+    Returns
+    --------
+    model_decoder_file, weights_decoder_file: .h5 file
+    	Files used to generate decoding neural networks to use in downstream analysis
+
+    model_encoder_file, weights_encoder_file: .h5 file
+    	Files used to generate encoding neural networks to use in downstream analysis
+
+    encoded_file: .txt file
+    	File containing input data encoded into latent space using encoder neural network
+    
     """
 
     # The below is necessary in Python 3.2.3 onwards to
@@ -304,19 +333,3 @@ def tybalt_2layer_model(
     weights = []
     for layer in decoder.layers:
         weights.append(layer.get_weights())
-
-    # Multiply hidden layers together to obtain a single representation of gene weights
-    #intermediate_weight_df = pd.DataFrame(weights[1][0])
-    #hidden_weight_df = pd.DataFrame(weights[1][2])
-    #abstracted_weight_df = intermediate_weight_df.dot(hidden_weight_df)
-
-    #abstracted_weight_df.index = range(0, latent_dim)
-    #abstracted_weight_df.columns = rnaseq.columns
-
-    # weight_file = os.path.join(
-     #   base_dir,
-     #   "data",
-     #   analysis_name,
-     #   "VAE_weight_matrix.txt")
-
-    #abstracted_weight_df.to_csv(weight_file, sep='\t')
