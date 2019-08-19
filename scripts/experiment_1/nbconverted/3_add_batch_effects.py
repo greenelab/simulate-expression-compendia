@@ -30,7 +30,6 @@ import seaborn as sns
 import warnings
 warnings.filterwarnings(action='ignore')
 
-from ggplot import *
 from sklearn.decomposition import PCA
 from numpy.random import seed
 randomState = 123
@@ -134,12 +133,12 @@ simulated_data.head(10)
 # In[8]:
 
 
-get_ipython().run_cell_magic('time', '', '# Add batch effects\nnum_simulated_samples = simulated_data.shape[0]\nnum_genes = simulated_data.shape[1]\nsubset_genes_to_change = np.random.RandomState(randomState).choice([0, 1], size=(num_genes), p=[3./4, 1./4])\n    \nfor i in num_batches:\n    print(\'Creating simulated data with {} batches..\'.format(i))\n    \n    batch_file = os.path.join(\n            base_dir,\n            "data",\n            "batch_simulated",\n            analysis_name,\n            "Batch_"+str(i)+".txt.xz")\n    \n    num_samples_per_batch = int(num_simulated_samples/i)\n    \n    if i == 1:        \n        simulated_data.to_csv(batch_file, sep=\'\\t\', compression=\'xz\')\n        \n    else:  \n        batch_data_df = pd.DataFrame()\n        \n        simulated_data_draw = simulated_data\n        for j in range(i):\n            stretch_factor = np.random.uniform(1.0,1.5)\n            \n            # Randomly select samples\n            batch_df = simulated_data_draw.sample(n=num_samples_per_batch, frac=None, replace=False)\n            batch_df.columns = batch_df.columns.astype(str)\n            \n            # Update df to remove selected samples\n            sampled_ids = list(batch_df.index)\n            simulated_data_draw = simulated_data_draw.drop(sampled_ids)\n\n            # Add batch effect\n            subset_genes_to_change_tile = pd.DataFrame(\n                pd.np.tile(\n                    subset_genes_to_change,\n                    (num_samples_per_batch, 1)),\n                index=batch_df.index,\n                columns=simulated_data.columns)\n\n            offset_vector = pd.DataFrame(subset_genes_to_change_tile*stretch_factor)\n            offset_vector.columns = offset_vector.columns.astype(str)\n            batch_df = batch_df + offset_vector\n            \n            #batch_df = batch_df*stretch_factor\n\n            # if any exceed 1 then set to 1 since gene expression is normalized\n            batch_df[batch_df>=1.0] = 1.0\n\n            # Append batched together\n            batch_data_df = batch_data_df.append(batch_df)\n\n            # Select a new direction (i.e. a new subset of genes to change)\n            np.random.shuffle(subset_genes_to_change)\n        \n        # Save\n        batch_data_df.to_csv(batch_file, sep=\'\\t\', compression=\'xz\')')
+get_ipython().run_cell_magic('time', '', '# Add batch effects\nnum_simulated_samples = simulated_data.shape[0]\nnum_genes = simulated_data.shape[1]\nsubset_genes_to_change = np.random.RandomState(randomState).choice([0, 1], size=(num_genes), p=[3./4, 1./4])\n    \nfor i in num_batches:\n    print(\'Creating simulated data with {} batches..\'.format(i))\n    \n    batch_file = os.path.join(\n            base_dir,\n            "data",\n            "batch_simulated",\n            analysis_name,\n            "Batch_"+str(i)+".txt.xz")\n    \n    num_samples_per_batch = int(num_simulated_samples/i)\n    \n    if i == 1:        \n        simulated_data.to_csv(batch_file, sep=\'\\t\', compression=\'xz\')\n        \n    else:  \n        batch_data_df = pd.DataFrame()\n        \n        simulated_data_draw = simulated_data\n        for j in range(i):            \n            # Randomly select samples\n            batch_df = simulated_data_draw.sample(n=num_samples_per_batch, frac=None, replace=False)\n            batch_df.columns = batch_df.columns.astype(str)\n            \n            # Update df to remove selected samples\n            sampled_ids = list(batch_df.index)\n            simulated_data_draw = simulated_data_draw.drop(sampled_ids)\n\n            # Add batch effect\n            \n            # Option 1: Add small amount to subset of genes\n            stretch_factor = np.random.uniform(0,0.5)\n            #stretch_factor = 0.0\n            subset_genes_to_change_tile = pd.DataFrame(\n                pd.np.tile(\n                    subset_genes_to_change,\n                    (num_samples_per_batch, 1)),\n                index=batch_df.index,\n                columns=simulated_data.columns)\n\n            offset_vector = pd.DataFrame(subset_genes_to_change_tile*stretch_factor)\n            offset_vector.columns = offset_vector.columns.astype(str)\n            \n            batch_df = batch_df + offset_vector\n            \n            # Option 2: Multiply all samples by small scale factor\n            #stretch_factor = np.random.uniform(1.0,1.5)\n            #batch_df = batch_df*stretch_factor\n\n            # if any exceed 1 then set to 1 since gene expression is normalized\n            batch_df[batch_df>=1.0] = 1.0\n\n            # Append batched together\n            batch_data_df = batch_data_df.append(batch_df)\n\n            # Select a new direction (i.e. a new subset of genes to change)\n            np.random.shuffle(subset_genes_to_change)\n            \n        # Save\n        batch_data_df.to_csv(batch_file, sep=\'\\t\', compression=\'xz\')')
 
 
 # ## Plot batch data using UMAP
 
-# In[9]:
+# In[12]:
 
 
 """
@@ -176,7 +175,7 @@ for i in num_batches:
 
 # ## Plot batch data using PCA
 
-# In[10]:
+# In[13]:
 
 
 """
