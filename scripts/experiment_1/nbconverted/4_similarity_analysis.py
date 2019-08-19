@@ -11,7 +11,7 @@
 # 
 # Briefly, SVCCA uses Singular Value Decomposition (SVD) to extract the components explaining 99% of the variation. This is done to remove potential dimensions described by noise. Next, SVCCA performs a Canonical Correlation Analysis (CCA) on the SVD matrices to identify maximum correlations of linear combinations of both input matrices. The algorithm will identify the canonical correlations of highest magnitude across and within algorithms of the same dimensionality.
 
-# In[2]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -30,11 +30,10 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 sys.path.append("../")
-from functions import cca_core
 
+from functions import cca_core
 from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import CCA
-
 from numpy.random import seed
 randomState = 123
 seed(randomState)
@@ -123,13 +122,13 @@ simulated_data.head(10)
 
 # ## Calculate Similarity using high dimensional (5K) batched data
 
-# In[7]:
+# In[ ]:
 
 
-get_ipython().run_cell_magic('time', '', '# Calculate similarity using SVCCA\n\n# Store svcca scores\noutput_list = []\n\nfor i in num_batches:\n    print(\'Calculating SVCCA score for 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n\n    # Use trained model to encode expression data into SAME latent space\n    original_data_df =  batch_1\n    \n    # All batches\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Use trained model to encode expression data into SAME latent space\n    batch_data_df =  batch_other\n    \n    # Check shape: ensure that the number of samples is the same between the two datasets\n    if original_data_df.shape[0] != batch_data_df.shape[0]:\n        diff = original_data_df.shape[0] - batch_data_df.shape[0]\n        original_data_df = original_data_df.iloc[:-diff,:]\n    \n    # SVCCA\n    svcca_results = cca_core.get_cca_similarity(original_data_df.T,\n                                          batch_data_df.T,\n                                          verbose=False)\n    \n    output_list.append(np.mean(svcca_results["cca_coef1"]))')
+get_ipython().run_cell_magic('time', '', '# Calculate similarity using SVCCA\n\n# Store svcca scores\noutput_list = []\n\nfor i in num_batches:\n    print(\'Calculating SVCCA score for 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n\n    # Use trained model to encode expression data into SAME latent space\n    original_data_df =  batch_1\n    \n    # All batches\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Use trained model to encode expression data into SAME latent space\n    batch_data_df =  batch_other\n    \n    # Samples need to be in the same order\n    batch_data_df = batch_data_df.sort_index()\n    \n    # Check shape: ensure that the number of samples is the same between the two datasets\n    if original_data_df.shape[0] != batch_data_df.shape[0]:\n        diff = original_data_df.shape[0] - batch_data_df.shape[0]\n        original_data_df = original_data_df.iloc[:-diff,:]\n    \n    # SVCCA\n    svcca_results = cca_core.get_cca_similarity(original_data_df.T,\n                                          batch_data_df.T,\n                                          verbose=False)\n    \n    output_list.append(np.mean(svcca_results["cca_coef1"]))')
 
 
-# In[8]:
+# In[ ]:
 
 
 # Convert output to pandas dataframe
@@ -137,7 +136,7 @@ svcca_raw_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], inde
 svcca_raw_df
 
 
-# In[9]:
+# In[ ]:
 
 
 # Permute simulated data
@@ -153,176 +152,15 @@ shuffled_simulated_data = pd.DataFrame(shuffled_simulated_arr, index=simulated_d
 shuffled_simulated_data.head()
 
 
-# In[10]:
+# In[ ]:
 
 
 get_ipython().run_cell_magic('time', '', '# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data.T,\n                                      shuffled_simulated_data.T,\n                                      verbose=False)\n\nprint(np.mean(svcca_results["cca_coef1"]))')
 
 
-# In[11]:
+# In[ ]:
 
 
 # Plot
 svcca_raw_df.plot()
-
-
-# ## Calculate Similarity using PCA projection of batched data
-
-# In[12]:
-
-
-"""
-output_list = []
-
-for i in num_batches:
-    print('Calculating SVCCA score for 1 batch vs {} batches..'.format(i))
-    
-    # Get batch 1
-    batch_1_file = os.path.join(
-        batch_dir,
-        "Batch_1.txt")
-
-    batch_1 = pd.read_table(
-        batch_1_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-
-    # PCA projection
-    pca = PCA(n_components=num_PCs)
-
-    # Use trained model to encode expression data into SAME latent space
-    original_data_PCAencoded = pca.fit_transform(batch_1)
-
-
-    original_data_PCAencoded_df = pd.DataFrame(original_data_PCAencoded,
-                                         index=batch_1.index
-                                         )
-    
-    # All batches
-    batch_other_file = os.path.join(
-        batch_dir,
-        "Batch_"+str(i)+".txt")
-
-    batch_other = pd.read_table(
-        batch_other_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-    
-    print("Using batch {}".format(i))
-    
-    # Use trained model to encode expression data into SAME latent space
-    batch_data_PCAencoded = pca.fit_transform(batch_other)
-    
-    
-    batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded,
-                                         index=batch_other.index
-                                         )
-        
-    # Check shape
-    if original_data_PCAencoded_df.shape[0] != batch_data_PCAencoded_df.shape[0]:
-        diff = original_data_PCAencoded_df.shape[0] - batch_data_PCAencoded_df.shape[0]
-        original_data_PCAencoded_df = original_data_PCAencoded_df.iloc[:-diff,:]
-    
-    # SVCCA
-    svcca_results = cca_core.get_cca_similarity(original_data_PCAencoded_df.T,
-                                          batch_data_PCAencoded_df.T,
-                                          verbose=False)
-    
-    output_list.append(np.mean(svcca_results["cca_coef1"]))
-
-# Convert output to pandas dataframe
-svcca_pca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
-svcca_pca_df
-"""
-
-
-# In[13]:
-
-
-"""
-# Plot
-svcca_pca_df.plot()"""
-
-
-# ## Manually compute similarity by applying CCA to PC batched data
-
-# In[14]:
-
-
-"""
-cca = CCA(n_components=1)
-
-output_list = []
-
-for i in num_batches:
-    print('Calculating SVCCA score for 1 batch vs {} batches..'.format(i))
-    
-    # Get batch 1
-    batch_1_file = os.path.join(
-        batch_dir,
-        "Batch_1.txt")
-
-    batch_1 = pd.read_table(
-        batch_1_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-
-    # PCA projection
-    pca = PCA(n_components=num_PCs)
-
-    # Use trained model to encode expression data into SAME latent space
-    original_data_PCAencoded = pca.fit_transform(batch_1)
-
-
-    original_data_PCAencoded_df = pd.DataFrame(original_data_PCAencoded,
-                                         index=batch_1.index
-                                         )
-    
-    # All batches
-    batch_other_file = os.path.join(
-        batch_dir,
-        "Batch_"+str(i)+".txt")
-
-    batch_other = pd.read_table(
-        batch_other_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-    
-    print("Using batch {}".format(i))
-    
-    # Use trained model to encode expression data into SAME latent space
-    batch_data_PCAencoded = pca.fit_transform(batch_other)
-    
-    
-    batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded,
-                                         index=batch_other.index
-                                         )
-        
-    # Check shape
-    if original_data_PCAencoded_df.shape[0] != batch_data_PCAencoded_df.shape[0]:
-        diff = original_data_PCAencoded_df.shape[0] - batch_data_PCAencoded_df.shape[0]
-        original_data_PCAencoded_df = original_data_PCAencoded_df.iloc[:-diff,:]
-    
-    # CCA
-    U_c, V_c = cca.fit_transform(original_data_PCAencoded_df, batch_data_PCAencoded_df)
-    result = np.corrcoef(U_c.T, V_c.T)[0,1]
-    
-    output_list.append(result)
-
-# Convert output to pandas dataframe
-pca_cca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
-pca_cca_df
-"""
-
-
-# In[15]:
-
-
-"""
-# Plot
-pca_cca_df.plot()"""
 
