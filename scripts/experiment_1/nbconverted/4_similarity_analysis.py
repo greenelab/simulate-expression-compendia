@@ -32,8 +32,7 @@ warnings.filterwarnings(action='ignore')
 sys.path.append("../")
 
 from functions import cca_core
-from sklearn.decomposition import PCA
-from sklearn.cross_decomposition import CCA
+from plotnine import *
 from numpy.random import seed
 randomState = 123
 seed(randomState)
@@ -155,12 +154,19 @@ shuffled_simulated_data.head()
 # In[ ]:
 
 
-get_ipython().run_cell_magic('time', '', '# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data.T,\n                                      shuffled_simulated_data.T,\n                                      verbose=False)\n\nprint(np.mean(svcca_results["cca_coef1"]))')
+get_ipython().run_cell_magic('time', '', '# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data.T,\n                                      shuffled_simulated_data.T,\n                                      verbose=False)\n\npermuted_svcca = np.mean(svcca_results["cca_coef1"])\nprint(permuted_svcca)')
 
 
 # In[ ]:
 
 
 # Plot
-svcca_raw_df.plot()
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_svcca,
+        (len(num_batches), 1)),
+    index=num_batches,
+    columns=['svcca'])
+
+ggplot(svcca_raw_df, aes(x=num_batches, y='svcca_mean_similarity'))     + geom_line()     + geom_line(aes(x=num_batches, y='svcca'), threshold, linetype='dashed')     + xlab('Number of Batch Effects')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
 
