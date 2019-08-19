@@ -29,10 +29,9 @@ import pickle
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../functions")
+sys.path.append("../")
 from functions import cca_core
 
-from ggplot import *
 from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import CCA
 from numpy.random import seed

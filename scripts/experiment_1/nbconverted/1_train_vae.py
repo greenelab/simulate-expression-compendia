@@ -3,7 +3,7 @@
 
 # # Train VAE
 
-# In[1]:
+# In[2]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -18,7 +18,7 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../functions")
+sys.path.append("../")
 from functions import vae
 
 from numpy.random import seed

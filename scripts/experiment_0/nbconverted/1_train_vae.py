@@ -18,7 +18,7 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../functions")
+sys.path.append("../")
 from functions import vae
 
 from numpy.random import seed
