@@ -10,6 +10,7 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 import os
+import sys
 import ast
 import pandas as pd
 import numpy as np
@@ -17,6 +18,7 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
+sys.path.append("../")
 from functions import vae
 
 from numpy.random import seed
@@ -54,11 +56,7 @@ for each_dir in base_dirs:
 
 
 # Load config params
-config_file = os.path.join(
-    os.path.abspath(os.path.join(os.getcwd(),"../..")),
-    "data",
-    "metadata",
-    "config_exp_0.txt")
+config_file = "config_exp_0.txt"
 
 d = {}
 float_params = ["learning_rate", "kappa", "epsilon_std"]

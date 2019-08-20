@@ -3,3 +3,6 @@
 data/batch_simulated/experiment_/* filter=lfs diff=lfs merge=lfs -text
 data/simulated/experiment_/* filter=lfs diff=lfs merge=lfs -text
 *.xz filter=lfs diff=lfs merge=lfs -text
+data/batch_simulated/experiment_0 filter=lfs diff=lfs merge=lfs -text
+data/batch_simulated/experiment_1 filter=lfs diff=lfs merge=lfs -text
+data/batch_simulated/experiment_1/* filter=lfs diff=lfs merge=lfs -text

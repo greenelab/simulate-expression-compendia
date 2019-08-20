@@ -23,8 +23,27 @@ Assist in designing experiments.
 
 # Experiments
 
-[Experiment_0](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_1_same_objective_diff_batches)  is an experiment to validate our approach.  Specifically we are checking:
+[Experiment_0](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_0)  
 
-1.  Does our simulated data represent realistic gene expression data?  By visual inspection between our original input data (Pa compendium) vs simulated data, the overall structure is maintained as seen in our [simulate_data.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_0_generate_simulated_data/2_simulate_data.ipynb)
-2.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect?  Does input dimensions affect the similarity calculation?  EXPLAIN MORE.
-3.  Is our defintion of batch effect accurate?  We want to make sure that our definition of batch effect reflects technical variations.  ADD CITATIONS AND EXPLAIN MORE.
+**Goals:** 
+To setup the pipeline that follows the approach enumerated above.
+
+**Conclusions:**
+In order to validate our approach, we examined different 2-layer VAE architectures and asked: Does our simulated data represent realistic gene expression data?  By visual inspection between our original input data (Pa compendium) vs simulated data, the overall structure is maintained as seen in our [2_simulate_data.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_0/2_simulate_data.ipynb)
+
+[Experiment_1](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_1)
+
+**Goal:**
+To validate 1) SVCCA and 2) implementation of batch effects.  Specifically we are checking:
+
+1.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect? See [test_svcca_and_transformations.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/test_svcca_and_transformations.ipynb) 
+
+2.  Does input dimensions affect the similarity calculation? See [test_svcca_and_dimensionality.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/test_svcca_and_dimensionality.ipynb).  We also used the same set of scripts from Experiment 0 but modified the simulation script, [2_simulate_data_truncated.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/2_simulate_data_truncated.ipynb), in order to allow the user to subsample the number of genes from the simulated dataset and examine the SVCCA performance. 
+
+3.  We also tested different definitions of batch effects - mainly varying the strength of the batch effect.  In general, this translates to varying the ```stretch_factor``` variable to be large or small in [3_add_batch_effects.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/3_add_batch_effects.ipynb)
+
+**Conclusions:**
+1. Fewer input dimensions yields svcca score closer to 1 comparing dataset vs itself and a lower svcca score comparing dataset vs permuted dataset, as expected
+2. Similarity score approaches the negative control (svcca score comparing dataset vs permuted dataset), which would indicate that as we increase the number of batch effects added, we are getting closer to noise.  It doesn’t appear that our similarity score is detecting our biological signal.  
+
+
