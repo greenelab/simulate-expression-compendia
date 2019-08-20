@@ -138,7 +138,7 @@ get_ipython().run_cell_magic('time', '', '# Add batch effects\nnum_simulated_sam
 
 # ## Plot batch data using UMAP
 
-# In[12]:
+# In[9]:
 
 
 """
@@ -175,7 +175,7 @@ for i in num_batches:
 
 # ## Plot batch data using PCA
 
-# In[13]:
+# In[10]:
 
 
 """

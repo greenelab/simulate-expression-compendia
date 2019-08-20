@@ -121,13 +121,13 @@ simulated_data.head(10)
 
 # ## Calculate Similarity using high dimensional (5K) batched data
 
-# In[ ]:
+# In[7]:
 
 
 get_ipython().run_cell_magic('time', '', '# Calculate similarity using SVCCA\n\n# Store svcca scores\noutput_list = []\n\nfor i in num_batches:\n    print(\'Calculating SVCCA score for 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n\n    # Use trained model to encode expression data into SAME latent space\n    original_data_df =  batch_1\n    \n    # All batches\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Use trained model to encode expression data into SAME latent space\n    batch_data_df =  batch_other\n    \n    # Samples need to be in the same order\n    batch_data_df = batch_data_df.sort_index()\n    \n    # Check shape: ensure that the number of samples is the same between the two datasets\n    if original_data_df.shape[0] != batch_data_df.shape[0]:\n        diff = original_data_df.shape[0] - batch_data_df.shape[0]\n        original_data_df = original_data_df.iloc[:-diff,:]\n    \n    # SVCCA\n    svcca_results = cca_core.get_cca_similarity(original_data_df.T,\n                                          batch_data_df.T,\n                                          verbose=False)\n    \n    output_list.append(np.mean(svcca_results["cca_coef1"]))')
 
 
-# In[ ]:
+# In[8]:
 
 
 # Convert output to pandas dataframe
@@ -135,7 +135,7 @@ svcca_raw_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], inde
 svcca_raw_df
 
 
-# In[ ]:
+# In[9]:
 
 
 # Permute simulated data
@@ -151,13 +151,13 @@ shuffled_simulated_data = pd.DataFrame(shuffled_simulated_arr, index=simulated_d
 shuffled_simulated_data.head()
 
 
-# In[ ]:
+# In[10]:
 
 
 get_ipython().run_cell_magic('time', '', '# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data.T,\n                                      shuffled_simulated_data.T,\n                                      verbose=False)\n\npermuted_svcca = np.mean(svcca_results["cca_coef1"])\nprint(permuted_svcca)')
 
 
-# In[ ]:
+# In[11]:
 
 
 # Plot
@@ -169,4 +169,10 @@ threshold = pd.DataFrame(
     columns=['svcca'])
 
 ggplot(svcca_raw_df, aes(x=num_batches, y='svcca_mean_similarity'))     + geom_line()     + geom_line(aes(x=num_batches, y='svcca'), threshold, linetype='dashed')     + xlab('Number of Batch Effects')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
+
+
+# In[ ]:
+
+
+
 

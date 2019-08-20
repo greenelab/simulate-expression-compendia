@@ -3,7 +3,7 @@
 
 # # Train VAE
 
-# In[2]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -52,7 +52,7 @@ for each_dir in base_dirs:
     os.makedirs(each_dir, exist_ok=True)
 
 
-# In[10]:
+# In[3]:
 
 
 # Load config params

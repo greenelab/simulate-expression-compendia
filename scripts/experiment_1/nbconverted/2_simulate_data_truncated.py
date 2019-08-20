@@ -25,7 +25,7 @@ import random
 import glob
 import pickle
 from keras.models import model_from_json, load_model
-from ggplot import *
+from plotnine import *
 import umap
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -179,9 +179,7 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-g = ggplot(aes(x='1',y='2'), data=input_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             scale_x_continuous(limits=(-15,20)) +            scale_y_continuous(limits=(-15,15)) +             ggtitle("Input data")
-
-print(g)
+ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(alpha=0.5)     + scale_color_brewer(type='qual', palette='Set2')     + ggtitle('Input data')
 
 
 # ## Plot encoded input data using UMAP
@@ -200,9 +198,7 @@ latent_data_UMAPencoded_df = pd.DataFrame(data=latent_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-g = ggplot(aes(x='1',y='2'), data=latent_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Encoded input data")
-
-print(g)
+ggplot(latent_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(alpha=0.5)     + scale_color_brewer(type='qual', palette='Set2')     + ggtitle("Encoded input data")
 
 
 # ## Plot decoded input data using UMAP
@@ -212,7 +208,7 @@ print(g)
 
 # Decode data back into gene space
 data_decoded = loaded_decode_model.predict_on_batch(data_encoded_df)
-data_decoded_df = pd.DataFrame(data_decoded, index=data_encoded_df)
+data_decoded_df = pd.DataFrame(data_decoded, index=data_encoded_df.index)
 
 # Plot
 data_decoded_UMAPencoded = model.transform(data_decoded_df)
@@ -221,9 +217,7 @@ data_decoded_UMAPencoded_df = pd.DataFrame(data=data_decoded_UMAPencoded,
                                          columns=['1','2'])
 
 
-g = ggplot(aes(x='1',y='2'), data=data_decoded_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Decoded input data")
-
-print(g)
+ggplot(data_decoded_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(alpha=0.5)     + scale_color_brewer(type='qual', palette='Set2')     + ggtitle("Decoded input data")
 
 
 # ## Simulate data
@@ -286,9 +280,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-g = ggplot(aes(x='1',y='2'), data=simulated_data_UMAPencoded_df) +             geom_point(alpha=0.5) +             scale_color_brewer(type='qual', palette='Set2') +             ggtitle("Simulated data")
-
-print(g)
+ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(alpha=0.5)     + scale_color_brewer(type='qual', palette='Set2')     + ggtitle("Simulated data")
 
 
 # In[13]:
