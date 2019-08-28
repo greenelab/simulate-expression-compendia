@@ -54,8 +54,8 @@ To explore alternative similarity metrics including:
 1. Visualizing data on PCA dimensions.  See [4_similarity_analysis_viz.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_viz.ipynb) for details.
 2. Calculating CCA.  See [4_similarity_analysis_cca.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_cca.ipynb) for details.
 3. Procrustes analysis.  See [4_similarity_analysis_procrustes.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_procrustes.ipynb) for details.
-4. Calculating Hausdorff distance>  See [4_similarity_analysis_hausdorff.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_hausdorff.ipynb) for details.
+4. Calculating Hausdorff distance  See [4_similarity_analysis_hausdorff.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_hausdorff.ipynb) for details.
 
 This experiment also modified the definition of batch effects by,
-1. Varying the amount of genes that get shifted in each batch - see ```subset_genes_to_change``` in [3_add_batch_effects.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/3_add_batch_effects.ipynb).
+1. Shifting *all* genes using a gaussian distribution centered around 0 in order to shift gene expression in different directions as opposed to just one.  See [3_add_batch_effects.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/3_add_batch_effects.ipynb).
 2. Verifying (via print statments) that the the subset of genes selected to be changed a) vary **between** batches and b) that the first batch is shifted from the original simulated.
