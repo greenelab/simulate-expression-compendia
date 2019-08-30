@@ -81,25 +81,41 @@ batch_dir = os.path.join(
 get_ipython().run_cell_magic('time', '', '# Calculate disparity using Procrustes analysis\noutput_list = []\n\nfor i in num_batches:\n    print(\'Cacluating disparity of 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1 data\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n\n    # Simulated data with all samples in a single batch\n    original_data_df =  batch_1\n    \n    # Get data with additional batch effects added\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Simulated data with i batch effects\n    batch_data_df =  batch_other\n    \n    # Procrustes\n    mtx1, mtx2, disparity = procrustes(original_data_df, batch_data_df)\n    \n    output_list.append(disparity)')
 
 
-# In[ ]:
+# In[7]:
 
 
 # Permute simulated data
+simulated_data_file = os.path.join(
+    base_dir,
+    "data",
+    "simulated",
+    analysis_name,
+    "simulated_data.txt.xz")
+
+# Read in data
+simulated_data = pd.read_table(
+    simulated_data_file,
+    header=0, 
+    index_col=0,
+    sep='\t')
+
+simulated_data.head(10)
+
 shuffled_simulated_arr = []
-num_samples = batch_1.drop(['group']).shape[0]
+num_samples = simulated_data.shape[0]
 
 for i in range(num_samples):
-    row = list(batch_1.values[i])
+    row = list(simulated_data.values[i])
     shuffled_simulated_row = random.sample(row, len(row))
     shuffled_simulated_arr.append(shuffled_simulated_row)
 
 shuffled_simulated_data = pd.DataFrame(shuffled_simulated_arr, 
-                                       index=batch_1.index,
-                                       columns=batch_1.drop(['group']).columns)
+                                       index=simulated_data.index, 
+                                       columns=simulated_data.columns)
 shuffled_simulated_data.head()
 
 
-# In[ ]:
+# In[11]:
 
 
 # Procrustes analysis of permuted dataset (Negative control)
@@ -112,8 +128,10 @@ threshold = pd.DataFrame(
     index=num_batches,
     columns=['disparity'])
 
+permuted_disparity
 
-# In[7]:
+
+# In[9]:
 
 
 # Plot
@@ -122,4 +140,13 @@ disparity_per_batch_effect = pd.DataFrame({'num_batch_effects':num_batches,
                                     })
 
 ggplot(disparity_per_batch_effect, aes(x='num_batch_effects', y='disparity'))     + geom_line()     + geom_line(aes(x=num_batches, y='disparity'), threshold, linetype='dashed')     + xlab('Number of Batch Effects')     + ylab('Disparity (mean squared difference)')     + ggtitle('Difference across increasing batch effects')
+
+
+# In[12]:
+
+
+# Print disparity scores
+disparity_per_batch_effect = pd.DataFrame(data={'disparity': output_list},
+                                     index=num_batches)
+disparity_per_batch_effect
 

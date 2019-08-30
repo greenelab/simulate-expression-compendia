@@ -31,6 +31,7 @@ warnings.filterwarnings(action='ignore')
 
 sys.path.append("../")
 
+from sklearn.decomposition import PCA
 from functions import cca_core
 from plotnine import *
 from numpy.random import seed
@@ -119,20 +120,20 @@ simulated_data = pd.read_table(
 simulated_data.head(10)
 
 
-# ## Calculate Similarity using high dimensional (5K) batched data
+# ## Calculate Similarity using PCA projection of batched data
 
 # In[7]:
 
 
-get_ipython().run_cell_magic('time', '', '# Calculate similarity using SVCCA\n\n# Store svcca scores\noutput_list = []\n\nfor i in num_batches:\n    print(\'Calculating SVCCA score for 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n\n    # Use trained model to encode expression data into SAME latent space\n    original_data_df =  batch_1\n    \n    # All batches\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Use trained model to encode expression data into SAME latent space\n    batch_data_df =  batch_other\n    \n    # Samples need to be in the same order\n    #batch_data_df = batch_data_df.sort_index()\n    \n    # Check shape: ensure that the number of samples is the same between the two datasets\n    if original_data_df.shape[0] != batch_data_df.shape[0]:\n        diff = original_data_df.shape[0] - batch_data_df.shape[0]\n        original_data_df = original_data_df.iloc[:-diff,:]\n    \n    # SVCCA\n    svcca_results = cca_core.get_cca_similarity(original_data_df.T,\n                                          batch_data_df.T,\n                                          verbose=False)\n    \n    output_list.append(np.mean(svcca_results["cca_coef1"]))')
+get_ipython().run_cell_magic('time', '', '# Calculate similarity using SVCCA\n\n# Store svcca scores\noutput_list = []\n\nfor i in num_batches:\n    print(\'Calculating SVCCA score for 1 batch vs {} batches..\'.format(i))\n    \n    # Get batch 1\n    batch_1_file = os.path.join(\n        batch_dir,\n        "Batch_1.txt.xz")\n\n    batch_1 = pd.read_table(\n        batch_1_file,\n        header=0,\n        sep=\'\\t\',\n        index_col=0)\n\n    # PCA projection\n    pca = PCA(n_components=num_PCs)\n\n    # Use trained model to encode expression data into SAME latent space\n    original_data_PCAencoded = pca.fit_transform(batch_1)\n\n\n    original_data_PCAencoded_df = pd.DataFrame(original_data_PCAencoded,\n                                         index=batch_1.index\n                                         )\n    \n    # All batches\n    batch_other_file = os.path.join(\n        batch_dir,\n        "Batch_"+str(i)+".txt.xz")\n\n    batch_other = pd.read_table(\n        batch_other_file,\n        header=0,\n        sep=\'\\t\',\n        index_col=0)\n    \n    print("Using batch {}".format(i))\n    \n    # Use trained model to encode expression data into SAME latent space\n    batch_data_PCAencoded = pca.fit_transform(batch_other)\n    \n    \n    batch_data_PCAencoded_df = pd.DataFrame(batch_data_PCAencoded,\n                                         index=batch_other.index\n                                         )\n        \n    # Check shape\n    if original_data_PCAencoded_df.shape[0] != batch_data_PCAencoded_df.shape[0]:\n        diff = original_data_PCAencoded_df.shape[0] - batch_data_PCAencoded_df.shape[0]\n        original_data_PCAencoded_df = original_data_PCAencoded_df.iloc[:-diff,:]\n    \n    # SVCCA\n    svcca_results = cca_core.get_cca_similarity(original_data_PCAencoded_df.T,\n                                          batch_data_PCAencoded_df.T,\n                                          verbose=False)\n    \n    output_list.append(np.mean(svcca_results["cca_coef1"]))')
 
 
 # In[8]:
 
 
 # Convert output to pandas dataframe
-svcca_raw_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
-svcca_raw_df
+svcca_pca_df = pd.DataFrame(output_list, columns=["svcca_mean_similarity"], index=num_batches)
+svcca_pca_df
 
 
 # In[9]:
@@ -144,7 +145,7 @@ get_ipython().run_cell_magic('time', '', '# Permute simulated data\nshuffled_sim
 # In[10]:
 
 
-get_ipython().run_cell_magic('time', '', '# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data.T,\n                                      shuffled_simulated_data.T,\n                                      verbose=False)\n\npermuted_svcca = np.mean(svcca_results["cca_coef1"])\nprint(permuted_svcca)')
+get_ipython().run_cell_magic('time', '', '# PCA\nsimulated_data_PCAencoded = pca.fit_transform(simulated_data)\n\n\nsimulated_data_PCAencoded_df = pd.DataFrame(simulated_data_PCAencoded,\n                                     index=simulated_data.index\n                                     )\n\nshuffled_data_PCAencoded = pca.fit_transform(shuffled_simulated_data)\n\n\nshuffled_data_PCAencoded_df = pd.DataFrame(shuffled_data_PCAencoded,\n                                     index=shuffled_simulated_data.index\n                                     )\n \n# SVCCA\nsvcca_results = cca_core.get_cca_similarity(simulated_data_PCAencoded_df.T,\n                                      shuffled_data_PCAencoded_df.T,\n                                      verbose=False)\n\npermuted_svcca = np.mean(svcca_results["cca_coef1"])\nprint(permuted_svcca)')
 
 
 # In[11]:
@@ -158,5 +159,11 @@ threshold = pd.DataFrame(
     index=num_batches,
     columns=['svcca'])
 
-ggplot(svcca_raw_df, aes(x=num_batches, y='svcca_mean_similarity'))     + geom_line()     + geom_line(aes(x=num_batches, y='svcca'), threshold, linetype='dashed')     + xlab('Number of Batch Effects')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
+ggplot(svcca_pca_df, aes(x=num_batches, y='svcca_mean_similarity'))     + geom_line()     + geom_line(aes(x=num_batches, y='svcca'), threshold, linetype='dashed')     + xlab('Number of Batch Effects')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
+
+
+# In[ ]:
+
+
+
 
