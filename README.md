@@ -47,3 +47,16 @@ To validate 1) SVCCA and 2) implementation of batch effects.  Specifically we ar
 2. Similarity score approaches the negative control (svcca score comparing dataset vs permuted dataset), which would indicate that as we increase the number of batch effects added, we are getting closer to noise.  It doesn’t appear that our similarity score is detecting our biological signal.  
 
 
+[Experiment_2](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_2)
+
+**Goal:**
+To explore alternative similarity metrics including:
+1. Visualizing data on PCA dimensions.  See [4_similarity_analysis_viz.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_viz.ipynb) for details.
+2. Calculating CCA.  See [4_similarity_analysis_cca.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_cca.ipynb) for details.
+3. Procrustes analysis.  See [4_similarity_analysis_procrustes.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_procrustes.ipynb) for details.
+4. Calculating Hausdorff distance  See [4_similarity_analysis_hausdorff.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_hausdorff.ipynb) for details.
+
+This experiment also modified the definition of batch effects by,
+1. Shifting *all* genes using a vector of values sampled from a gaussian distribution centered around 0.  We want to shift gene expression in different directions as opposed to just one.  See [3_add_batch_effects.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/3_add_batch_effects.ipynb).
+2. Embedding our high dimensional gene expression data into PCA space and using this compressed representation to calculate similarity.  See [4_similarity_analysis_pca_svcca.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_pca_svcca.ipynb).
+3. Verifying (via print statments) that the the subset of genes selected to be changed a) vary **between** batches and b) that the first batch is shifted from the original simulated.

@@ -1,0 +1,13 @@
+learning_rate	0.001
+batch_size	100
+epochs	100
+kappa	0.01
+intermediate_dim	2500
+latent_dim	30
+epsilon_std	1.0
+analysis_name	experiment_2
+NN_architecture	NN_2500_30
+num_simulated_samples	2000
+num_PCs	10
+num_batches	[1,2,3,5,10,20,50,100,500,1000]
+num_dims	1000
