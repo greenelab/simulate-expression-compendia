@@ -23,10 +23,7 @@ randomState = 123
 
 def simulate_data(
         normalized_data_file,
-        model_encoder_file,
-        weights_encoder_file,
-        model_decoder_file,
-        weights_decoder_file,
+        NN_architecture,
         analysis_name,
         num_simulated_samples,
         num_dims
@@ -48,20 +45,23 @@ def simulate_data(
     normalized_data_file: str
         File containing normalized gene expression data
 
-    model_decoder_file, weights_decoder_file: str
-        Files containing encoder and decoderneural networks
+        ------------------------------| PA0001 | PA0002 |...
+        05_PA14000-4-2_5-10-07_S2.CEL | 0.8533 | 0.7252 |...
+        54375-4-05.CEL				  | 0.7789 | 0.7678 |...
+        ...							  |	...	   | ...    |...
 
-    model_encoder_file, weights_encoder_file: str
-        Files containing weights associated with encoder and decoder neural networks
+    NN_architecture: str
+        Name of neural network architecture to use.  
+        Format 'NN_<intermediate layer>_<latent layer>'
 
     analysis_name: str
-        Name of analysis. Format 'analysis_<int'
+        Name of analysis. Format 'analysis_<int>'
 
     number_simulated_samples: int
         Number of samples to simulate
 
     number_dims: int
-        Number of geature dimensions (i.e. genes) to use
+        Number of feature dimensions (i.e. genes) to use
         * This will be removed in the future but wanted
         to keep parameters the same as previous runs to 
         verify scripts
@@ -87,6 +87,24 @@ def simulate_data(
     os.makedirs(analysis_dir, exist_ok=True)
 
     print('\n')
+
+    # Files
+    NN_dir = base_dir + "/models/" + NN_architecture
+    model_encoder_file = glob.glob(os.path.join(
+        NN_dir,
+        "*_encoder_model.h5"))[0]
+
+    weights_encoder_file = glob.glob(os.path.join(
+        NN_dir,
+        "*_encoder_weights.h5"))[0]
+
+    model_decoder_file = glob.glob(os.path.join(
+        NN_dir,
+        "*_decoder_model.h5"))[0]
+
+    weights_decoder_file = glob.glob(os.path.join(
+        NN_dir,
+        "*_decoder_weights.h5"))[0]
 
     # Load saved models
     loaded_model = load_model(model_encoder_file)
@@ -307,11 +325,10 @@ def add_experiments(
             # Shuffle indices
             np.random.shuffle(simulated_ind)
 
+            # Partition indices to batch
+            partition = np.array_split(simulated_ind, i)
+
             for j in range(i):
-
-                # Partition indices to batch
-                partition = np.array_split(simulated_ind, i)
-
                 # Scalar to shift gene expressiond data
                 stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
 

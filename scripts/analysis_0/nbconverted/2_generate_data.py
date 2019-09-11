@@ -58,31 +58,6 @@ normalized_data_file = os.path.join(
     "input",
     "train_set_normalized.pcl")
 
-model_encoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models",
-    NN_architecture,
-    "*_encoder_model.h5"))[0]
-
-weights_encoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models",
-    NN_architecture,
-    "*_encoder_weights.h5"))[0]
-
-model_decoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models", 
-    NN_architecture,
-    "*_decoder_model.h5"))[0]
-
-
-weights_decoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models",  
-    NN_architecture,
-    "*_decoder_weights.h5"))[0]
-
 
 # ### Generate simulated data
 
@@ -91,10 +66,7 @@ weights_decoder_file = glob.glob(os.path.join(
 
 # Generate simulated data
 generate_data.simulate_data(normalized_data_file,
-                            model_encoder_file,
-                            weights_encoder_file,
-                            model_decoder_file,
-                            weights_decoder_file,
+                            NN_architecture,
                             analysis_name,
                             num_simulated_samples,
                             num_dims
@@ -138,7 +110,7 @@ permuted_simulated_data_file = os.path.join(
 
 # ### Add number of experiments to simulated data
 
-# In[10]:
+# In[8]:
 
 
 # Add batch effects
@@ -150,7 +122,7 @@ generate_data.add_experiments(simulated_data_file,
 
 # ### Calculate similarity
 
-# In[12]:
+# In[9]:
 
 
 # Calculate similarity
@@ -163,7 +135,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[14]:
+# In[10]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -174,13 +146,13 @@ similarity_score_df.index.name = 'number of batches'
 similarity_score_df
 
 
-# In[15]:
+# In[11]:
 
 
 permuted_score
 
 
-# In[17]:
+# In[12]:
 
 
 # Plot

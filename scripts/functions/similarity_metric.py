@@ -24,6 +24,70 @@ randomState = 123
 seed(randomState)
 
 
+def read_data(simulated_data_file,
+              permuted_simulated_data_file,
+              base_dir,
+              analysis_name):
+    """
+    Script used by all similarity metrics to:
+
+    1. Read in simulated, permuted data into data
+    2. Generate directory for simulated experiment data to be stored
+    3. Read in simulated data with a single experiment
+
+    Returns
+    --------
+    simulated_data: dataframe
+        Dataframe containing simulated gene expression data
+
+    shuffled_simulated_data: dataframe
+        Dataframe containing simulated gene expression data that has been permuted
+
+    experiment_dir: str
+        Directory path where simulated experiment data will be stored
+
+    experiment_1: dataframe
+        Dataframe containing simulated gene expression data from a single experiment
+
+    """
+
+    # Read in data
+    simulated_data = pd.read_table(
+        simulated_data_file,
+        header=0,
+        index_col=0,
+        sep='\t')
+
+    shuffled_simulated_data = pd.read_table(
+        permuted_simulated_data_file,
+        header=0,
+        index_col=0,
+        sep='\t')
+
+    # Experiment directory
+    experiment_dir = os.path.join(
+        base_dir,
+        "data",
+        "experiment_simulated",
+        analysis_name)
+
+    # Get experiment 1
+    experiment_1_file = os.path.join(
+        experiment_dir,
+        "Experiment_1.txt.xz")
+
+    experiment_1 = pd.read_table(
+        experiment_1_file,
+        header=0,
+        index_col=0,
+        sep='\t')
+
+    return [simulated_data,
+            shuffled_simulated_data,
+            experiment_dir,
+            experiment_1]
+
+
 def sim_svcca(simulated_data_file,
               permuted_simulated_data_file,
               num_experiments,
@@ -32,14 +96,20 @@ def sim_svcca(simulated_data_file,
               base_dir,
               analysis_name):
     '''
-    We want to determine if the different batch simulated data is able to capture the
+    We want to determine if adding multiple simulated experiments is able to capture the
     biological signal that is present in the original data:
-    How much of the real input data is captured in the simulated batch data?
+    How much of the simulated data with a single experiment is captured in the simulated data with multiple experiments?
 
-    In other words, we want to compare the representation of the real input data and the simulated batch data.
+    In other words, we want to compare the representation of the single simulated experiment and multiple simulated experiments.
+
+    Note: For the representation of the simulated data, users can choose to use:  
+    1. All genes
+    2. PCA representation with <num_PCs> dimensions
+
     We will use **SVCCA** to compare these two representations.
 
-    Here, we apply Singular Vector Canonical Correlation Analysis
+    How does it work?
+    Singular Vector Canonical Correlation Analysis
     [Raghu et al. 2017](https://arxiv.org/pdf/1706.05806.pdf) [(github)](https://github.com/google/svcca)
     to the UMAP and PCA representations of our batch 1 simulated dataset vs batch n simulated datasets.
     The output of the SVCCA analysis is the SVCCA mean similarity score. This single number can be interpreted
@@ -88,37 +158,10 @@ def sim_svcca(simulated_data_file,
 
     seed(randomState)
 
-    # Read in data
-    simulated_data = pd.read_table(
-        simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    shuffled_simulated_data = pd.read_table(
-        permuted_simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    # Experiment directory
-    experiment_dir = os.path.join(
-        base_dir,
-        "data",
-        "experiment_simulated",
-        analysis_name)
-
-    # Get experiment 1
-    experiment_1_file = os.path.join(
-        experiment_dir,
-        "Experiment_1.txt.xz")
-
-    experiment_1 = pd.read_table(
-        experiment_1_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
+    [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
+                                                                                        permuted_simulated_data_file,
+                                                                                        base_dir,
+                                                                                        analysis_name)
     output_list = []
 
     for i in num_experiments:
@@ -204,13 +247,17 @@ def sim_hausdorff(simulated_data_file,
                   base_dir,
                   analysis_name):
     '''
-    We want to determine if the different batch simulated data is able to capture the
-    biological signal that is present in the original data: How much of the real input
-    data is captured in the simulated batch data?
+    We want to determine if adding multiple simulated experiments is able to capture the
+    biological signal that is present in the original data:
+    How much of the simulated data with a single experiment is captured in the simulated data with multiple experiments?
 
-    In other words, we want to ask: “do these datasets have similar patterns”?
+    In other words, we want to compare the representation of the single simulated experiment and multiple simulated experiments.
 
-    To do this we will use Hausdorff distance.
+    Note: For the representation of the simulated data, users can choose to use:  
+    1. All genes
+    2. PCA representation with <num_PCs> dimensions
+
+    We will use **Hausdorff distance* to compare these two representations.
 
     How does it work?
     Informally, two sets are close in the Hausdorff distance if every point of either set
@@ -255,36 +302,10 @@ def sim_hausdorff(simulated_data_file,
 
     seed(randomState)
 
-    # Read in data
-    simulated_data = pd.read_table(
-        simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    shuffled_simulated_data = pd.read_table(
-        permuted_simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    # Experiment directory
-    experiment_dir = os.path.join(
-        base_dir,
-        "data",
-        "experiment_simulated",
-        analysis_name)
-
-    # Get experiment 1
-    experiment_1_file = os.path.join(
-        experiment_dir,
-        "Experiment_1.txt.xz")
-
-    experiment_1 = pd.read_table(
-        experiment_1_file,
-        header=0,
-        index_col=0,
-        sep='\t')
+    [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
+                                                                                        permuted_simulated_data_file,
+                                                                                        base_dir,
+                                                                                        analysis_name)
 
     output_list = []
 
@@ -359,13 +380,17 @@ def sim_procrustes(simulated_data_file,
                    base_dir,
                    analysis_name):
     '''
-    We want to determine if the different batch simulated data is able to capture
-    the biological signal that is present in the original data: How much of the real
-    input data is captured in the simulated batch data?
+    We want to determine if adding multiple simulated experiments is able to capture the
+    biological signal that is present in the original data:
+    How much of the simulated data with a single experiment is captured in the simulated data with multiple experiments?
 
-    In other words, we want to ask: “do these datasets have similar patterns”?
+    In other words, we want to compare the representation of the single simulated experiment and multiple simulated experiments.
 
-    To do this we will use a procrustes analysis.
+    Note: For the representation of the simulated data, users can choose to use:  
+    1. All genes
+    2. PCA representation with <num_PCs> dimensions
+
+    We will use **Procrustes analysis* to compare these two representations.
 
     How does it work? Given data1 and data2, procrustes manipulates data1 to transform it into data2
     through a series of rotations, shifts, scaling in order to minimize the sum of squares of the
@@ -409,36 +434,10 @@ def sim_procrustes(simulated_data_file,
 
     seed(randomState)
 
-    # Read in data
-    simulated_data = pd.read_table(
-        simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    shuffled_simulated_data = pd.read_table(
-        permuted_simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    # Experiment directory
-    experiment_dir = os.path.join(
-        base_dir,
-        "data",
-        "experiment_simulated",
-        analysis_name)
-
-    # Get experiment 1
-    experiment_1_file = os.path.join(
-        experiment_dir,
-        "Experiment_1.txt.xz")
-
-    experiment_1 = pd.read_table(
-        experiment_1_file,
-        header=0,
-        index_col=0,
-        sep='\t')
+    [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
+                                                                                        permuted_simulated_data_file,
+                                                                                        base_dir,
+                                                                                        analysis_name)
 
     output_list = []
 
@@ -513,13 +512,17 @@ def sim_cca(simulated_data_file,
             base_dir,
             analysis_name):
     '''
-    We want to determine if the different batch simulated data is able to capture
-    the biological signal that is present in the original data: How much of the real
-     input data is captured in the simulated batch data?
+    We want to determine if adding multiple simulated experiments is able to capture the
+    biological signal that is present in the original data:
+    How much of the simulated data with a single experiment is captured in the simulated data with multiple experiments?
 
-    In other words, we want to ask: “do these datasets have similar patterns”?
+    In other words, we want to compare the representation of the single simulated experiment and multiple simulated experiments.
 
-    To do this we will use CCA directly, as opposed to using SVCCA which uses
+    Note: For the representation of the simulated data, users can choose to use:  
+    1. All genes
+    2. PCA representation with <num_PCs> dimensions
+
+    We will use CCA directly, as opposed to using SVCCA which uses
     the numpy library to compute the individual matrix operations (i.e. dot product, inversions).
 
     How does CCA work? Let A and B be the two datasets we want to compare. CCA will find a set of
@@ -564,36 +567,10 @@ def sim_cca(simulated_data_file,
 
     seed(randomState)
 
-    # Read in data
-    simulated_data = pd.read_table(
-        simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    shuffled_simulated_data = pd.read_table(
-        permuted_simulated_data_file,
-        header=0,
-        index_col=0,
-        sep='\t')
-
-    # Experiment directory
-    experiment_dir = os.path.join(
-        base_dir,
-        "data",
-        "experiment_simulated",
-        analysis_name)
-
-    # Get experiment 1
-    experiment_1_file = os.path.join(
-        experiment_dir,
-        "Experiment_1.txt.xz")
-
-    experiment_1 = pd.read_table(
-        experiment_1_file,
-        header=0,
-        index_col=0,
-        sep='\t')
+    [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
+                                                                                        permuted_simulated_data_file,
+                                                                                        base_dir,
+                                                                                        analysis_name)
 
     output_list = []
 

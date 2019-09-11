@@ -50,6 +50,7 @@ lst_num_experiments = [1,2,5,10,20,50,100,500,1000,2000,3000,6000]
 
 # Load data
 base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+NN_dir = base_dir + "/models/" + NN_architecture
 
 normalized_data_file = os.path.join(
     base_dir,
@@ -58,28 +59,19 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 model_encoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models",
-    NN_architecture,
+    NN_dir,
     "*_encoder_model.h5"))[0]
 
 weights_encoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models",
-    NN_architecture,
+    NN_dir,
     "*_encoder_weights.h5"))[0]
 
 model_decoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models", 
-    NN_architecture,
+    NN_dir,
     "*_decoder_model.h5"))[0]
 
-
 weights_decoder_file = glob.glob(os.path.join(
-    base_dir,
-    "models",  
-    NN_architecture,
+    NN_dir,
     "*_decoder_weights.h5"))[0]
 
 experiment_dir = os.path.join(
