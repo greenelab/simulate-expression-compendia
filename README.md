@@ -1,62 +1,31 @@
-# Batch effects simulation
+# The impact of undesired technical variability on large-scale data compendia
 
-**Background:**
-In general, datasets tend to be processed in batches where subsets of samples are processed together.  When the data is processed in batches, each batch shares the same technical details such as the same technician, array platform, time of day, lab and study.  These factors are referred to as batch effects and introduce technical variation into the dataset that is separate from the biological variation in the data.  For example, say we were interested in identifying differentially expressed genes between disease versus normal samples.  However, we have gene expression measurements that were generated from two different lab technicians which can introduce variation between samples that are not due to disease state but rather slight differences in data handling between the two technicians.  We want to be able to normalize out this technical variation in the data in order to detect the variation that is due to disease versus normal.  
+**Motivation:**  
+Technical sources of variation in gene expression data commonly arise from differences in technicians, array platforms, sampling time or lab.  These variations distort biological signals in the data and can potentially cause misinterpretations.  In the last two decades, scientists working in different labs on different experiments have assayed millions of samples.  These experiments are being combined into compendia in order to gain a more systematic understanding of some biological processes.  
 
-**Question:**
-Batch effects are expected to obscure the biological signal that unsupervised analyses extract.  
+**Challenge:**
+As the scale of these compendia increase, it becomes crucial to determine how integrating multiple experiments will disrupt our ability to detect biological patterns.
 
-If we have a compendium comprised of a collection of gene expression experiments, would we want a small or large number of experiments?
-
-In other words, if we have a collection of gene expression data with technical noise that is experiment specific and biological signal that is more consistent, how are unsupervised learning approaches affected?  
-
-**Hypothesis:**
-Without any batches, the underlying signal is clear. With a few large batches, the batch effects are captured reducing the capacity of the model to extract biological features. With many batches, the underlying signal is again clearer.
-
-**Impact:**
-Assist in designing experiments.
+**Objective:**
+We sought to determine the extent to which underlying biological signal can be extracted in the presence of technical artifacts via simulation. 
 
 **Approach:**
-1. Use VAE to simulate realistic gene expression data
-2. Add different amounts and types of batch effects
-3. Compare the similarity between the input data and the batched data
+1. Train a multi-layer Variational Autoencoder (VAE) using [compendium](https://msystems.asm.org/content/1/1/e00025-15) of *P. aeruginosa* gene expression experiments from different labs measuring different biological processes
+2. Simulated gene expression from a compendium using the trained VAE
+3. Added variation to subsets of simulated samples in order to represent different numbers of experiments 
+4. Compared gene expression patterns from a compendium containing a single simulated experiment and the pattern from a compendium with multiple experiments using a canonical correlation analysis
+5. Correct for technical variation added using existing methods like [removeBatchEffect](https://rdrr.io/bioc/limma/man/removeBatchEffect.html) and re-calculate similarity in reference to single simulated experiment
 
-# Experiments
+# Analysis
 
-[Experiment_0](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_0)  
+[Analysis_0](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/analysis_0)  
 
 **Goals:** 
-To setup the pipeline that follows the approach enumerated above.
+To demonstrate proof-of-concept that:
+1. Simulating a compendium containing few experiments, it is difficult to detect the simulated signals of interest.  However, as the number of experiments increased, the simulated signals became more clear.
+2. We can correct for this added technical variation from having multiple experiments.
 
 **Conclusions:**
-In order to validate our approach, we examined different 2-layer VAE architectures and asked: Does our simulated data represent realistic gene expression data?  By visual inspection between our original input data (Pa compendium) vs simulated data, the overall structure is maintained as seen in our [2_simulate_data.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_0/2_simulate_data.ipynb)
+We generated gene expression data that represents a collection of different biological signals.  We then added variation to samples in order to represent different numbers of experiments.  We found that having 2-20 experiments confound our ability to extract our original biological signal.  However, interestingly, as the number of experiments grows to hundreds it becomes easier to discover the underlying biological patterns.  Our ability to extract biological signal is defined by our ability to retain the structure of the biological data -- in other words, is our representation of the simulated data with a single experiment similar to the representation with multiple experiments?  
 
-[Experiment_1](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_1)
-
-**Goal:**
-To validate 1) SVCCA and 2) implementation of batch effects.  Specifically we are checking:
-
-1.  Is our similarity metric, [SVCCA](https://arxiv.org/pdf/1706.05806.pdf), working as we expect? See [test_svcca_and_transformations.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/test_svcca_and_transformations.ipynb) 
-
-2.  Does input dimensions affect the similarity calculation? See [test_svcca_and_dimensionality.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/test_svcca_and_dimensionality.ipynb).  We also used the same set of scripts from Experiment 0 but modified the simulation script, [2_simulate_data_truncated.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/2_simulate_data_truncated.ipynb), in order to allow the user to subsample the number of genes from the simulated dataset and examine the SVCCA performance. 
-
-3.  We also tested different definitions of batch effects - mainly varying the strength of the batch effect.  In general, this translates to varying the ```stretch_factor``` variable to be large or small in [3_add_batch_effects.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_1/3_add_batch_effects.ipynb)
-
-**Conclusions:**
-1. Fewer input dimensions yields svcca score closer to 1 comparing dataset vs itself and a lower svcca score comparing dataset vs permuted dataset, as expected
-2. Similarity score approaches the negative control (svcca score comparing dataset vs permuted dataset), which would indicate that as we increase the number of batch effects added, we are getting closer to noise.  It doesn’t appear that our similarity score is detecting our biological signal.  
-
-
-[Experiment_2](https://github.com/ajlee21/Batch_effects_simulation/tree/master/scripts/experiment_2)
-
-**Goal:**
-To explore alternative similarity metrics including:
-1. Visualizing data on PCA dimensions.  See [4_similarity_analysis_viz.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_viz.ipynb) for details.
-2. Calculating CCA.  See [4_similarity_analysis_cca.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_cca.ipynb) for details.
-3. Procrustes analysis.  See [4_similarity_analysis_procrustes.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_procrustes.ipynb) for details.
-4. Calculating Hausdorff distance  See [4_similarity_analysis_hausdorff.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_hausdorff.ipynb) for details.
-
-This experiment also modified the definition of batch effects by,
-1. Shifting *all* genes using a vector of values sampled from a gaussian distribution centered around 0.  We want to shift gene expression in different directions as opposed to just one.  See [3_add_batch_effects.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/3_add_batch_effects.ipynb).
-2. Embedding our high dimensional gene expression data into PCA space and using this compressed representation to calculate similarity.  See [4_similarity_analysis_pca_svcca.ipynb](https://github.com/ajlee21/Batch_effects_simulation/blob/master/scripts/experiment_2/4_similarity_analysis_pca_svcca.ipynb).
-3. Verifying (via print statments) that the the subset of genes selected to be changed a) vary **between** batches and b) that the first batch is shifted from the original simulated.
+![Test Image 1](https://github.com/ajlee21/Batch_effects_simulation/tree/master/similarity_trend.png)
