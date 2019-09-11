@@ -28,4 +28,4 @@ To demonstrate proof-of-concept that:
 **Conclusions:**
 We generated gene expression data that represents a collection of different biological signals.  We then added variation to samples in order to represent different numbers of experiments.  We found that having 2-20 experiments confound our ability to extract our original biological signal.  However, interestingly, as the number of experiments grows to hundreds it becomes easier to discover the underlying biological patterns.  Our ability to extract biological signal is defined by our ability to retain the structure of the biological data -- in other words, is our representation of the simulated data with a single experiment similar to the representation with multiple experiments?  
 
-![Test Image 1](https://raw.githubusercontent.com/github.com/ajlee21/Batch_effects_simulation/tree/master/similarity_trend.png)
+![Test Image 1](https://raw.githubusercontent.com/github.com/greenelab/Batch_effects_simulation/master/similarity_trend.png)
