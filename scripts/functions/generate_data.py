@@ -25,8 +25,7 @@ def simulate_data(
         normalized_data_file,
         NN_architecture,
         analysis_name,
-        num_simulated_samples,
-        num_dims
+        num_simulated_samples
 ):
     '''
     Generate simulated data by sampling from VAE latent space. Then
@@ -59,12 +58,6 @@ def simulate_data(
 
     number_simulated_samples: int
         Number of samples to simulate
-
-    number_dims: int
-        Number of feature dimensions (i.e. genes) to use
-        * This will be removed in the future but wanted
-        to keep parameters the same as previous runs to 
-        verify scripts
 
     Returns
     --------
@@ -151,12 +144,8 @@ def simulate_data(
     new_data_decoded = loaded_decode_model.predict_on_batch(new_data_df)
     simulated_data = pd.DataFrame(data=new_data_decoded)
 
-    # Randomly select subset of genes ********
-    subset_simulated_data = simulated_data.sample(n=num_dims, axis=1)
-    subset_simulated_data.head()
-
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
-        subset_simulated_data.shape[0], subset_simulated_data.shape[1]))
+        simulated_data.shape[0], simulated_data.shape[1]))
 
     # Output
     simulated_data_file = os.path.join(
@@ -166,7 +155,7 @@ def simulate_data(
         analysis_name,
         "simulated_data.txt.xz")
 
-    subset_simulated_data.to_csv(
+    simulated_data.to_csv(
         simulated_data_file, float_format='%.3f', sep='\t', compression='xz')
 
 
@@ -326,6 +315,8 @@ def add_experiments(
             np.random.shuffle(simulated_ind)
 
             # Partition indices to batch
+            # Note: 'array_split' will chunk data into almost equal sized chunks.
+            # Returns arrays of size N % i and one array with the remainder
             partition = np.array_split(simulated_ind, i)
 
             for j in range(i):
