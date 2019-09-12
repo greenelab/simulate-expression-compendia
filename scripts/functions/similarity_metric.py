@@ -199,11 +199,6 @@ def sim_svcca(simulated_data_file,
             # Use trained model to encode expression data into SAME latent space
             experiment_data_df = experiment_other
 
-        # Check shape: ensure that the number of samples is the same between the two datasets
-        if original_data_df.shape[0] != experiment_data_df.shape[0]:
-            diff = original_data_df.shape[0] - experiment_data_df.shape[0]
-            original_data_df = original_data_df.iloc[:-diff, :]
-
         # SVCCA
         svcca_results = cca_core.get_cca_similarity(original_data_df.T,
                                                     experiment_data_df.T,
