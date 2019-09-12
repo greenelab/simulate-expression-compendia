@@ -39,7 +39,6 @@ seed(randomState)
 # User parameters
 NN_architecture = 'NN_2500_30'
 analysis_name = 'analysis_0'
-num_dims=5000
 num_simulated_samples = 6000
 lst_num_experiments = [1,2,5,10,20,50,100,500,1000,2000,3000,6000]
 use_pca = True
@@ -68,8 +67,7 @@ normalized_data_file = os.path.join(
 generate_data.simulate_data(normalized_data_file,
                             NN_architecture,
                             analysis_name,
-                            num_simulated_samples,
-                            num_dims
+                            num_simulated_samples
                            )
 
 
@@ -163,5 +161,5 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Batch Effects')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
+ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
 
