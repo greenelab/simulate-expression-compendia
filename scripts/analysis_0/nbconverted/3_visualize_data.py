@@ -40,7 +40,6 @@ seed(randomState)
 # User parameters
 NN_architecture = 'NN_2500_30'
 analysis_name = 'analysis_0'
-num_dims=5000
 num_simulated_samples = 6000
 lst_num_experiments = [1,2,5,10,20,50,100,500,1000,2000,3000,6000]
 
@@ -161,8 +160,7 @@ ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(alpha=0.5) 
 
 
 # UMAP embedding of simulated data
-## When dimensions are the same then can use the same UMAP projection, but for now it is different
-simulated_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(simulated_data)
+simulated_data_UMAPencoded = model.transform(simulated_data)
 simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          index=simulated_data.index,
                                          columns=['1','2'])
@@ -177,19 +175,14 @@ ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(alpha=0
 ## Side by side original input vs simulated data
 
 # Add label for input or simulated dataset
-#input_data_UMAPencoded_df['dataset'] = 'original'
-#simulated_data_UMAPencoded_df['dataset'] = 'simulated'
+input_data_UMAPencoded_df['dataset'] = 'original'
+simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 
 # Concatenate input and simulated dataframes together
-#combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
+combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-#ggplot(combined_data_df, aes(x='1', y='2')) \
-#+ geom_point(alpha=0.3) \
-#+ facet_wrap('~dataset') \
-#+ xlab('UMAP 1') \
-#+ ylab('UMAP 2') \
-#+ ggtitle('UMAP of original and simulated data')
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(alpha=0.3) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data')
 
 
 # ## Visualize effects of multiple experiments in PCA space
