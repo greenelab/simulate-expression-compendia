@@ -5,9 +5,11 @@
 # 
 # In order to start making interpretations we will generate two visualizations of our data
 # 
-# First, we will verify that the simulated dataset is a good representation of our original input dataset by visually comparing the structures in the two datasets projected onto UMAP space.
+# 1. We will verify that the simulated dataset is a good representation of our original input dataset by visually comparing the structures in the two datasets projected onto UMAP space.
 # 
-# Second, we will plot the PCA project data after adding batch effects to examine how the batch effects shift the data
+# 2. We will plot the PCA projected data after adding experiments to examine how the technical variation shifted the data.
+# 
+# 3. We plot the PCA projected data after correcting for the technical variation introduced by the experiments and examine the effectiveness of the correction method by comparing the data before and after the correction.
 
 # In[1]:
 
@@ -48,7 +50,9 @@ lst_num_experiments = [1,2,5,10,20,50,100,500,1000,2000,3000,6000]
 
 
 # Load data
-base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))    # base dir on repo
+local_dir = os.path.abspath(os.path.join(os.getcwd(),"../../../.."))    # base dir on local machine for data storage
+
 NN_dir = base_dir + "/models/" + NN_architecture
 
 normalized_data_file = os.path.join(
@@ -74,27 +78,30 @@ weights_decoder_file = glob.glob(os.path.join(
     "*_decoder_weights.h5"))[0]
 
 experiment_dir = os.path.join(
-    base_dir,
-    "data",
+    local_dir,
+    "Data",
+    "Batch_effects",
     "experiment_simulated",
     analysis_name)
 
 simulated_data_file = os.path.join(
-    base_dir,
-    "data",
+    local_dir,
+    "Data",
+    "Batch_effects",
     "simulated",
     analysis_name,
     "simulated_data.txt.xz")
 
 permuted_simulated_data_file = os.path.join(
-    base_dir,
-    "data",
+    local_dir,
+    "Data",
+    "Batch_effects",
     "simulated",
     analysis_name,
     "permuted_simulated_data.txt.xz")
 
 
-# ## Visualize simulated data in UMAP space
+# ## 1. Visualize simulated data in UMAP space
 
 # In[4]:
 
@@ -185,7 +192,7 @@ combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPenco
 ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(alpha=0.3) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data')
 
 
-# ## Visualize effects of multiple experiments in PCA space
+# ## 2. Visualize effects of multiple experiments in PCA space
 
 # In[11]:
 
@@ -200,11 +207,31 @@ get_ipython().run_cell_magic('time', '', '\nall_data_df = pd.DataFrame()\n\n# Ge
 ggplot(all_data_df, aes(x='PC1', y='PC2')) + geom_point(aes(color='group'), alpha=0.3) + facet_wrap('~num_experiments') + xlab('PC1') + ylab('PC2') + ggtitle('PCA of experiment 1 vs experiment x')
 
 
+# ## 3. Visualize variance corrected experiment data
+
+# In[13]:
+
+
+get_ipython().run_cell_magic('time', '', '\nall_data_df = pd.DataFrame()\n\nfor i in lst_num_experiments:\n    print(\'Plotting PCA of 1 experiment vs {} experiments...\'.format(i))\n    \n     # Get data BEFORE correction\n    experiment_before_file = os.path.join(\n        experiment_dir,\n        "Experiment_"+str(i)+".txt.xz")\n\n    experiment_before = pd.read_table(\n        experiment_before_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Match format of column names in before and after df\n    experiment_before.columns = experiment_before.columns.astype(str)\n    \n    print(experiment_before.shape)\n    \n    # Add grouping column for plotting\n    experiment_before[\'group\'] = "before"\n    \n    # Get data with additional batch effects added\n    experiment_after_file = os.path.join(\n        experiment_dir,\n        "Experiment_corrected_"+str(i)+".txt.xz")\n\n    experiment_after = pd.read_table(\n        experiment_after_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Transpose data to df: sample x gene\n    experiment_after = experiment_after.T\n    \n    # Match format of column names in before and after df\n    experiment_after.columns = experiment_after.columns.astype(str)\n    \n    print(experiment_after.shape)\n    \n    # Add grouping column for plotting\n    experiment_after[\'group\'] = "after"\n        \n    # Concatenate datasets together\n    combined_data_df = pd.concat([experiment_before, experiment_after])\n    \n    print(combined_data_df.shape)\n    \n    # PCA projection\n    pca = PCA(n_components=2)\n\n    # Encode expression data into 2D PCA space    \n    combined_data_numeric_df = combined_data_df.drop([\'group\'], axis=1)    \n    combined_data_PCAencoded = pca.fit_transform(combined_data_numeric_df)\n\n    \n    combined_data_PCAencoded_df = pd.DataFrame(combined_data_PCAencoded,\n                                               index=combined_data_df.index,\n                                               columns=[\'PC1\', \'PC2\']\n                                              )\n    print("after PCA applied")\n    \n    # Add back in batch labels (i.e. labels = "batch_"<how many batch effects were added>)\n    combined_data_PCAencoded_df[\'group\'] = combined_data_df[\'group\']\n    \n    # Add column that designates which batch effect comparision (i.e. comparison of 1 batch vs 5 batches\n    # is represented by label = 5)\n    combined_data_PCAencoded_df[\'num_experiments\'] = str(i)\n    \n    # Concatenate ALL comparisons\n    all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])\n    \n    \n    # Plot individual comparisons\n    print(ggplot(combined_data_PCAencoded_df, aes(x=\'PC1\', y=\'PC2\')) \\\n          + geom_point(aes(color=\'group\'), alpha=0.4) \\\n          + xlab(\'PC1\') \\\n          + ylab(\'PC2\') \\\n          + ggtitle(\'Experiment {} and Corrected Experiment {}\'.format(i, i))\n         )')
+
+
+# In[14]:
+
+
+# Plot all comparisons in one figure
+
+# Split dataframe in order to plot 'after' on top of 'before'
+df_layer_1 = all_data_df[all_data_df['group'] == "before"]
+df_layer_2 = all_data_df[all_data_df['group'] == "after"]
+
+ggplot() + geom_point(df_layer_1, aes(x='PC1', y='PC2'), colour = '#00BFC4', alpha = 0.3) + geom_point(df_layer_2, aes(x='PC1', y='PC2'), colour = '#F8766D', alpha = 0.3) + facet_wrap('~num_experiments') + xlab('PC1') + ylab('PC2') + ggtitle('PCA of experiment x vs corrected experiment x')
+
+
 # ## Permuted dataset (Negative control)
 # 
 # As a negative control we will permute the values within a sample, across genes in order to disrupt the gene expression structure.
 
-# In[13]:
+# In[15]:
 
 
 # Read in permuated data
@@ -215,7 +242,7 @@ shuffled_simulated_data = pd.read_table(
     sep='\t')
 
 
-# In[14]:
+# In[16]:
 
 
 # Label samples with label = perumuted
@@ -238,7 +265,7 @@ shuffled_data_PCAencoded_df = pd.DataFrame(shuffled_data_PCAencoded,
 shuffled_data_PCAencoded_df['group'] = input_vs_permuted_df['group']
 
 
-# In[15]:
+# In[17]:
 
 
 # Plot permuted data
