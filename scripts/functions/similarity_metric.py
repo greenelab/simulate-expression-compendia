@@ -26,7 +26,8 @@ seed(randomState)
 
 def read_data(simulated_data_file,
               permuted_simulated_data_file,
-              base_dir,
+              file_prefix,
+              local_dir,
               analysis_name):
     """
     Script used by all similarity metrics to:
@@ -40,8 +41,12 @@ def read_data(simulated_data_file,
     simulated_data: dataframe
         Dataframe containing simulated gene expression data
 
-    shuffled_simulated_data: dataframe
+    permuted_simulated_data: dataframe
         Dataframe containing simulated gene expression data that has been permuted
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment")
+        or after correction ("Experiment_corrected")
 
     experiment_dir: str
         Directory path where simulated experiment data will be stored
@@ -66,21 +71,25 @@ def read_data(simulated_data_file,
 
     # Experiment directory
     experiment_dir = os.path.join(
-        base_dir,
-        "data",
+        local_dir,
+        "Data",
+        "Batch_effects",
         "experiment_simulated",
         analysis_name)
 
     # Get experiment 1
     experiment_1_file = os.path.join(
         experiment_dir,
-        "Experiment_1.txt.xz")
+        file_prefix + "_1.txt.xz")
 
     experiment_1 = pd.read_table(
         experiment_1_file,
         header=0,
         index_col=0,
         sep='\t')
+
+    if file_prefix == "Experiment_corrected":
+        experiment_1 = experiment_1.T
 
     return [simulated_data,
             shuffled_simulated_data,
@@ -90,10 +99,11 @@ def read_data(simulated_data_file,
 
 def sim_svcca(simulated_data_file,
               permuted_simulated_data_file,
+              file_prefix,
               num_experiments,
               use_pca,
               num_PCs,
-              base_dir,
+              local_dir,
               analysis_name):
     '''
     We want to determine if adding multiple simulated experiments is able to capture the
@@ -128,6 +138,10 @@ def sim_svcca(simulated_data_file,
     permuted_simulated_data_file: str
         File containing permuted simulated gene expression data
 
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment")
+        or after correction ("Experiment_corrected")
+
     num_experiments: list
         List of different numbers of experiments to add to
         simulated data
@@ -139,7 +153,7 @@ def sim_svcca(simulated_data_file,
     num_PCs: int
         Number of top PCs to use to represent expression data
 
-    base_dir: str
+    local_dir: str
         Parent directory containing data files
 
     analysis_name: str
@@ -160,7 +174,8 @@ def sim_svcca(simulated_data_file,
 
     [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
                                                                                         permuted_simulated_data_file,
-                                                                                        base_dir,
+                                                                                        file_prefix,
+                                                                                        local_dir,
                                                                                         analysis_name)
     output_list = []
 
@@ -170,13 +185,16 @@ def sim_svcca(simulated_data_file,
         # All experiments
         experiment_other_file = os.path.join(
             experiment_dir,
-            "Experiment_" + str(i) + ".txt.xz")
+            file_prefix + "_" + str(i) + ".txt.xz")
 
         experiment_other = pd.read_table(
             experiment_other_file,
             header=0,
             index_col=0,
             sep='\t')
+
+        if file_prefix == "Experiment_corrected":
+            experiment_other = experiment_other.T
 
         if use_pca:
             # PCA projection
@@ -239,7 +257,7 @@ def sim_hausdorff(simulated_data_file,
                   num_experiments,
                   use_pca,
                   num_PCs,
-                  base_dir,
+                  local_dir,
                   analysis_name):
     '''
     We want to determine if adding multiple simulated experiments is able to capture the
@@ -278,7 +296,7 @@ def sim_hausdorff(simulated_data_file,
     num_PCs: int
         Number of top PCs to use to represent expression data
 
-    base_dir: str
+    local_dir: str
         Parent directory containing data files
 
     analysis_name: str
@@ -299,7 +317,7 @@ def sim_hausdorff(simulated_data_file,
 
     [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
                                                                                         permuted_simulated_data_file,
-                                                                                        base_dir,
+                                                                                        local_dir,
                                                                                         analysis_name)
 
     output_list = []
@@ -372,7 +390,7 @@ def sim_procrustes(simulated_data_file,
                    num_experiments,
                    use_pca,
                    num_PCs,
-                   base_dir,
+                   local_dir,
                    analysis_name):
     '''
     We want to determine if adding multiple simulated experiments is able to capture the
@@ -410,7 +428,7 @@ def sim_procrustes(simulated_data_file,
     num_PCs: int
         Number of top PCs to use to represent expression data
 
-    base_dir: str
+    local_dir: str
         Parent directory containing data files
 
     analysis_name: str
@@ -431,7 +449,7 @@ def sim_procrustes(simulated_data_file,
 
     [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
                                                                                         permuted_simulated_data_file,
-                                                                                        base_dir,
+                                                                                        local_dir,
                                                                                         analysis_name)
 
     output_list = []
@@ -504,7 +522,7 @@ def sim_cca(simulated_data_file,
             num_experiments,
             use_pca,
             num_PCs,
-            base_dir,
+            local_dir,
             analysis_name):
     '''
     We want to determine if adding multiple simulated experiments is able to capture the
@@ -544,7 +562,7 @@ def sim_cca(simulated_data_file,
     num_PCs: int
         Number of top PCs to use to represent expression data
 
-    base_dir: str
+    local_dir: str
         Parent directory containing data files
 
     analysis_name: str
@@ -564,7 +582,7 @@ def sim_cca(simulated_data_file,
 
     [simulated_data, shuffled_simulated_data, experiment_dir, experiment_1] = read_data(simulated_data_file,
                                                                                         permuted_simulated_data_file,
-                                                                                        base_dir,
+                                                                                        local_dir,
                                                                                         analysis_name)
 
     output_list = []
