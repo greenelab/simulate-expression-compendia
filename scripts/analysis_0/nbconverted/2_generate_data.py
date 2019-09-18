@@ -50,7 +50,7 @@ num_PCs = 10
 
 # Input files
 base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))    # base dir on repo
-local_dir = os.path.abspath(os.path.join(os.getcwd(),"../../../.."))    # base dir on local machine for data storage
+local_dir = "home/alexandra/Documents"                           # base dir on local machine for data storage
 
 normalized_data_file = os.path.join(
     base_dir,
@@ -72,7 +72,7 @@ generate_data.simulate_data(normalized_data_file,
                            )
 
 
-# In[5]:
+# In[4]:
 
 
 # Simulated data file 
