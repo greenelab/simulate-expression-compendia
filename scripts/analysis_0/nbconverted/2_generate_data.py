@@ -49,7 +49,8 @@ num_PCs = 10
 
 
 # Input files
-base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))    # base dir on repo
+local_dir = "~/Documents"                                        # base dir on local machine for data storage
 
 normalized_data_file = os.path.join(
     base_dir,
@@ -71,13 +72,14 @@ generate_data.simulate_data(normalized_data_file,
                            )
 
 
-# In[5]:
+# In[4]:
 
 
 # Simulated data file 
 simulated_data_file = os.path.join(
-    base_dir,
-    "data",
+    local_dir,
+    "Data",
+    "Batch_effects",
     "simulated",
     analysis_name,
     "simulated_data.txt.xz")
@@ -90,7 +92,7 @@ simulated_data_file = os.path.join(
 
 # Permute simulated data to be used as a negative control
 generate_data.permute_data(simulated_data_file,
-                          base_dir,
+                          local_dir,
                           analysis_name)
 
 
@@ -99,8 +101,9 @@ generate_data.permute_data(simulated_data_file,
 
 # Permuted simulated data file 
 permuted_simulated_data_file = os.path.join(
-    base_dir,
-    "data",
+    local_dir,
+    "Data",
+    "Batch_effects",
     "simulated",
     analysis_name,
     "permuted_simulated_data.txt.xz")
@@ -114,7 +117,7 @@ permuted_simulated_data_file = os.path.join(
 # Add batch effects
 generate_data.add_experiments(simulated_data_file,
                                lst_num_experiments,
-                               base_dir,
+                               local_dir,
                                analysis_name)
 
 
@@ -126,10 +129,11 @@ generate_data.add_experiments(simulated_data_file,
 # Calculate similarity
 batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            permuted_simulated_data_file,
+                                                           'Experiment',
                                                            lst_num_experiments,
                                                            use_pca,
                                                            num_PCs,
-                                                           base_dir,
+                                                           local_dir,
                                                            analysis_name)
 
 
@@ -140,7 +144,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
 similarity_score_df = pd.DataFrame(data={'score': batch_scores},
                                      index=lst_num_experiments,
                                     columns=['score'])
-similarity_score_df.index.name = 'number of batches'
+similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
@@ -161,5 +165,5 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('SVCCA')     + ggtitle('Similarity across increasing batch effects')
+ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('SVCCA')     + ggtitle('Similarity across varying numbers of experiments')
 

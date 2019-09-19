@@ -46,8 +46,8 @@ def simulate_data(
 
         ------------------------------| PA0001 | PA0002 |...
         05_PA14000-4-2_5-10-07_S2.CEL | 0.8533 | 0.7252 |...
-        54375-4-05.CEL				  | 0.7789 | 0.7678 |...
-        ...							  |	...	   | ...    |...
+        54375-4-05.CEL                | 0.7789 | 0.7678 |...
+        ...                           | ...    | ...    |...
 
     NN_architecture: str
         Name of neural network architecture to use.  
@@ -69,7 +69,8 @@ def simulate_data(
 
     # Create directory to output simulated data
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    new_dir = os.path.join(base_dir, "data", "simulated")
+    local_dir = os.path.abspath(os.path.join(os.getcwd(), "../../../.."))
+    new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
 
@@ -149,8 +150,9 @@ def simulate_data(
 
     # Output
     simulated_data_file = os.path.join(
-        base_dir,
-        "data",
+        local_dir,
+        "Data",
+        "Batch_effects",
         "simulated",
         analysis_name,
         "simulated_data.txt.xz")
@@ -160,7 +162,7 @@ def simulate_data(
 
 
 def permute_data(simulated_data_file,
-                 base_dir,
+                 local_dir,
                  analysis_name):
     '''
     Permute the simulated data
@@ -170,7 +172,7 @@ def permute_data(simulated_data_file,
     simulated_data_file: str
         File containing simulated gene expression data
 
-    base_dir: str
+    local_dir: str
         Parent directory containing data files
 
     analysis_name: str
@@ -185,6 +187,7 @@ def permute_data(simulated_data_file,
     '''
 
     seed(randomState)
+
     # Read in data
     simulated_data = pd.read_table(
         simulated_data_file,
@@ -208,8 +211,9 @@ def permute_data(simulated_data_file,
 
     # Output
     permuted_simulated_data_file = os.path.join(
-        base_dir,
-        "data",
+        local_dir,
+        "Data",
+        "Batch_effects",
         "simulated",
         analysis_name,
         "permuted_simulated_data.txt.xz")
@@ -221,7 +225,7 @@ def permute_data(simulated_data_file,
 def add_experiments(
         simulated_data_file,
         num_experiments,
-        base_dir,
+        local_dir,
         analysis_name):
     '''
     Say we are interested in identifying genes that differentiate between 
@@ -247,7 +251,7 @@ def add_experiments(
         List of different numbers of experiments to add to 
         simulated data
 
-    base_dir: str
+    local_dir: str
         Parent directory containing data files
 
     analysis_name: str
@@ -263,11 +267,10 @@ def add_experiments(
     seed(randomState)
 
     # Create directories
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-
     new_dir = os.path.join(
-        base_dir,
-        "data",
+        local_dir,
+        "Data",
+        "Batch_effects",
         "experiment_simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
@@ -299,14 +302,34 @@ def add_experiments(
         print('Creating simulated data with {} experiments..'.format(i))
 
         experiment_file = os.path.join(
-            base_dir,
-            "data",
+            local_dir,
+            "Data",
+            "Batch_effects",
             "experiment_simulated",
             analysis_name,
             "Experiment_" + str(i) + ".txt.xz")
 
+        experiment_map_file = os.path.join(
+            local_dir,
+            "Data",
+            "Batch_effects",
+            "experiment_simulated",
+            analysis_name,
+            "Experiment_map_" + str(i) + ".txt.xz")
+
+        # Create dataframe with grouping
+        experiment_data_map = simulated_data.copy()
+
         if i == 1:
             simulated_data.to_csv(experiment_file, sep='\t', compression='xz')
+
+            # Add experiment id to map dataframe
+            experiment_data_map['experiment'] = str(i)
+            experiment_data_map_df = pd.DataFrame(
+                data=experiment_data_map['experiment'], index=simulated_ind.sort())
+
+            experiment_data_map_df.to_csv(
+                experiment_map_file, sep='\t', compression='xz')
 
         else:
             experiment_data = simulated_data.copy()
@@ -336,6 +359,15 @@ def add_experiments(
                 experiment_data.loc[partition[j].tolist(
                 )] = experiment_data.loc[partition[j].tolist()] + stretch_factor_tile
 
+                # Add experiment id to map dataframe
+                experiment_data_map.loc[partition[j], 'experiment'] = str(j)
+
+            experiment_data_map_df = pd.DataFrame(
+                data=experiment_data_map['experiment'], index=simulated_ind.sort())
+
             # Save
             experiment_data.to_csv(
                 experiment_file, float_format='%.3f', sep='\t', compression='xz')
+
+            experiment_data_map_df.to_csv(
+                experiment_map_file, sep='\t', compression='xz')
