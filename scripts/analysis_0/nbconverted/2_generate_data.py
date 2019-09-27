@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[1]:
+# In[14]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -20,7 +20,7 @@ import os
 import sys
 import glob
 import pandas as pd
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes
+from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -45,12 +45,13 @@ use_pca = True
 num_PCs = 10
 
 
-# In[3]:
+# In[29]:
 
 
 # Input files
 base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))    # base dir on repo
-local_dir = "~/Documents"                                        # base dir on local machine for data storage
+local_dir = "/home/alexandra/Documents/"                         # base dir on local machine for data storage
+                                                                 # Save doesn't recognize ~
 
 normalized_data_file = os.path.join(
     base_dir,
@@ -59,9 +60,21 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
+# In[30]:
+
+
+# Output file
+svcca_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "svcca.pdf")
+
+
 # ### Generate simulated data
 
-# In[4]:
+# In[5]:
 
 
 # Generate simulated data
@@ -72,7 +85,7 @@ generate_data.simulate_data(normalized_data_file,
                            )
 
 
-# In[4]:
+# In[6]:
 
 
 # Simulated data file 
@@ -87,7 +100,7 @@ simulated_data_file = os.path.join(
 
 # ### Generate permuted version of simulated data (negative control)
 
-# In[6]:
+# In[7]:
 
 
 # Permute simulated data to be used as a negative control
@@ -96,7 +109,7 @@ generate_data.permute_data(simulated_data_file,
                           analysis_name)
 
 
-# In[7]:
+# In[8]:
 
 
 # Permuted simulated data file 
@@ -111,7 +124,7 @@ permuted_simulated_data_file = os.path.join(
 
 # ### Add number of experiments to simulated data
 
-# In[8]:
+# In[9]:
 
 
 # Add batch effects
@@ -123,7 +136,7 @@ generate_data.add_experiments(simulated_data_file,
 
 # ### Calculate similarity
 
-# In[9]:
+# In[10]:
 
 
 # Calculate similarity
@@ -137,7 +150,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[10]:
+# In[11]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -148,13 +161,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[11]:
+# In[12]:
 
 
 permuted_score
 
 
-# In[12]:
+# In[32]:
 
 
 # Plot
@@ -165,5 +178,8 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('SVCCA')     + ggtitle('Similarity across varying numbers of experiments')
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('SVCCA')     + ggtitle('Similarity across varying numbers of experiments')
+
+print(g)
+ggsave(plot=g, filename=svcca_file, dpi=300)
 
