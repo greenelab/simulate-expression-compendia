@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[14]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -45,7 +45,7 @@ use_pca = True
 num_PCs = 10
 
 
-# In[29]:
+# In[3]:
 
 
 # Input files
@@ -60,7 +60,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[30]:
+# In[4]:
 
 
 # Output file
@@ -136,7 +136,7 @@ generate_data.add_experiments(simulated_data_file,
 
 # ### Calculate similarity
 
-# In[10]:
+# In[ ]:
 
 
 # Calculate similarity
@@ -150,7 +150,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[11]:
+# In[ ]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -161,13 +161,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[12]:
+# In[ ]:
 
 
 permuted_score
 
 
-# In[32]:
+# In[ ]:
 
 
 # Plot
@@ -178,7 +178,7 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('SVCCA')     + ggtitle('Similarity across varying numbers of experiments')
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of experiments')
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
