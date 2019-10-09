@@ -10,7 +10,7 @@
 # 2. Use [removeBatchEffect](https://rdrr.io/bioc/limma/man/removeBatchEffect.html) package from the limma library in R.
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset corrected for the variation introduced by having some number of experiments added.
 
-# In[1]:
+# In[12]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -26,7 +26,7 @@ import os
 import sys
 import glob
 import pandas as pd
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes
+from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -62,7 +62,7 @@ num_PCs = 10
 
 # Input files
 base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))    # base dir on repo
-local_dir = "~/Documents"                                        # base dir on local machine for data storage
+local_dir = "/home/alexandra/Documents/"                         # base dir on local machine for data storage
 
 # Simulated data file 
 simulated_data_file = os.path.join(
@@ -74,9 +74,21 @@ simulated_data_file = os.path.join(
     "simulated_data.txt.xz")
 
 
+# In[5]:
+
+
+# Output file
+svcca_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "svcca_correction.pdf")
+
+
 # ### Correct for added variation
 
-# In[5]:
+# In[6]:
 
 
 for i in lst_num_experiments:
@@ -140,7 +152,7 @@ for i in lst_num_experiments:
 
 # ### Calculate similarity
 
-# In[6]:
+# In[7]:
 
 
 # Permuted simulated data file 
@@ -153,7 +165,7 @@ permuted_simulated_data_file = os.path.join(
     "permuted_simulated_data.txt.xz")
 
 
-# In[7]:
+# In[8]:
 
 
 # Calculate similarity
@@ -167,7 +179,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[8]:
+# In[9]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -178,13 +190,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[9]:
+# In[10]:
 
 
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[10]:
+# In[13]:
 
 
 # Plot
@@ -195,5 +207,8 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of experiments')
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of experiments')
+
+print(g)
+ggsave(plot=g, filename=svcca_file, dpi=300)
 
