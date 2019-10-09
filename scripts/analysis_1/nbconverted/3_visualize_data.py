@@ -23,7 +23,7 @@ import pandas as pd
 import numpy as np
 import random
 import glob
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, aes, facet_wrap, scale_color_manual, xlim, ylim
+from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, aes, facet_wrap, scale_color_manual, xlim, ylim, scale_color_brewer 
 from sklearn.decomposition import PCA
 from keras.models import load_model
 import umap
@@ -160,12 +160,12 @@ sample_ids = list(simulated_data.index)
 
 normalized_data_label = normalized_data.copy()
 
-normalized_data_label['color_by'] = 'XXX'
+normalized_data_label['color_by'] = 'Not in experiment'
 normalized_data_label.loc[sample_ids, 'color_by'] = simulated_data['color_by']
 normalized_data_label.loc[sample_ids].head(10)
 
 
-# In[13]:
+# In[22]:
 
 
 # UMAP embedding of original input data
@@ -183,7 +183,13 @@ input_data_UMAPencoded_df['color_by'] = normalized_data_label['color_by']
 ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlim(7, 11)     + ylim(-3, -2.5)     + ggtitle('Input data')
 
 
-# In[10]:
+# In[28]:
+
+
+label_ls = normalized_data_label['color_by'].unique()
+
+
+# In[29]:
 
 
 # UMAP embedding of simulated data
@@ -200,12 +206,13 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
 simulated_data_UMAPencoded_df['color_by'] = simulated_data['color_by']
 
 
-ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + ggtitle("Simulated data")
+ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     #+ scale_color_brewer(type='qual', palette='Set1', labels=label_ls) \
+    + ggtitle("Simulated data")
 
 
 # ### Side by side view
 
-# In[11]:
+# In[ ]:
 
 
 # Add label for input or simulated dataset
@@ -219,7 +226,7 @@ combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPenco
 ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data')
 
 
-# In[12]:
+# In[ ]:
 
 
 # Zoomed in view
@@ -232,5 +239,5 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + xlim(4, 11) + ylim(-4, 2) + ggtitle('UMAP of original and simulated data')
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + xlim(7, 11) + ylim(-4, 0) + ggtitle('UMAP of original and simulated data')
 

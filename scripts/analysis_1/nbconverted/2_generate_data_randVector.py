@@ -205,7 +205,7 @@ normalized_data.head()
 # In[14]:
 
 
-# Check that samples are in gene expression dataset otherwise exit
+# Check that samples are in gene expression dataset
 if any(x in list(normalized_data.index) for x in sample_ids):
     print('found')
 else:
