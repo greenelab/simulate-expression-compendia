@@ -10,11 +10,11 @@ As the scale of these compendia increase, it becomes crucial to determine how in
 We sought to determine the extent to which underlying biological signal can be extracted in the presence of technical artifacts via simulation. 
 
 **Approach:**
-We used a series of simulation experiments in order to answer the question: given a compendium of gene expression experiments, how will increasing the number of experiments change our ability to represent the original biological signal?
+We used a series of simulation experiments in order to answer the question: given a compendium of gene expression experiments, how will increasing the number of experiments change our ability to detect the original biological signal?
 
 1. Train a multi-layer Variational Autoencoder (VAE) using [compendium](https://msystems.asm.org/content/1/1/e00025-15) of *P. aeruginosa* gene expression experiments from different labs measuring different biological processes
 2. Used trained VAE to simulate a compendium with varying numbers of experiments
-3. Compared gene expression patterns from a compendium containing a single simulated experiment and the pattern from a compendium with multiple experiments using a canonical correlation analysis
+3. Compared gene expression patterns from a compendium containing a single simulated experiment and the pattern from a compendium with multiple experiments using a [singular vector canonical correlation (SVCCA)](https://arxiv.org/abs/1706.05806) analysis
 4. Correct for technical variation added using existing methods like [removeBatchEffect](https://rdrr.io/bioc/limma/man/removeBatchEffect.html) and re-calculate similarity in reference to single simulated experiment
 
 ## Simulation experiments
@@ -28,7 +28,7 @@ To assess the impact of technical variation from increasing numbers of experimen
 **Assumptions:**
 1. There is linear technical noise between different experiments where the noise is normally distributed
 2. All experiments have the same number of samples
-3. The total number of samples in the compendium is fixed and each experiment has the same number of samples.  In order to test for the effect of the number of experiments we held sample size fixed.
+3. The total number of samples in the compendium is fixed and each experiment has the same number of samples (i.e. the number of samples in each experiment is equal to the total number of samples in the compendium divided by the number of experiments).  In order to test for the effect of the number of experiments we held sample size fixed.
 4. In order to generate new data we sample from latent space that represents an entire Pseudomonas compendium, and therefore represents a generic Pseudomonas expression signal
 
 **Conclusions:**
