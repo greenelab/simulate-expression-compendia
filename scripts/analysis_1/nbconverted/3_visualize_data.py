@@ -165,7 +165,7 @@ normalized_data_label.loc[sample_ids, 'color_by'] = simulated_data['color_by']
 normalized_data_label.loc[sample_ids].head(10)
 
 
-# In[28]:
+# In[9]:
 
 
 # UMAP embedding of original input data
@@ -183,7 +183,7 @@ input_data_UMAPencoded_df['color_by'] = normalized_data_label['color_by']
 ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlim(7, 11)     + ylim(-3, -2.5)     + xlab('UMAP 1')     + ylab('UMAP 2')     + ggtitle('Input data')
 
 
-# In[11]:
+# In[10]:
 
 
 # UMAP embedding of simulated data
@@ -205,7 +205,7 @@ ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(col
 
 # ### Side by side view
 
-# In[20]:
+# In[11]:
 
 
 # Add label for input or simulated dataset
@@ -219,7 +219,7 @@ combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPenco
 ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data (gene space)')
 
 
-# In[27]:
+# In[12]:
 
 
 # Zoomed in view
@@ -237,7 +237,7 @@ ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), 
 
 # ## Visualize simulated data (gene space) projected into PCA space
 
-# In[39]:
+# In[13]:
 
 
 # UMAP embedding of original input data
@@ -256,7 +256,7 @@ input_data_PCAencoded_df['color_by'] = normalized_data_label['color_by']
 ggplot(input_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle('Input data')
 
 
-# In[31]:
+# In[14]:
 
 
 # UMAP embedding of simulated data
@@ -276,7 +276,7 @@ simulated_data_PCAencoded_df['color_by'] = simulated_data['color_by']
 ggplot(simulated_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle("Simulated data")
 
 
-# In[33]:
+# In[15]:
 
 
 # Add label for input or simulated dataset
@@ -292,7 +292,7 @@ ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), 
 
 # ## Visualize simulated data (latent space) projected into UMAP space
 
-# In[14]:
+# In[16]:
 
 
 # Encode original gene expression data into latent space
@@ -302,7 +302,7 @@ data_encoded_all_df = pd.DataFrame(data_encoded_all, index=normalized_data.index
 data_encoded_all_df.head()
 
 
-# In[15]:
+# In[17]:
 
 
 # Get and save model
@@ -318,7 +318,7 @@ input_data_UMAPencoded_df['color_by'] = normalized_data_label['color_by']
 ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlim(1,2)     + ylim(4,6)     + ggtitle('Input data')
 
 
-# In[16]:
+# In[18]:
 
 
 # Encode simulated gene expression data into latent space
@@ -330,7 +330,7 @@ simulated_data_encoded_df = pd.DataFrame(simulated_data_encoded, index=simulated
 simulated_data_encoded_df.head()
 
 
-# In[17]:
+# In[19]:
 
 
 # Use same UMAP projection to plot simulated data
@@ -346,7 +346,7 @@ simulated_data_UMAPencoded_df['color_by'] = simulated_data['color_by']
 ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + ggtitle("Simulated data")
 
 
-# In[19]:
+# In[20]:
 
 
 # Zoomed in view
@@ -364,7 +364,7 @@ ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), 
 
 # ## Visualize simulated data (latent space) projected into PCA space
 
-# In[35]:
+# In[21]:
 
 
 # Get and save model
@@ -381,7 +381,7 @@ input_data_PCAencoded_df['color_by'] = normalized_data_label['color_by']
 ggplot(input_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle('Input data')
 
 
-# In[36]:
+# In[22]:
 
 
 # Use same UMAP projection to plot simulated data
@@ -397,7 +397,7 @@ simulated_data_PCAencoded_df['color_by'] = simulated_data['color_by']
 ggplot(simulated_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle("Simulated data")
 
 
-# In[38]:
+# In[23]:
 
 
 # Zoomed in view

@@ -331,12 +331,9 @@ for j in range(latent_dim):
     new_centroid[j] = np.random.normal(
         encoded_means[j], encoded_stds[j])
 
-# Shift samples based on using same distance and direction of each sample in reference to centroid
-simulated_data_encoded_df = data_encoded_df.copy()
 
-for sample_id in data_encoded_df.index:
-    shift_vec = data_encoded_df.loc[sample_id] - centroid
-    simulated_data_encoded_df.loc[sample_id] = new_centroid + shift_vec
+shift_vec_df = data_encoded_df.apply(lambda x: x-centroid, axis=1)
+simulated_data_encoded_df = shift_vec_df.apply(lambda x: x+new_centroid, axis=1)
 
 simulated_data_encoded_df.head()
 
