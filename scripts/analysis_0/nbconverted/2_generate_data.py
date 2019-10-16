@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[1]:
+# In[12]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -20,6 +20,7 @@ import os
 import sys
 import glob
 import pandas as pd
+import numpy as np
 from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -136,7 +137,7 @@ generate_data.add_experiments(simulated_data_file,
 
 # ### Calculate similarity
 
-# In[ ]:
+# In[10]:
 
 
 # Calculate similarity
@@ -150,8 +151,11 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[ ]:
+# In[13]:
 
+
+# log10 number of experiments
+lst_num_experiments = np.log(lst_num_experiments)
 
 # Convert similarity scores to pandas dataframe
 similarity_score_df = pd.DataFrame(data={'score': batch_scores},
@@ -161,13 +165,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[ ]:
+# In[14]:
 
 
 permuted_score
 
 
-# In[ ]:
+# In[15]:
 
 
 # Plot
