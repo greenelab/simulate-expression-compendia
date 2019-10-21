@@ -11,7 +11,7 @@
 # 
 # 3. We plot the PCA projected data after correcting for the technical variation introduced by the experiments and examine the effectiveness of the correction method by comparing the data before and after the correction.
 
-# In[1]:
+# In[25]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -23,7 +23,7 @@ import pandas as pd
 import numpy as np
 import random
 import glob
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, aes, facet_wrap, scale_color_manual, ggsave
+from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, aes, facet_wrap, scale_colour_manual, ggsave
 from sklearn.decomposition import PCA
 from keras.models import load_model
 import umap
@@ -246,7 +246,7 @@ combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPenco
 ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(alpha=0.3) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data')
 
 
-# In[12]:
+# In[28]:
 
 
 # Overlay original input vs simulated data

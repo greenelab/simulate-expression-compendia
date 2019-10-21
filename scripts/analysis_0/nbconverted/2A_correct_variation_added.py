@@ -46,7 +46,7 @@ seed(randomState)
 get_ipython().run_cell_magic('R', '', '# Run once to install needed R packages\n#install.packages(c("devtools"))\n#source("http://www.bioconductor.org/biocLite.R")\n#biocLite(c("limma"))\nlibrary(limma)')
 
 
-# In[3]:
+# In[15]:
 
 
 # User parameters
@@ -180,11 +180,8 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[9]:
+# In[16]:
 
-
-# log10 number of experiments
-lst_num_experiments = np.log(lst_num_experiments)
 
 # Convert similarity scores to pandas dataframe
 similarity_score_df = pd.DataFrame(data={'score': batch_scores},
@@ -194,13 +191,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[10]:
+# In[17]:
 
 
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[11]:
+# In[18]:
 
 
 # Plot
