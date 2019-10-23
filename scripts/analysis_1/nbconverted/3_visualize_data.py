@@ -23,7 +23,7 @@ import pandas as pd
 import numpy as np
 import random
 import glob
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, aes, facet_wrap, scale_color_manual, xlim, ylim, scale_color_brewer 
+from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, aes, facet_wrap, scale_color_manual, xlim, ylim, scale_colour_manual 
 from sklearn.decomposition import PCA
 from keras.models import load_model
 import umap
@@ -106,7 +106,7 @@ permuted_simulated_data_file = os.path.join(
     "permuted_simulated_data.txt.xz")
 
 
-# ## Visualize simulated data (gene space) projected into UMAP space
+# ## Load data
 
 # In[4]:
 
@@ -154,18 +154,38 @@ simulated_data.head(10)
 # In[8]:
 
 
-# Add labels to original normalized data
+# Remove corresponding rows from simulated_data df
 sample_ids = list(simulated_data.index)
 
-
-normalized_data_label = normalized_data.copy()
-
-normalized_data_label['color_by'] = 'Not in experiment'
-normalized_data_label.loc[sample_ids, 'color_by'] = simulated_data['color_by']
-normalized_data_label.loc[sample_ids].head(10)
+sample_ids_toremove = []
+for sample_id in sample_ids:
+    if sample_id not in list(normalized_data.index):
+        sample_ids_toremove.append(sample_id)
+       
+simulated_data.drop(sample_ids_toremove, inplace=True)
 
 
 # In[9]:
+
+
+# Remove any sample_ids that are not found in gene expression data
+sample_ids = [sample for sample in sample_ids if sample in normalized_data.index]
+
+
+# In[10]:
+
+
+# Add labels to original normalized data
+normalized_data_label = normalized_data.copy()
+
+normalized_data_label['experiment_id'] = 'Not selected'
+normalized_data_label.loc[sample_ids, 'experiment_id'] = simulated_data['experiment_id']
+normalized_data_label.loc[sample_ids].head(10)
+
+
+# ## Visualize simulated data (gene space) projected into UMAP space
+
+# In[11]:
 
 
 # UMAP embedding of original input data
@@ -178,18 +198,16 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          index=normalized_data.index,
                                          columns=['1','2'])
 # Add label
-input_data_UMAPencoded_df['color_by'] = normalized_data_label['color_by']
-
-ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlim(7, 11)     + ylim(-3, -2.5)     + xlab('UMAP 1')     + ylab('UMAP 2')     + ggtitle('Input data')
+input_data_UMAPencoded_df['experiment_id'] = normalized_data_label['experiment_id']
 
 
-# In[10]:
+# In[12]:
 
 
 # UMAP embedding of simulated data
 
 # Drop label column
-simulated_data_numeric = simulated_data.drop(['color_by'], axis=1)
+simulated_data_numeric = simulated_data.drop(['experiment_id'], axis=1)
 
 simulated_data_UMAPencoded = model.transform(simulated_data_numeric)
 simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
@@ -197,15 +215,10 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 # Add back label column
-simulated_data_UMAPencoded_df['color_by'] = simulated_data['color_by']
+simulated_data_UMAPencoded_df['experiment_id'] = simulated_data['experiment_id']
 
 
-ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('UMAP 1')     + ylab('UMAP 2')     + ggtitle("Simulated data")
-
-
-# ### Side by side view
-
-# In[11]:
+# In[13]:
 
 
 # Add label for input or simulated dataset
@@ -215,29 +228,44 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 # Concatenate input and simulated dataframes together
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
+# Plot sequentially
+#backgrd_data = combined_data_df[combined_data_df['experiment_id'] == 'Not selected']
+#select_data = combined_data_df[combined_data_df['experiment_id'] != 'Not selected']
+
 # Plot
-ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data (gene space)')
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='experiment_id'), alpha=0.3) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data (gene space)')
+#+ xlim(3,12) \
+#+ ylim(-7,10) \
+#+ scale_colour_manual(values=["blue", "purple", "orange", "red", "magenta", "lightgrey"]) \
 
 
-# In[12]:
+# In[14]:
 
+
+# Overlay original and simulated data 
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='dataset'), alpha=0.3) + scale_colour_manual(values=["grey", "blue"]) + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data (gene space)')
 
 # Zoomed in view
 
 # Add label for input or simulated dataset
-input_data_UMAPencoded_df['dataset'] = 'original'
-simulated_data_UMAPencoded_df['dataset'] = 'simulated'
+#input_data_UMAPencoded_df['dataset'] = 'original'
+#simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 
 # Concatenate input and simulated dataframes together
-combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
+#combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + xlim(-2, 7) + ylim(-4, 7) + ggtitle('UMAP of original and simulated data (gene space)')
-
-
+#ggplot(combined_data_df, aes(x='1', y='2')) \
+#+ geom_point(aes(color='experiment_id'), alpha=1) \
+#+ facet_wrap('~dataset') \
+#+ xlab('UMAP 1') \
+#+ ylab('UMAP 2') \
+#+ xlim(-2, 7) \
+#+ ylim(-4, 7) \
+#+ ggtitle('UMAP of original and simulated data (gene space)')
 # ## Visualize simulated data (gene space) projected into PCA space
 
-# In[13]:
+# In[15]:
 
 
 # UMAP embedding of original input data
@@ -251,18 +279,16 @@ input_data_PCAencoded_df = pd.DataFrame(data=input_data_PCAencoded,
                                          index=normalized_data.index,
                                          columns=['1','2'])
 # Add label
-input_data_PCAencoded_df['color_by'] = normalized_data_label['color_by']
-
-ggplot(input_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle('Input data')
+input_data_PCAencoded_df['experiment_id'] = normalized_data_label['experiment_id']
 
 
-# In[14]:
+# In[16]:
 
 
 # UMAP embedding of simulated data
 
 # Drop label column
-simulated_data_numeric = simulated_data.drop(['color_by'], axis=1)
+simulated_data_numeric = simulated_data.drop(['experiment_id'], axis=1)
 
 simulated_data_PCAencoded = pca.transform(simulated_data_numeric)
 simulated_data_PCAencoded_df = pd.DataFrame(data=simulated_data_PCAencoded,
@@ -270,13 +296,10 @@ simulated_data_PCAencoded_df = pd.DataFrame(data=simulated_data_PCAencoded,
                                          columns=['1','2'])
 
 # Add back label column
-simulated_data_PCAencoded_df['color_by'] = simulated_data['color_by']
+simulated_data_PCAencoded_df['experiment_id'] = simulated_data['experiment_id']
 
 
-ggplot(simulated_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle("Simulated data")
-
-
-# In[15]:
+# In[17]:
 
 
 # Add label for input or simulated dataset
@@ -287,12 +310,13 @@ simulated_data_PCAencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_PCAencoded_df, simulated_data_PCAencoded_df])
 
 # Plot
-ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=0.5) + facet_wrap('~dataset') + xlab('PCA 1') + ylab('PCA 2') + ggtitle('PCA of original and simulated data (gene space)')
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='experiment_id'), alpha=0.3) + facet_wrap('~dataset') + xlab('PCA 1') + ylab('PCA 2') + ggtitle('PCA of original and simulated data (gene space)')
+#+ scale_colour_manual(values=["blue", "purple", "orange", "red", "magenta", "lightgrey"]) \
 
 
 # ## Visualize simulated data (latent space) projected into UMAP space
 
-# In[16]:
+# In[18]:
 
 
 # Encode original gene expression data into latent space
@@ -302,7 +326,7 @@ data_encoded_all_df = pd.DataFrame(data_encoded_all, index=normalized_data.index
 data_encoded_all_df.head()
 
 
-# In[17]:
+# In[19]:
 
 
 # Get and save model
@@ -313,16 +337,14 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          index=data_encoded_all_df.index,
                                          columns=['1','2'])
 # Add label
-input_data_UMAPencoded_df['color_by'] = normalized_data_label['color_by']
-
-ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlim(1,2)     + ylim(4,6)     + ggtitle('Input data')
+input_data_UMAPencoded_df['experiment_id'] = normalized_data_label['experiment_id']
 
 
-# In[18]:
+# In[20]:
 
 
 # Encode simulated gene expression data into latent space
-simulated_data_numeric = simulated_data.drop(['color_by'], axis=1)
+simulated_data_numeric = simulated_data.drop(['experiment_id'], axis=1)
 
 simulated_data_encoded = loaded_model.predict_on_batch(simulated_data_numeric)
 simulated_data_encoded_df = pd.DataFrame(simulated_data_encoded, index=simulated_data.index)
@@ -330,7 +352,7 @@ simulated_data_encoded_df = pd.DataFrame(simulated_data_encoded, index=simulated
 simulated_data_encoded_df.head()
 
 
-# In[19]:
+# In[21]:
 
 
 # Use same UMAP projection to plot simulated data
@@ -340,16 +362,11 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 # Add back label column
-simulated_data_UMAPencoded_df['color_by'] = simulated_data['color_by']
+simulated_data_UMAPencoded_df['experiment_id'] = simulated_data['experiment_id']
 
 
-ggplot(simulated_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + ggtitle("Simulated data")
+# In[22]:
 
-
-# In[20]:
-
-
-# Zoomed in view
 
 # Add label for input or simulated dataset
 input_data_UMAPencoded_df['dataset'] = 'original'
@@ -359,12 +376,15 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + xlim(-2, 3) + ylim(-5,6) + ggtitle('UMAP of original and simulated data (latent space)')
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='experiment_id'), alpha=0.3) + facet_wrap('~dataset') + xlab('UMAP 1') + ylab('UMAP 2') + ggtitle('UMAP of original and simulated data (latent space)')
+#+ xlim(-10,5) \
+#+ ylim(-10,10) \
+#+ scale_colour_manual(values=["blue", "purple", "orange", "red", "magenta", "lightgrey"]) \
 
 
 # ## Visualize simulated data (latent space) projected into PCA space
 
-# In[21]:
+# In[23]:
 
 
 # Get and save model
@@ -376,12 +396,10 @@ input_data_PCAencoded_df = pd.DataFrame(data=input_data_PCAencoded,
                                          index=data_encoded_all_df.index,
                                          columns=['1','2'])
 # Add label
-input_data_PCAencoded_df['color_by'] = normalized_data_label['color_by']
-
-ggplot(input_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle('Input data')
+input_data_PCAencoded_df['experiment_id'] = normalized_data_label['experiment_id']
 
 
-# In[22]:
+# In[24]:
 
 
 # Use same UMAP projection to plot simulated data
@@ -391,16 +409,11 @@ simulated_data_PCAencoded_df = pd.DataFrame(data=simulated_data_PCAencoded,
                                          columns=['1','2'])
 
 # Add back label column
-simulated_data_PCAencoded_df['color_by'] = simulated_data['color_by']
+simulated_data_PCAencoded_df['experiment_id'] = simulated_data['experiment_id']
 
 
-ggplot(simulated_data_PCAencoded_df, aes(x='1',y='2'))     + geom_point(aes(color='color_by'), alpha=1)     + xlab('PCA 1')     + ylab('PCA 2')     + ggtitle("Simulated data")
+# In[25]:
 
-
-# In[23]:
-
-
-# Zoomed in view
 
 # Add label for input or simulated dataset
 input_data_PCAencoded_df['dataset'] = 'original'
@@ -410,5 +423,6 @@ simulated_data_PCAencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_PCAencoded_df, simulated_data_PCAencoded_df])
 
 # Plot
-ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='color_by'), alpha=1) + facet_wrap('~dataset') + xlab('PCA 1') + ylab('PCA 2') + ggtitle('PCA of original and simulated data (latent space)')
+ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='experiment_id'), alpha=0.4) + facet_wrap('~dataset') + xlab('PCA 1') + ylab('PCA 2') + ggtitle('PCA of original and simulated data (latent space)')
+#+ scale_colour_manual(values=["blue", "purple", "orange", "red", "magenta", "lightgrey"]) \
 

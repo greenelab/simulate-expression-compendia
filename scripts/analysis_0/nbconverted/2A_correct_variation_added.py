@@ -10,7 +10,7 @@
 # 2. Use [removeBatchEffect](https://rdrr.io/bioc/limma/man/removeBatchEffect.html) package from the limma library in R.
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset corrected for the variation introduced by having some number of experiments added.
 
-# In[12]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -26,6 +26,7 @@ import os
 import sys
 import glob
 import pandas as pd
+import numpy as np
 from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -45,7 +46,7 @@ seed(randomState)
 get_ipython().run_cell_magic('R', '', '# Run once to install needed R packages\n#install.packages(c("devtools"))\n#source("http://www.bioconductor.org/biocLite.R")\n#biocLite(c("limma"))\nlibrary(limma)')
 
 
-# In[3]:
+# In[15]:
 
 
 # User parameters
@@ -179,7 +180,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[9]:
+# In[16]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -190,13 +191,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[10]:
+# In[17]:
 
 
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[13]:
+# In[18]:
 
 
 # Plot

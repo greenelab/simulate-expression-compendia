@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[1]:
+# In[30]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -20,7 +20,8 @@ import os
 import sys
 import glob
 import pandas as pd
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
+import numpy as np
+from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave, scale_x_log10
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -33,7 +34,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[2]:
+# In[22]:
 
 
 # User parameters
@@ -123,6 +124,10 @@ permuted_simulated_data_file = os.path.join(
 
 
 # ### Add number of experiments to simulated data
+# 
+# Note: The original Pseudomonas compendium contains 107 experiments (see data/metadata/sample_annotations.tsv).  For this simulation experiment, we are defining a simulated experiment to be a randomly subset of the ```num_simulated_samples``` simulated samples.  
+# 
+# For example, *experiment 1* = all simulated samples in 1 partition, experiment 2 = all samples partitioned into 2 experiments where each experiment has a different amount of random noise added to it.  This noise represents the technical variation for that experiment.
 
 # In[9]:
 
@@ -136,7 +141,7 @@ generate_data.add_experiments(simulated_data_file,
 
 # ### Calculate similarity
 
-# In[ ]:
+# In[10]:
 
 
 # Calculate similarity
@@ -150,7 +155,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[ ]:
+# In[26]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -161,13 +166,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[ ]:
+# In[29]:
 
 
-permuted_score
+print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[ ]:
+# In[32]:
 
 
 # Plot
