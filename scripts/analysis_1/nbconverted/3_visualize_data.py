@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Visualize data
@@ -290,13 +290,13 @@ ggplot(all_data_df, aes(x='UMAP1', y='UMAP2')) + geom_point(aes(color='group'), 
 
 # ## 3. Visualize variance corrected experiment data
 
-# In[ ]:
+# In[17]:
 
 
 get_ipython().run_cell_magic('time', '', '\nall_data_df = pd.DataFrame()\n\nfor i in lst_num_partitions:\n    print(\'Plotting PCA of 1 partition vs {} partitions...\'.format(i))\n    \n    # Get data BEFORE correction\n    partition_before_file = os.path.join(\n        partition_dir,\n        "Partition_"+str(i)+".txt.xz")\n\n    partition_before = pd.read_table(\n        partition_before_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Match format of column names in before and after df\n    partition_before.columns = partition_before.columns.astype(str)\n    \n    print(partition_before.shape)\n    \n    # Add grouping column for plotting\n    partition_before[\'group\'] = "before"\n    \n    # Get data AFTER correction\n    partition_after_file = os.path.join(\n        partition_dir,\n        "Partition_corrected_"+str(i)+".txt.xz")\n\n    partition_after = pd.read_table(\n        partition_after_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Transpose data to df: sample x gene\n    partition_after = partition_after.T\n    \n    # Match format of column names in before and after df\n    #experiment_after.columns = experiment_after.columns.astype(str)\n    \n    print(partition_after.shape)\n    \n    # Add grouping column for plotting\n    partition_after[\'group\'] = "after"\n        \n    # Concatenate datasets together\n    combined_data_df = pd.concat([partition_before, partition_after])\n    \n    print(combined_data_df.shape)\n    \n    # PCA projection\n    pca = PCA(n_components=2)\n\n    # Encode expression data into 2D PCA space    \n    combined_data_numeric_df = combined_data_df.drop([\'group\'], axis=1)    \n    combined_data_PCAencoded = pca.fit_transform(combined_data_numeric_df)\n\n    \n    combined_data_PCAencoded_df = pd.DataFrame(combined_data_PCAencoded,\n                                               index=combined_data_df.index,\n                                               columns=[\'PC1\', \'PC2\']\n                                              )\n    print("after PCA applied")\n    \n    # Add back in batch labels (i.e. labels = "batch_"<how many batch effects were added>)\n    combined_data_PCAencoded_df[\'group\'] = combined_data_df[\'group\']\n    \n    # Add column that designates which batch effect comparision (i.e. comparison of 1 batch vs 5 batches\n    # is represented by label = 5)\n    combined_data_PCAencoded_df[\'num_partitions\'] = str(i)\n    \n    # Concatenate ALL comparisons\n    all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])\n    \n    # Split dataframe in order to plot \'after\' on top of \'before\'\n    df_layer_1 = combined_data_PCAencoded_df[combined_data_PCAencoded_df[\'group\'] == "before"]\n    df_layer_2 = combined_data_PCAencoded_df[combined_data_PCAencoded_df[\'group\'] == "after"]\n\n    \n    # Plot individual comparisons\n    print(ggplot(combined_data_PCAencoded_df, aes(x=\'PC1\', y=\'PC2\')) \\\n          + geom_point(aes(color=\'group\'), alpha=0.2) \\\n          + geom_point(df_layer_1, aes(color=[\'before\']), alpha=0.2) \\\n          + geom_point(df_layer_2, aes(color=[\'after\']), alpha=0.2) \\\n          + xlab(\'PC1\') \\\n          + ylab(\'PC2\') \\\n          + ggtitle(\'Partition {} and Corrected Partition {}\'.format(i, i))\n         )')
 
 
-# In[ ]:
+# In[18]:
 
 
 # Plot all comparisons in one figure
@@ -315,7 +315,7 @@ ggsave(plot = g_correct, filename = pca_correct_file, dpi=300)
 # 
 # As a negative control we will permute the values within a sample, across genes in order to disrupt the gene expression structure.
 
-# In[ ]:
+# In[19]:
 
 
 # Read in permuated data
@@ -326,7 +326,7 @@ shuffled_simulated_data = pd.read_table(
     sep='\t')
 
 
-# In[ ]:
+# In[20]:
 
 
 # Label samples with label = perumuted
@@ -349,7 +349,7 @@ shuffled_data_PCAencoded_df = pd.DataFrame(shuffled_data_PCAencoded,
 shuffled_data_PCAencoded_df['group'] = input_vs_permuted_df['group']
 
 
-# In[ ]:
+# In[21]:
 
 
 # Plot permuted data

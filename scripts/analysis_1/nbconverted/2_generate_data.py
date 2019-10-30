@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Generate data and calculate similarity
@@ -15,7 +15,7 @@
 # 2. Embed samples from the experiment into the trained latent space
 # 3. Randomly shift the samples to a new location in the latent space. This new location will be selected based on the distribution of samples in the latent space 
 
-# In[1]:
+# In[3]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -31,7 +31,8 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
+from plotnine import (ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave,
+                     theme_bw)
 
 sys.path.append("../")
 from functions import generate_data
@@ -235,7 +236,7 @@ similarity_score_df
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[17]:
+# In[4]:
 
 
 # Plot
@@ -246,7 +247,7 @@ threshold = pd.DataFrame(
     index=lst_num_partitions,
     columns=['score'])
 
-g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_partitions, y='score'), threshold, linetype='dashed')     + xlab('Number of Partitions')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of partitions')
+g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_partitions, y='score'), threshold, linetype='dashed')     + xlab('Number of Partitions')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of partitions')     + theme_bw()
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
