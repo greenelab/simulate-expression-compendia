@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Process metadata
@@ -30,7 +30,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[3]:
+# In[2]:
 
 
 # Input files
@@ -41,9 +41,6 @@ base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
 # base dir on local machine for data storage
 # os.makedirs doesn't recognize `~`
 local_dir = local_dir = os.path.abspath(os.path.join(os.getcwd(), "../../../..")) 
-
-NN_dir = base_dir + "/models/" + NN_architecture
-latent_dim = NN_architecture.split('_')[-1]
 
 mapping_file = os.path.join(
     base_dir,
@@ -58,7 +55,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[4]:
+# In[3]:
 
 
 # Output file
@@ -71,7 +68,7 @@ experiment_id_file = os.path.join(
 
 # ### Get experiment ids
 
-# In[5]:
+# In[4]:
 
 
 # Read in metadata
@@ -84,14 +81,14 @@ metadata = pd.read_table(
 metadata.head()
 
 
-# In[6]:
+# In[5]:
 
 
 map_experiment_sample = metadata[['sample_name', 'ml_data_source']]
 map_experiment_sample.head()
 
 
-# In[7]:
+# In[6]:
 
 
 experiment_ids = np.unique(np.array(map_experiment_sample.index))
@@ -100,7 +97,7 @@ print("There are {} experiments in the compendium".format(len(experiment_ids)))
 
 # ### Get sample ids from gene expression data
 
-# In[8]:
+# In[7]:
 
 
 normalized_data = pd.read_table(
@@ -112,7 +109,7 @@ normalized_data = pd.read_table(
 normalized_data.head()
 
 
-# In[9]:
+# In[8]:
 
 
 sample_ids_with_gene_expression = list(normalized_data.index)
@@ -120,7 +117,7 @@ sample_ids_with_gene_expression = list(normalized_data.index)
 
 # ### Get samples belonging to selected experiment
 
-# In[10]:
+# In[9]:
 
 
 experiment_ids_with_gene_expression = []
@@ -138,14 +135,14 @@ for experiment_id in experiment_ids:
 print('There are {} experiments with gene expression data'.format(len(experiment_ids_with_gene_expression)))
 
 
-# In[11]:
+# In[10]:
 
 
 experiment_ids_with_gene_expression_df = pd.DataFrame(experiment_ids_with_gene_expression, columns=['experiment_id'])
 experiment_ids_with_gene_expression_df.head()
 
 
-# In[12]:
+# In[11]:
 
 
 # Save simulated data
