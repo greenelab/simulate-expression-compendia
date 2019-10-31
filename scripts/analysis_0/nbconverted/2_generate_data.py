@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Generate data and calculate similarity
@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[30]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -21,7 +21,14 @@ import sys
 import glob
 import pandas as pd
 import numpy as np
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave, scale_x_log10
+from plotnine import (ggplot, 
+                      labs,  
+                      geom_line, 
+                      aes, 
+                      ggsave, 
+                      theme_bw,
+                      theme,
+                      element_text)
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -34,7 +41,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[22]:
+# In[2]:
 
 
 # User parameters
@@ -70,7 +77,7 @@ svcca_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
-    "svcca.pdf")
+    "analysis_0_svcca.png")
 
 
 # ### Generate simulated data
@@ -155,7 +162,7 @@ batch_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_file,
                                                            analysis_name)
 
 
-# In[26]:
+# In[11]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -166,13 +173,13 @@ similarity_score_df.index.name = 'number of experiments'
 similarity_score_df
 
 
-# In[29]:
+# In[12]:
 
 
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[32]:
+# In[13]:
 
 
 # Plot
@@ -183,7 +190,11 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + xlab('Number of Experiments')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of experiments')
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + labs(x = "Number of Experiments", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity across varying numbers of experiments") \
+    + theme_bw() \
+    + theme(plot_title=element_text(weight='bold'))
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)

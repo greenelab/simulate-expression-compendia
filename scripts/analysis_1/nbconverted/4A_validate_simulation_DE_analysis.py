@@ -167,9 +167,9 @@ sns.clustermap(selected_simulated_data.T)
 
 # Get experiment id
 #experiment_id = 'E-GEOD-43641'
-#experiment_id = 'E-GEOD-51409'
+experiment_id = 'E-GEOD-51409'
 #experiment_id = 'E-GEOD-49759'
-experiment_id = 'E-GEOD-30967'
+#experiment_id = 'E-GEOD-30967'
 
 
 # In[15]:
@@ -248,15 +248,15 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
 
-# In[22]:
+# In[21]:
 
 
-get_ipython().run_cell_magic('R', '', 'source("/home/alexandra/Documents/Repos/Batch_effects_simulation/scripts/functions/DE_analysis.R")\nexperiment_id = \'E-GEOD-30967\'\nfind_DEGs("metadata_deg_phosphate", experiment_id)\n#find_DEGs("metadata_deg_temp")')
+get_ipython().run_cell_magic('R', '', 'source("/home/alexandra/Documents/Repos/Batch_effects_simulation/scripts/functions/DE_analysis.R")\nexperiment_id = \'E-GEOD-51409\'\nfind_DEGs("metadata_deg_phosphate", experiment_id)\n#find_DEGs("metadata_deg_temp")')
 
 
 # ## Visualize gene expression data using DEGs
 
-# In[23]:
+# In[22]:
 
 
 # Import list of DEGs
@@ -277,7 +277,7 @@ DEG_original_file = os.path.join(
     "sign_DEG_original_"+experiment_id+".txt")
 
 
-# In[24]:
+# In[23]:
 
 
 # Read data
@@ -296,7 +296,27 @@ DEG_original_data = pd.read_table(
 DEG_sim_data.head()
 
 
+# ### Select top differentially expressed genes
+
+# In[24]:
+
+
+DEG_sim_data.sort_values(by=['adj.P.Val'])
+DEG_sim_data = DEG_sim_data.iloc[0:10,]
+
+DEG_sim_data
+
+
 # In[25]:
+
+
+DEG_original_data.sort_values(by=['adj.P.Val'])
+DEG_original_data = DEG_original_data.iloc[0:10,]
+
+DEG_original_data
+
+
+# In[26]:
 
 
 # Get DEG ids
@@ -304,7 +324,7 @@ sim_gene_ids = list(DEG_sim_data.index)
 original_gene_ids = list(DEG_original_data.index)
 
 
-# In[26]:
+# In[27]:
 
 
 # Plot original data
@@ -312,7 +332,7 @@ selected_original_DEG_data = selected_original_data[original_gene_ids]
 sns.clustermap(selected_original_DEG_data.T)
 
 
-# In[27]:
+# In[28]:
 
 
 # Plot simulated

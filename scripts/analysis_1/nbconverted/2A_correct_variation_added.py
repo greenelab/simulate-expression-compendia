@@ -27,7 +27,14 @@ import sys
 import glob
 import pandas as pd
 import numpy as np
-from plotnine import ggplot, ggtitle, xlab, ylab, geom_point, geom_line, aes, ggsave
+from plotnine import (ggplot, 
+                      labs,  
+                      geom_line, 
+                      aes, 
+                      ggsave, 
+                      theme_bw,
+                      theme,
+                      element_text)
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -83,7 +90,7 @@ svcca_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
-    "svcca_correction.pdf")
+    "analysis_1_svcca_correction.png")
 
 
 # ### Correct for added variation
@@ -210,7 +217,11 @@ threshold = pd.DataFrame(
     index=lst_num_partitions,
     columns=['score'])
 
-g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_partitions, y='score'), threshold, linetype='dashed')     + xlab('Number of Partitions')     + ylab('Similarity score (SVCCA)')     + ggtitle('Similarity across varying numbers of partitions')
+g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_partitions, y='score'), threshold, linetype='dashed')     + labs(x = "Number of Partitions", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity after correcting for partition variation") \
+    + theme_bw() \
+    + theme(plot_title=element_text(weight='bold'))
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
