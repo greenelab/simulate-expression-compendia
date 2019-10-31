@@ -593,7 +593,7 @@ def add_experiments(
 
             for j in range(i):
                 # Scalar to shift gene expressiond data
-                stretch_factor = np.random.normal(0.0, 0.1, [1, num_genes])
+                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
 
                 # Tile stretch_factor to be able to add to batches
                 num_samples_per_experiment = len(partition[j])
