@@ -160,13 +160,10 @@ def simulate_compendium(
 
     simulated_data_df = pd.DataFrame()
 
-    # Randomly select experiment id
-    selected_experiment_ids = np.random.choice(
-        experiment_ids['experiment_id'], size=num_simulated_experiments, replace=False)
-
     for i in range(num_simulated_experiments):
 
-        selected_experiment_id = selected_experiment_ids[i]
+        selected_experiment_id = np.random.choice(
+            experiment_ids['experiment_id'], size=1)[0]
 
         # Get corresponding sample ids
         sample_ids = get_sample_ids(selected_experiment_id)
@@ -220,13 +217,13 @@ def simulate_compendium(
         simulated_data_decoded = loaded_decode_model.predict_on_batch(
             simulated_data_encoded_df)
 
-        # print(normalized_data.columns)
         simulated_data_decoded_df = pd.DataFrame(simulated_data_decoded,
                                                  index=simulated_data_encoded_df.index,
-                                                 columns=normalized_data.columns)
+                                                 columns=selected_data_df.columns)
 
         # Add experiment label
-        simulated_data_decoded_df["experiment_id"] = selected_experiment_id
+        simulated_data_decoded_df["experiment_id"] = selected_experiment_id + \
+            "_" + str(i)
 
         # Concatenate dataframe per experiment together
         simulated_data_df = pd.concat(
@@ -245,12 +242,18 @@ def simulate_compendium(
 
     simulated_data_scaled_df['experiment_id'] = simulated_data_df['experiment_id']
 
+    # If sampling with replacement, then there will be multiple sample ids that are the same
+    # therefore we want to reset the index.
+    simulated_data_scaled_df.reset_index(drop=True, inplace=True)
+
+    print(simulated_data_scaled_df.shape)
+
     # Remove expression data for samples that have duplicate sample id across
     # different experiment ids
     # We remove these because we are not sure which experiment the sample should
     # belong to
-    simulated_data_scaled_df = simulated_data_scaled_df.loc[~simulated_data_scaled_df.index.duplicated(
-        keep=False)]
+    # simulated_data_scaled_df = simulated_data_scaled_df.loc[~simulated_data_scaled_df.index.duplicated(
+    #    keep=False)]
 
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
         simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
