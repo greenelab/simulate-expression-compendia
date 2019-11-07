@@ -10,7 +10,7 @@
 # 2. Use [removeBatchEffect](https://rdrr.io/bioc/limma/man/removeBatchEffect.html) package from the limma library in R.
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset corrected for the variation introduced by having some number of experiments added.
 
-# In[1]:
+# In[21]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -34,7 +34,9 @@ from plotnine import (ggplot,
                       ggsave, 
                       theme_bw,
                       theme,
-                      element_text)
+                      element_text,
+                      element_rect,
+                      element_line)
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -59,7 +61,7 @@ get_ipython().run_cell_magic('R', '', '# Run once to install needed R packages\n
 # User parameters
 NN_architecture = 'NN_2500_30'
 analysis_name = 'analysis_1'
-lst_num_partitions = [1,2,3,5,10,20,30,50,70,100]
+lst_num_partitions =[1,2,3,5,10,20,30,50,70,100,200,300,400,500,600]
 use_pca = True
 num_PCs = 10
 
@@ -81,7 +83,7 @@ simulated_data_file = os.path.join(
     "simulated_data.txt.xz")
 
 
-# In[5]:
+# In[25]:
 
 
 # Output file
@@ -91,6 +93,20 @@ svcca_file = os.path.join(
     "Batch_effects",
     "output",
     "analysis_1_svcca_correction.png")
+
+svcca_blk_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_svcca_correction_blk.png")
+
+similarity_corrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_similarity_corrected.pickle")
 
 
 # ### Correct for added variation
@@ -206,7 +222,7 @@ similarity_score_df
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[11]:
+# In[17]:
 
 
 # Plot
@@ -225,4 +241,38 @@ g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
+
+
+# In[24]:
+
+
+# Plot - black
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_score,
+        (len(lst_num_partitions), 1)),
+    index=lst_num_partitions,
+    columns=['score'])
+
+g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line(colour="white")     + geom_line(aes(x=lst_num_partitions, y='score'), threshold, colour="white", linetype='dashed')     + labs(x = "Number of Partitions", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity after correcting for partition variation") \
+    + theme(plot_title=element_text(weight='bold', colour="white"),
+            plot_background=element_rect(fill="black"),
+            panel_background=element_rect(fill="black"),
+            axis_title_x=element_text(colour="white"),
+            axis_title_y=element_text(colour="white"),
+            axis_line=element_line(color="white"),
+            axis_text=element_text(color="white")
+           )
+
+print(g)
+ggsave(plot=g, filename=svcca_blk_file, dpi=300)
+
+
+# In[26]:
+
+
+# Pickle similarity scores to overlay uncorrected and corrected svcca curves
+similarity_score_df.to_pickle(similarity_corrected_file)
 

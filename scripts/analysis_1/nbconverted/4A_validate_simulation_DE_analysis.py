@@ -68,8 +68,33 @@ simulated_data_file = os.path.join(
     analysis_name,
     "simulated_data.txt.xz")
 
+mapping_file = os.path.join(
+    base_dir,
+    "data",
+    "metadata",
+    "sample_annotations.tsv")
+
 
 # In[4]:
+
+
+# Output files
+original_DEG_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_DE_original_analysis.png")
+
+simulated_DEG_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_DE_simulated_analysis.png")
+
+
+# In[5]:
 
 
 # Read data
@@ -89,80 +114,113 @@ print(normalized_data.shape)
 print(simulated_data.shape)
 
 
-# In[5]:
+# In[6]:
 
 
 normalized_data.head(10)
 
 
-# In[6]:
+# In[7]:
 
 
 normalized_data.hist(column='PA0002')
 
 
-# In[7]:
+# In[8]:
 
 
 simulated_data.head(10)
 
 
-# In[8]:
+# In[9]:
 
 
 simulated_data.hist(column='PA0002')
+
+
+# In[10]:
+
+
+# Read in metadata
+metadata = pd.read_table(
+    mapping_file, 
+    header=0, 
+    sep='\t', 
+    index_col=0)
+
+metadata.head()
+
+
+# In[11]:
+
+
+map_experiment_sample = metadata[['sample_name', 'ml_data_source']]
+map_experiment_sample.head()
 
 
 # ## Oxygen gradient experiment
 # 
 # **Question:** Is the gene expression pattern/profile of the PA1683 gene consistent between the input and the simulated data?  (The magnitude of the activity may be different but the trend should be the same)
 
-# In[9]:
+# In[12]:
 
 
 # Get experiment id
 experiment_id = 'E-GEOD-52445'
 
 
-# In[10]:
-
-
-# Get simulated samples associated with experiment_id
-selected_simulated_data = simulated_data[simulated_data['experiment_id'] == experiment_id]
-
-# Get sample ids associated with experiment_id
-selected_sample_ids = list(selected_simulated_data.index)
-
-selected_simulated_data.head(5)
-
-
-# In[11]:
+# In[13]:
 
 
 # Get original samples associated with experiment_id
-selected_original_data = normalized_data.loc[selected_sample_ids]
+selected_mapping = map_experiment_sample.loc[experiment_id]
+original_selected_sample_ids = list(selected_mapping['ml_data_source'].values)
+
+selected_original_data = normalized_data.loc[original_selected_sample_ids]
 
 selected_original_data.head(5)
 
 
-# In[12]:
+# In[14]:
+
+
+# Get first matching experiment id
+match_experiment_id = ''
+for experiment_name in simulated_data['experiment_id'].values:
+    if experiment_name.split("_")[0] == experiment_id:
+        match_experiment_id = experiment_name        
+
+
+# In[15]:
+
+
+# Get simulated samples associated with experiment_id
+selected_simulated_data = simulated_data[simulated_data['experiment_id'] == match_experiment_id]
+
+# Map sample ids from original data to simulated data
+selected_simulated_data.index = original_selected_sample_ids
+
+selected_simulated_data.head(5)
+
+
+# In[16]:
 
 
 # Plot original data
-sns.clustermap(selected_original_data.T)
+sns.clustermap(selected_original_data.T, cmap="viridis")
 
 
-# In[13]:
+# In[17]:
 
 
 # Plot simulated
 selected_simulated_data = selected_simulated_data.drop(columns=['experiment_id'])
-sns.clustermap(selected_simulated_data.T)
+sns.clustermap(selected_simulated_data.T, cmap="viridis")
 
 
 # ## Two different conditions
 
-# In[14]:
+# In[18]:
 
 
 # Get experiment id
@@ -172,47 +230,61 @@ experiment_id = 'E-GEOD-51409'
 #experiment_id = 'E-GEOD-30967'
 
 
-# In[15]:
-
-
-# Get simulated samples associated with experiment_id
-selected_simulated_data = simulated_data[simulated_data['experiment_id'] == experiment_id]
-
-# Get sample ids associated with experiment_id
-selected_sample_ids = list(selected_simulated_data.index)
-
-selected_simulated_data.head(5)
-
-
-# In[16]:
+# In[19]:
 
 
 # Get original samples associated with experiment_id
-selected_original_data = normalized_data.loc[selected_sample_ids]
+selected_mapping = map_experiment_sample.loc[experiment_id]
+original_selected_sample_ids = list(selected_mapping['ml_data_source'].values)
+
+selected_original_data = normalized_data.loc[original_selected_sample_ids]
 
 selected_original_data.head(10)
 
 
-# In[17]:
+# In[20]:
+
+
+# Get first matching experiment id
+match_experiment_id = ''
+for experiment_name in simulated_data['experiment_id'].values:
+    if experiment_name.split("_")[0] == experiment_id:
+        match_experiment_id = experiment_name 
+
+
+# In[21]:
+
+
+# Get simulated samples associated with experiment_id
+selected_simulated_data = simulated_data[simulated_data['experiment_id'] == match_experiment_id]
+
+# Map sample ids from original data to simulated data
+selected_simulated_data.index = original_selected_sample_ids
+
+selected_simulated_data.head(5)
+
+
+# In[22]:
 
 
 # Plot original data
-sns.clustermap(selected_original_data.T)
+sns.clustermap(selected_original_data.T, cmap="viridis")
 
 
-# In[18]:
+# In[23]:
 
 
 # Plot simulated
 selected_simulated_data = selected_simulated_data.drop(columns=['experiment_id'])
-sns.clustermap(selected_simulated_data.T)
+with sns.color_palette("viridis"):
+    sns.clustermap(selected_simulated_data.T, cmap="viridis")
 
 
 # ## Output selected gene expression data
 # 
 # We will use this to put into R script to identify differentially expressed genes (DEGs)
 
-# In[19]:
+# In[24]:
 
 
 selected_simulated_data_file = os.path.join(
@@ -240,7 +312,7 @@ selected_original_data.to_csv(
 
 # ## Find differentially expressed genes
 
-# In[20]:
+# In[25]:
 
 
 get_ipython().run_line_magic('load_ext', 'rpy2.ipython')
@@ -248,7 +320,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
 
-# In[21]:
+# In[26]:
 
 
 get_ipython().run_cell_magic('R', '', 'source("/home/alexandra/Documents/Repos/Batch_effects_simulation/scripts/functions/DE_analysis.R")\nexperiment_id = \'E-GEOD-51409\'\nfind_DEGs("metadata_deg_phosphate", experiment_id)\n#find_DEGs("metadata_deg_temp")')
@@ -256,7 +328,7 @@ get_ipython().run_cell_magic('R', '', 'source("/home/alexandra/Documents/Repos/B
 
 # ## Visualize gene expression data using DEGs
 
-# In[22]:
+# In[27]:
 
 
 # Import list of DEGs
@@ -277,7 +349,7 @@ DEG_original_file = os.path.join(
     "sign_DEG_original_"+experiment_id+".txt")
 
 
-# In[23]:
+# In[28]:
 
 
 # Read data
@@ -298,7 +370,7 @@ DEG_sim_data.head()
 
 # ### Select top differentially expressed genes
 
-# In[24]:
+# In[29]:
 
 
 DEG_sim_data.sort_values(by=['adj.P.Val'])
@@ -307,7 +379,7 @@ DEG_sim_data = DEG_sim_data.iloc[0:10,]
 DEG_sim_data
 
 
-# In[25]:
+# In[30]:
 
 
 DEG_original_data.sort_values(by=['adj.P.Val'])
@@ -316,7 +388,7 @@ DEG_original_data = DEG_original_data.iloc[0:10,]
 DEG_original_data
 
 
-# In[26]:
+# In[31]:
 
 
 # Get DEG ids
@@ -324,19 +396,27 @@ sim_gene_ids = list(DEG_sim_data.index)
 original_gene_ids = list(DEG_original_data.index)
 
 
-# In[27]:
+# In[32]:
 
 
 # Plot original data
 selected_original_DEG_data = selected_original_data[original_gene_ids]
-sns.clustermap(selected_original_DEG_data.T)
+#sns.clustermap(selected_original_DEG_data.T)
+f = sns.clustermap(selected_original_DEG_data.T, cmap="viridis")
+f.savefig(original_DEG_file, dpi=300)
 
 
-# In[28]:
+# In[41]:
 
 
 # Plot simulated
 #selected_simulated_data = selected_simulated_data.drop(columns=['experiment_id'])
 selected_simulated_DEG_data = selected_simulated_data[sim_gene_ids]
-sns.clustermap(selected_simulated_DEG_data.T)
+#sns.clustermap(selected_simulated_DEG_data.T)
+import matplotlib.pyplot as plt
+sns.set(style="ticks", context="talk")
+plt.style.use("dark_background")
+#sns.set_style("darkgrid")
+sns.clustermap(selected_simulated_DEG_data.T, cmap="viridis")
+#f.savefig(simulated_DEG_file, dpi=300)
 

@@ -10,7 +10,7 @@
 # 2. Use [removeBatchEffect](https://rdrr.io/bioc/limma/man/removeBatchEffect.html) package from the limma library in R.
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset corrected for the variation introduced by having some number of experiments added.
 
-# In[1]:
+# In[18]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -25,6 +25,7 @@ limma = importr('limma')
 import os
 import sys
 import glob
+import pickle
 import pandas as pd
 import numpy as np
 from plotnine import (ggplot, 
@@ -34,7 +35,9 @@ from plotnine import (ggplot,
                       ggsave, 
                       theme_bw,
                       theme,
-                      element_text)
+                      element_text,
+                      element_rect,
+                      element_line)
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -82,7 +85,7 @@ simulated_data_file = os.path.join(
     "simulated_data.txt.xz")
 
 
-# In[5]:
+# In[19]:
 
 
 # Output file
@@ -92,6 +95,20 @@ svcca_file = os.path.join(
     "Batch_effects",
     "output",
     "analysis_0_svcca_correction.png")
+
+svcca_blk_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_0_svcca_correction_blk.png")
+
+similarity_corrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_0_similarity_corrected.pickle")
 
 
 # ### Correct for added variation
@@ -204,7 +221,7 @@ similarity_score_df
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[11]:
+# In[16]:
 
 
 # Plot
@@ -223,4 +240,38 @@ g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geo
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
+
+
+# In[17]:
+
+
+# Plot - black
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_score,
+        (len(lst_num_experiments), 1)),
+    index=lst_num_experiments,
+    columns=['score'])
+
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line(colour="white")     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, colour="white", linetype='dashed')     + labs(x = "Number of Experiments", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity after correcting for experiment variation") \
+    + theme(plot_title=element_text(weight='bold', colour="white"),
+            plot_background=element_rect(fill="black"),
+            panel_background=element_rect(fill="black"),
+            axis_title_x=element_text(colour="white"),
+            axis_title_y=element_text(colour="white"),
+            axis_line=element_line(color="white"),
+            axis_text=element_text(color="white")
+           )
+
+print(g)
+ggsave(plot=g, filename=svcca_blk_file, dpi=300)
+
+
+# In[20]:
+
+
+# Pickle similarity scores to overlay uncorrected and corrected svcca curves
+similarity_score_df.to_pickle(similarity_corrected_file)
 

@@ -38,7 +38,9 @@ from plotnine import (ggplot,
                       ggsave, 
                       theme_bw,
                       theme,
-                      element_text)
+                      element_text,
+                      element_rect,
+                      element_line)
 
 sys.path.append("../")
 from functions import generate_data
@@ -55,8 +57,8 @@ seed(randomState)
 # User parameters
 NN_architecture = 'NN_2500_30'
 analysis_name = 'analysis_1'
-num_simulated_experiments = 100
-lst_num_partitions = [1,2,3,5,10,20,30,50,70,100]
+num_simulated_experiments = 600
+lst_num_partitions = [1,2,3,5,10,20,30,50,70,100,200,300,400,500,600]
 use_pca = True
 num_PCs = 10
 
@@ -82,7 +84,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[4]:
+# In[24]:
 
 
 # Output file
@@ -92,6 +94,27 @@ svcca_file = os.path.join(
     "Batch_effects",
     "output",
     "analysis_1_svcca.png")
+
+svcca_blk_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_svcca_blk.png")
+
+similarity_uncorrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_similarity_uncorrected.pickle")
+
+permuted_score_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_permuted.txt")
 
 
 # ### Load file with experiment ids
@@ -149,6 +172,14 @@ simulated_data.head()
 # In[9]:
 
 
+ids = set([i.split("_")[0] for i in simulated_data['experiment_id']])
+len(ids)     
+#simulated_data['experiment_id'].sort_values()
+
+
+# In[10]:
+
+
 normalized_data = pd.read_table(
         normalized_data_file,
         header=0,
@@ -160,7 +191,7 @@ normalized_data.head()
 
 # ### Generate permuted version of simulated data (negative control)
 
-# In[10]:
+# In[11]:
 
 
 # Permute simulated data to be used as a negative control
@@ -169,7 +200,7 @@ generate_data.permute_data(simulated_data_file,
                           analysis_name)
 
 
-# In[11]:
+# In[12]:
 
 
 # Permuted simulated data file 
@@ -182,7 +213,7 @@ permuted_simulated_data_file = os.path.join(
     "permuted_simulated_data.txt.xz")
 
 
-# In[12]:
+# In[13]:
 
 
 # Read in data
@@ -199,7 +230,7 @@ permuted_data.head()
 # 
 # For this simulation experiment we want to capture the experiment-level information.  In []() we divided our samples into experiments, we divide the experiments (by experiment id) into partitions where each partition is capturing a source of technical variation (i.e. these 3 experiments came from lab A and these other 3 experiments came from lab B and so lab A and B are our partitions).
 
-# In[13]:
+# In[14]:
 
 
 # Add technical variation to partitions
@@ -211,7 +242,7 @@ generate_data.add_experiments_grped(simulated_data_file,
 
 # ### Calculate similarity
 
-# In[14]:
+# In[15]:
 
 
 # Calculate similarity
@@ -225,7 +256,7 @@ similarity_scores, permuted_score = similarity_metric.sim_svcca(simulated_data_f
                                                            analysis_name)
 
 
-# In[15]:
+# In[16]:
 
 
 # Convert similarity scores to pandas dataframe
@@ -236,13 +267,13 @@ similarity_score_df.index.name = 'number of partitions'
 similarity_score_df
 
 
-# In[16]:
+# In[17]:
 
 
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[17]:
+# In[18]:
 
 
 # Plot
@@ -253,7 +284,7 @@ threshold = pd.DataFrame(
     index=lst_num_partitions,
     columns=['score'])
 
-g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line()     + labs(x = "Number of Partitions", 
+g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_partitions, y='score'), threshold, linetype='dashed')     + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
            title = "Similarity across varying numbers of partitions") \
     + theme_bw() \
@@ -261,4 +292,40 @@ g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom
 
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
+
+
+# In[22]:
+
+
+# Plot - black
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_score,
+        (len(lst_num_partitions), 1)),
+    index=lst_num_partitions,
+    columns=['score'])
+
+g = ggplot(similarity_score_df, aes(x=lst_num_partitions, y='score'))     + geom_line(color="white")     + geom_line(threshold, aes(x=lst_num_partitions, y='score'), color="white", linetype='dashed')     + labs(x = "Number of Partitions", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity across varying numbers of partitions") \
+    + theme(plot_title=element_text(weight='bold', colour="white"),
+            plot_background=element_rect(fill="black"),
+            panel_background=element_rect(fill="black"),
+            axis_title_x=element_text(colour="white"),
+            axis_title_y=element_text(colour="white"),
+            axis_line=element_line(color="white"),
+            axis_text=element_text(color="white")
+           )
+
+
+print(g)
+ggsave(plot=g, filename=svcca_blk_file, dpi=300)
+
+
+# In[25]:
+
+
+# Pickle similarity scores to overlay uncorrected and corrected svcca curves
+similarity_score_df.to_pickle(similarity_uncorrected_file)
+np.save(permuted_score_file, permuted_score)
 

@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[1]:
+# In[52]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -19,6 +19,7 @@ get_ipython().run_line_magic('autoreload', '2')
 import os
 import sys
 import glob
+import pickle
 import pandas as pd
 import numpy as np
 from plotnine import (ggplot, 
@@ -28,7 +29,9 @@ from plotnine import (ggplot,
                       ggsave, 
                       theme_bw,
                       theme,
-                      element_text)
+                      element_text,
+                      element_rect,
+                      element_line)
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -68,7 +71,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[4]:
+# In[56]:
 
 
 # Output file
@@ -78,6 +81,27 @@ svcca_file = os.path.join(
     "Batch_effects",
     "output",
     "analysis_0_svcca.png")
+
+svcca_blk_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_0_svcca_blk.png")
+
+similarity_uncorrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_0_similarity_uncorrected.pickle")
+
+permuted_score_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_0_permuted.txt")
 
 
 # ### Generate simulated data
@@ -179,7 +203,7 @@ similarity_score_df
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[13]:
+# In[51]:
 
 
 # Plot
@@ -190,12 +214,49 @@ threshold = pd.DataFrame(
     index=lst_num_experiments,
     columns=['score'])
 
-g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(aes(x=lst_num_experiments, y='score'), threshold, linetype='dashed')     + labs(x = "Number of Experiments", 
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line()     + geom_line(threshold, aes(x=lst_num_experiments, y='score'), linetype='dashed')     + labs(x = "Number of Experiments", 
            y = "Similarity score (SVCCA)", 
            title = "Similarity across varying numbers of experiments") \
     + theme_bw() \
     + theme(plot_title=element_text(weight='bold'))
 
+
 print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
+
+
+# In[50]:
+
+
+# Plot - black
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_score,
+        (len(lst_num_experiments), 1)),
+    index=lst_num_experiments,
+    columns=['score'])
+
+g = ggplot(similarity_score_df, aes(x=lst_num_experiments, y='score'))     + geom_line(color="white")     + geom_line(threshold, aes(x=lst_num_experiments, y='score'), color="white", linetype='dashed')     + labs(x = "Number of Experiments", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity across varying numbers of experiments") \
+    + theme(plot_title=element_text(weight='bold', colour="white"),
+            plot_background=element_rect(fill="black"),
+            panel_background=element_rect(fill="black"),
+            axis_title_x=element_text(colour="white"),
+            axis_title_y=element_text(colour="white"),
+            axis_line=element_line(color="white"),
+            axis_text=element_text(color="white")
+           )
+
+
+print(g)
+ggsave(plot=g, filename=svcca_blk_file, dpi=300)
+
+
+# In[57]:
+
+
+# Pickle similarity scores to overlay uncorrected and corrected svcca curves
+similarity_score_df.to_pickle(similarity_uncorrected_file)
+np.save(permuted_score_file, permuted_score)
 
