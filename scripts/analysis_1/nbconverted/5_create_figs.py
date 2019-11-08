@@ -65,6 +65,13 @@ permuted_score_file = os.path.join(
 
 
 # Output files
+svcca_uncorrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "analysis_1_svcca_uncorrected.png")
+
 svcca_overlay_file = os.path.join(
     local_dir,
     "Data",
@@ -108,6 +115,51 @@ all_svcca
 # In[7]:
 
 
+# Plot - uncorrected only
+lst_num_experiments = list(all_svcca.index[0:int(len(all_svcca.index)/2)])
+
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_score,
+        (len(lst_num_experiments), 1)),
+    index=lst_num_experiments,
+    columns=['score'])
+
+g = ggplot(all_svcca[all_svcca['Group'] == 'uncorrected'])     + geom_line(all_svcca[all_svcca['Group'] == 'uncorrected'],
+                aes(x=lst_num_experiments, y='score', color='Group'),
+                size=1.5) \
+    + geom_line(threshold, 
+                aes(x=lst_num_experiments, y='score'), 
+                linetype='dashed',
+                size=1,
+                color="darkgrey",
+                show_legend=False) \
+    + labs(x = "Number of Partitions", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity across varying numbers of partitions") \
+    + theme(plot_title=element_text(weight='bold'),
+            plot_background=element_rect(fill="white"),
+            panel_background=element_rect(fill="white"),
+            panel_grid_major_x=element_line(color="lightgrey"),
+            panel_grid_major_y=element_line(color="lightgrey"),
+            axis_line=element_line(color="grey"),
+            legend_key=element_rect(fill='white', colour='white')
+           ) \
+    + scale_color_manual(['#b3e5fc']) \
+
+print(g)
+ggsave(plot=g, filename=svcca_uncorrected_file, dpi=300)
+
+
+# In[8]:
+
+
+all_svcca[all_svcca['Group'] == 'uncorrected']
+
+
+# In[9]:
+
+
 # Plot
 lst_num_experiments = list(all_svcca.index)
 
@@ -120,16 +172,16 @@ threshold = pd.DataFrame(
 
 g = ggplot(all_svcca)     + geom_line(all_svcca,
                 aes(x=lst_num_experiments, y='score', color='Group'),
-                size=0.8) \
+                size=1.5) \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',
-                size=0.8,
+                size=1,
                 color="darkgrey",
                 show_legend=False) \
-    + labs(x = "Number of Experiments", 
+    + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
-           title = "Similarity across varying numbers of experiments") \
+           title = "Similarity across varying numbers of partitions") \
     + theme(plot_title=element_text(weight='bold'),
             plot_background=element_rect(fill="white"),
             panel_background=element_rect(fill="white"),
@@ -138,13 +190,13 @@ g = ggplot(all_svcca)     + geom_line(all_svcca,
             axis_line=element_line(color="grey"),
             legend_key=element_rect(fill='white', colour='white')
            ) \
-    + scale_color_manual(['#83AF9B', '#87CEFA']) \
+    + scale_color_manual(['#1976d2', '#b3e5fc']) \
 
 print(g)
 ggsave(plot=g, filename=svcca_overlay_file, dpi=300)
 
 
-# In[8]:
+# In[10]:
 
 
 # Plot - black
@@ -159,16 +211,16 @@ threshold = pd.DataFrame(
 
 g = ggplot(all_svcca)     + geom_line(all_svcca,
                 aes(x=lst_num_experiments, y='score', color='Group'),
-                size=0.8) \
+                size=1.5) \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',
-                size=0.8,
+                size=1,
                 color="lightgrey",
                 show_legend=False) \
-    + labs(x = "Number of Experiments", 
+    + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
-           title = "Similarity across varying numbers of experiments") \
+           title = "Similarity across varying numbers of partitions") \
     + theme(plot_background=element_rect(fill='black'),
         legend_title_align = "center",
         legend_background=element_rect(fill='black', colour='black'),
@@ -184,7 +236,7 @@ g = ggplot(all_svcca)     + geom_line(all_svcca,
         strip_text=element_text(colour="white"),
         strip_background=element_blank()
            ) \
-    + scale_color_manual(['#83AF9B', '#87CEFA']) \
+    + scale_color_manual(['#1976d2', '#b3e5fc']) \
 
 print(g)
 ggsave(plot=g, filename=svcca_overlay_blk_file, dpi=300)
