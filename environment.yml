@@ -27,6 +27,7 @@ dependencies:
 - conda-forge::gxx_linux-64
 - conda-forge::rpy2=2.8
 - conda-forge::libiconv=1.15
+- conda-forge::joblib=0.13.2
 - pip:
   - torch>=0.4.0
   - matplotlib==3.0.0
