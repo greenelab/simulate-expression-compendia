@@ -145,15 +145,18 @@ def sim_svcca(simulated_data_file,
 
     Arguments
     ----------
-    simulated_data_file: str
-        File containing simulated gene expression data
+    simulated_data: df
+        Dataframe containing simulated gene expression data
 
-    permuted_simulated_data_file: str
-        File containing permuted simulated gene expression data
+    permuted_simulated_data: df
+        Dataframe containing permuted simulated gene expression data
 
-    file_prefix: str
-        File prefix to determine whether to use data before correction ("Experiment")
-        or after correction ("Experiment_corrected")
+    lst_compendia: list
+        list of dataframes containing simulated gene expression data
+        with varying amount of technical variation added
+
+    corrected: bool
+        True if correction was applied
 
     num_experiments: list
         List of different numbers of experiments/partitions to add to
@@ -193,6 +196,8 @@ def sim_svcca(simulated_data_file,
 
     output_list = []
 
+    #compendium_1 = lst_compendia[0][0]
+
     for i in num_experiments:
         if "Experiment" in file_prefix:
             print(
@@ -201,6 +206,8 @@ def sim_svcca(simulated_data_file,
             print('Calculating SVCCA score for 1 partition vs {} partitions..'.format(i))
 
         # All experiments/partitions
+        #compendium_other = lst_compendia[i][0]
+
         compendium_other_file = os.path.join(
             compendium_dir,
             file_prefix + "_" + str(i) + ".txt.xz")
@@ -211,9 +218,11 @@ def sim_svcca(simulated_data_file,
             index_col=0,
             sep='\t')
 
+        #print(compendium_other.shape)
+
         # Transpose compendium df because output format
         # for correction method is swapped
-        if file_prefix.split("_")[-1] == "corrected":
+        if "corrected" in file_prefix:
             compendium_other = compendium_other.T
 
         if use_pca:
@@ -265,7 +274,7 @@ def sim_svcca(simulated_data_file,
 
     else:
         svcca_results = cca_core.get_cca_similarity(simulated_data.T,
-                                                    shuffled_simulated_data.T,
+                                                    permuted_data.T,
                                                     verbose=False)
 
         permuted_svcca = np.mean(svcca_results["cca_coef1"])
