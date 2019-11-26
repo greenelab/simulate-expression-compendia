@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # # Visualize data
@@ -349,13 +349,13 @@ ggsave(plot = g_pca, filename = pca_blk_file, dpi=300)
 
 # ## Visualize multiple experiments in UMAP space
 
-# In[17]:
+# In[ ]:
 
 
 get_ipython().run_cell_magic('time', '', '\nall_data_df = pd.DataFrame()\n\n# Get batch 1 data\npartition_1_file = os.path.join(\n    partition_dir,\n    "Partition_1.txt.xz")\n\npartition_1 = pd.read_table(\n    partition_1_file,\n    header=0,\n    index_col=0,\n    sep=\'\\t\')\n\n\nfor i in lst_num_partitions:\n    print(\'Plotting UMAP of 10-PCA of 1 partition vs {} partitions...\'.format(i))\n    \n    # Simulated data with all samples in a single batch\n    original_data_df =  partition_1.copy()\n    \n    # Add grouping column for plotting\n    original_data_df[\'group\'] = \'partition_1\'\n    \n    # Get data with additional partitions added\n    partition_other_file = os.path.join(\n        partition_dir,\n        "Partition_"+str(i)+".txt.xz")\n\n    partition_other = pd.read_table(\n        partition_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Simulated data with i partitions\n    partition_data_df =  partition_other\n    \n    # Add grouping column for plotting\n    partition_data_df[\'group\'] = "partition_{}".format(i)\n    \n    # Concatenate datasets together\n    combined_data_df = pd.concat([original_data_df, partition_data_df])\n    \n    # PCA projection\n    pca = PCA(n_components=10)\n\n    # Encode expression data into 2D PCA space\n    combined_data_numeric_df = combined_data_df.drop([\'group\'], axis=1)\n    combined_data_PCAencoded = pca.fit_transform(combined_data_numeric_df)\n\n\n    combined_data_PCAencoded_df = pd.DataFrame(combined_data_PCAencoded,\n                                               index=combined_data_df.index,\n                                              )\n    \n    # Variance explained\n    print(pca.explained_variance_ratio_)  \n                                              \n   \n    # Encode 10-dim PCA compressed expression data into UMAP space\n    combined_data_UMAPencoded = umap.UMAP(random_state=randomState).fit_transform(combined_data_PCAencoded_df)\n    combined_data_UMAPencoded_df = pd.DataFrame(data=combined_data_UMAPencoded,\n                                             index=combined_data_PCAencoded_df.index,\n                                             columns=[\'UMAP1\',\'UMAP2\'])\n    \n    \n    # Add back in batch labels (i.e. labels = "batch_"<how many batch effects were added>)\n    combined_data_UMAPencoded_df[\'group\'] = combined_data_df[\'group\']\n    \n    # Add column that designates which batch effect comparision (i.e. comparison of 1 batch vs 5 batches\n    # is represented by label = 5)\n    combined_data_UMAPencoded_df[\'num_partitions\'] = str(i)\n    \n    # Concatenate ALL comparisons\n    all_data_df = pd.concat([all_data_df, combined_data_UMAPencoded_df])\n    \n    # Plot individual comparisons\n    print(ggplot(combined_data_UMAPencoded_df, aes(x=\'UMAP1\', y=\'UMAP2\')) \\\n          + geom_point(aes(color=\'group\'), alpha=0.2) \\\n          + labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of partition 1 vs partition {}".format(i)) \\\n         )')
 
 
-# In[18]:
+# In[ ]:
 
 
 # Plot all comparisons in one figure
@@ -370,13 +370,13 @@ ggplot(all_data_df, aes(x='UMAP1', y='UMAP2')) + geom_point(aes(color='group'), 
 
 # ## 3. Visualize variance corrected experiment data
 
-# In[19]:
+# In[ ]:
 
 
 get_ipython().run_cell_magic('time', '', '\nall_data_df = pd.DataFrame()\n\n# Get batch 1 data\npartition_1_file = os.path.join(\n    partition_dir,\n    "Partition_corrected_1.txt.xz")\n\npartition_1 = pd.read_table(\n    partition_1_file,\n    header=0,\n    index_col=0,\n    sep=\'\\t\')\n\n# Transpose data to df: sample x gene\npartition_1 = partition_1.T\n\nfor i in lst_num_partitions:\n    print(\'Plotting PCA of 1 partition vs {} partitions...\'.format(i))\n    \n    # Simulated data with all samples in a single batch\n    original_data_df =  partition_1.copy()\n    \n    # Match format of column names in before and after df\n    #partition_before.columns = partition_before.columns.astype(str)\n    \n    # Add grouping column for plotting\n    original_data_df[\'num_partitions\'] = \'1\'\n    \n    # Get data with additional batch effects added and corrected\n    partition_other_file = os.path.join(\n        partition_dir,\n        "Partition_corrected_"+str(i)+".txt.xz")\n\n    partition_other = pd.read_table(\n        partition_other_file,\n        header=0,\n        index_col=0,\n        sep=\'\\t\')\n    \n    # Transpose data to df: sample x gene\n    partition_other = partition_other.T\n    \n    # Simulated data with i batch effects that are corrected\n    partition_data_df =  partition_other\n    \n    # Match format of column names in before and after df\n    partition_data_df.columns = partition_data_df.columns.astype(str)\n    \n    # Add grouping column for plotting\n    partition_data_df[\'num_partitions\'] = \'multiple\'\n        \n    # Concatenate datasets together\n    combined_data_df = pd.concat([original_data_df, partition_data_df])\n    \n    # PCA projection\n    pca = PCA(n_components=2)\n\n    # Encode expression data into 2D PCA space    \n    combined_data_numeric_df = combined_data_df.drop([\'num_partitions\'], axis=1)    \n    combined_data_PCAencoded = pca.fit_transform(combined_data_numeric_df)\n\n    \n    combined_data_PCAencoded_df = pd.DataFrame(combined_data_PCAencoded,\n                                               index=combined_data_df.index,\n                                               columns=[\'PC1\', \'PC2\']\n                                              )\n    \n    # Add back in batch labels (i.e. labels = "batch_"<how many batch effects were added>)\n    combined_data_PCAencoded_df[\'num_partitions\'] = combined_data_df[\'num_partitions\']\n    \n    # Add column that designates which batch effect comparision (i.e. comparison of 1 batch vs 5 batches\n    # is represented by label = 5)\n    combined_data_PCAencoded_df[\'comparison\'] = str(i)\n    \n    # Concatenate ALL comparisons\n    all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])\n    \n    # Split dataframe in order to plot \'after\' on top of \'before\'\n    #df_layer_1 = combined_data_PCAencoded_df[combined_data_PCAencoded_df[\'correction\'] == "before"]\n    #df_layer_2 = combined_data_PCAencoded_df[combined_data_PCAencoded_df[\'correction\'] == "after"]\n\n    # Plot individual comparisons\n    print(ggplot(combined_data_PCAencoded_df, aes(x=\'PC1\', y=\'PC2\')) \\\n          + geom_point(aes(color=\'num_partitions\'), alpha=0.2) \\\n          + labs(x = "PC 1", y = "PC 2", title = "Partition 1 and Partition {}".format(i))\\\n          + theme_bw() \\\n          + theme(\n                legend_title_align = "center",\n                plot_background=element_rect(fill=\'white\'),\n                legend_key=element_rect(fill=\'white\', colour=\'white\'), \n                plot_title=element_text(weight=\'bold\')\n            ) \\\n          + guides(colour=guide_legend(override_aes={\'alpha\': 1})) \\\n          + scale_colour_manual([\'#bdbdbd\', \'#1976d2\'])\n         )    \n    # Plot individual comparisons\n    #print(ggplot(combined_data_PCAencoded_df, aes(x=\'PC1\', y=\'PC2\')) \\\n    #      + geom_point(aes(color=\'correction\'), alpha=0.2) \\\n    #      + geom_point(df_layer_1, aes(color=[\'before\']), alpha=0.2) \\\n    #      + geom_point(df_layer_2, aes(color=[\'after\']), alpha=0.2) \\\n    #      + labs(x = "PC 1", y = "PC 2", title = "Partition {} and Corrected Partition {}".format(i, i)) \\\n    #      + theme_bw() \\\n    #      + theme(\n    #            legend_title_align = "center",\n    #            plot_background=element_rect(fill=\'white\'),\n    #            legend_key=element_rect(fill=\'white\', colour=\'white\'),\n    #            plot_title=element_text(weight=\'bold\')) \\\n    #      + scale_colour_manual(["grey", \'#87CEFA\'])\n    #     )')
 
 
-# In[20]:
+# In[ ]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -394,7 +394,7 @@ all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 all_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[21]:
+# In[ ]:
 
 
 # Plot all comparisons in one figure
@@ -411,7 +411,7 @@ print(g_pca)
 ggsave(plot = g_pca, filename = pca_correct_file, dpi=300)
 
 
-# In[22]:
+# In[ ]:
 
 
 # Plot - black
@@ -442,7 +442,7 @@ ggsave(plot = g_pca, filename = pca_correct_blk_file, dpi=300)
 # 
 # As a negative control we will permute the values within a sample, across genes in order to disrupt the gene expression structure.
 
-# In[26]:
+# In[ ]:
 
 
 # Read in permuated data
@@ -453,7 +453,7 @@ shuffled_simulated_data = pd.read_table(
     sep='\t')
 
 
-# In[27]:
+# In[ ]:
 
 
 # Label samples with label = perumuted

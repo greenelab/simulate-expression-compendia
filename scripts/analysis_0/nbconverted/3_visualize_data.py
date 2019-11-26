@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # # Visualize data
@@ -457,7 +457,7 @@ ggsave(plot = g_pca, filename = pca_correct_blk_file, dpi=300)
 # 
 # As a negative control we will permute the values within a sample, across genes in order to disrupt the gene expression structure.
 
-# In[28]:
+# In[26]:
 
 
 # Read in permuated data
@@ -468,7 +468,13 @@ shuffled_simulated_data = pd.read_table(
     sep='\t')
 
 
-# In[29]:
+# In[27]:
+
+
+shuffled_simulated_data.head()
+
+
+# In[28]:
 
 
 # Label samples with label = perumuted
@@ -491,13 +497,13 @@ shuffled_data_PCAencoded_df = pd.DataFrame(shuffled_data_PCAencoded,
 shuffled_data_PCAencoded_df['group'] = input_vs_permuted_df['group']
 
 
-# In[32]:
+# In[ ]:
 
 
 shuffled_simulated_data.columns
 
 
-# In[33]:
+# In[ ]:
 
 
 original_data_df.columns

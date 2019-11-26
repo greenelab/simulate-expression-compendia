@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # # Generate data and calculate similarity
@@ -10,7 +10,7 @@
 # 2. Add number of experiments in ```lst_num_experiments```
 # 3. Calculate the similarity between the dataset with a single experiment and the dataset with some number of experiments added.  
 
-# In[52]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -71,7 +71,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[56]:
+# In[4]:
 
 
 # Output file
@@ -203,7 +203,7 @@ similarity_score_df
 print("Similarity between input vs permuted data is {}".format(permuted_score))
 
 
-# In[51]:
+# In[13]:
 
 
 # Plot
@@ -225,7 +225,7 @@ print(g)
 ggsave(plot=g, filename=svcca_file, dpi=300)
 
 
-# In[50]:
+# In[14]:
 
 
 # Plot - black
@@ -253,7 +253,7 @@ print(g)
 ggsave(plot=g, filename=svcca_blk_file, dpi=300)
 
 
-# In[57]:
+# In[15]:
 
 
 # Pickle similarity scores to overlay uncorrected and corrected svcca curves

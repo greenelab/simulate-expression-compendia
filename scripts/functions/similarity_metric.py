@@ -218,7 +218,7 @@ def sim_svcca(simulated_data_file,
             index_col=0,
             sep='\t')
 
-        #print(compendium_other.shape)
+        # print(compendium_other.shape)
 
         # Transpose compendium df because output format
         # for correction method is swapped

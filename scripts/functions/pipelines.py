@@ -94,10 +94,11 @@ def simple_simulation_experiment_uncorrected():
   return permuted_score, similarity_score_df, lst_compendia
 
 
-def simple_simulation_experiment_corrected():
+def simple_simulation_experiment_corrected(run):
   # Parameters
   NN_architecture = 'NN_2500_30'
   analysis_name = 'analysis_0'
+  file_prefix = 'Experiment_corrected'
   num_simulated_samples = 6000
   lst_num_experiments = [1, 2, 5, 10, 20,
                          50, 100, 500, 1000, 2000, 3000, 6000]
@@ -133,26 +134,29 @@ def simple_simulation_experiment_corrected():
                                                       analysis_name)
 
   # Add technical variation
-  ls_compendia, ls_compendia_labels = generate_data_parallel.add_experiments(simulated_data,
-                                                                             lst_num_experiments,
-                                                                             local_dir,
-                                                                             analysis_name)
+  generate_data_parallel.add_experiments_io(simulated_data,
+                                            lst_num_experiments,
+                                            run,
+                                            local_dir,
+                                            analysis_name)
 
   # Remove technical variation
-  ls_corrected_compendia = generate_data_parallel.apply_correction(lst_num_experiments,
-                                                                   ls_compendia,
-                                                                   ls_compendia_labels)
+  generate_data_parallel.apply_correction_io(local_dir,
+                                             run,
+                                             analysis_name,
+                                             lst_num_experiments)
 
   # Calculate similarity between compendium and compendium + noise
-  batch_scores, permuted_score = similarity_metric_parallel.sim_svcca(simulated_data,
-                                                                      permuted_data,
-                                                                      ls_corrected_compendia,
-                                                                      corrected,
-                                                                      lst_num_experiments,
-                                                                      use_pca,
-                                                                      num_PCs,
-                                                                      local_dir,
-                                                                      analysis_name)
+  batch_scores, permuted_score = similarity_metric_parallel.sim_svcca_io(simulated_data,
+                                                                         permuted_data,
+                                                                         corrected,
+                                                                         file_prefix,
+                                                                         run,
+                                                                         lst_num_experiments,
+                                                                         use_pca,
+                                                                         num_PCs,
+                                                                         local_dir,
+                                                                         analysis_name)
 
   # batch_scores, permuted_score
 
@@ -165,4 +169,4 @@ def simple_simulation_experiment_corrected():
   similarity_score_df
 
   # Return similarity scores and permuted score
-  return permuted_score, similarity_score_df, ls_corrected_compendia
+  return permuted_score, similarity_score_df

@@ -516,32 +516,6 @@ def add_experiments(
     Files of simulated data with different numbers of experiments added.
     Each file named as "Experiment_<number of experiments added>"
     '''
-
-    # Create directories
-    # new_dir = os.path.join(
-    #    local_dir,
-    #    "Data",
-    #    "Batch_effects",
-    #    "experiment_simulated")
-
-    #analysis_dir = os.path.join(new_dir, analysis_name)
-
-    # if os.path.exists(analysis_dir):
-    #    print('Directory already exists: \n {}'.format(analysis_dir))
-    # else:
-    #    print('Creating new directory: \n {}'.format(analysis_dir))
-    #os.makedirs(analysis_dir, exist_ok=True)
-
-    # print('\n')
-
-    # Read in data
-    # simulated_data = pd.read_table(
-    #    simulated_data_file,
-    #    header=0,
-    #    index_col=0,
-    #    compression='xz',
-    #    sep='\t')
-
     # Add batch effects
     num_simulated_samples = simulated_data.shape[0]
     num_genes = simulated_data.shape[1]
@@ -557,22 +531,6 @@ def add_experiments(
 
     for i in num_experiments:
         print('Creating simulated data with {} experiments..'.format(i))
-
-        # experiment_file = os.path.join(
-        #    local_dir,
-        #    "Data",
-        #    "Batch_effects",
-        #    "experiment_simulated",
-        #    analysis_name,
-        #    "Experiment_" + str(i) + ".txt.xz")
-
-        # experiment_map_file = os.path.join(
-        #    local_dir,
-        #    "Data",
-        #    "Batch_effects",
-        #    "experiment_simulated",
-        #    analysis_name,
-        #    "Experiment_map_" + str(i) + ".txt.xz")
 
         # Create dataframe with grouping
         experiment_data_map = simulated_data.copy()
@@ -627,13 +585,143 @@ def add_experiments(
             # Save
             ls_compendia.append(experiment_data)
             ls_compendia_labels.append(experiment_data_map_df)
-            # experiment_data.to_csv(
-            #    experiment_file, float_format='%.3f', sep='\t', compression='xz')
-
-            # experiment_data_map_df.to_csv(
-            #    experiment_map_file, sep='\t', compression='xz')
 
     return ls_compendia, ls_compendia_labels
+
+
+def add_experiments_io(
+        simulated_data,
+        num_experiments,
+        run,
+        local_dir,
+        analysis_name):
+    '''
+    Say we are interested in identifying genes that differentiate between
+    disease vs normal states. However our dataset includes samples from
+    different tissues or time points and there are variations
+    in gene expression that are due to these other conditions
+    and do not have to do with disease state.
+    These non-relevant variations in the data are called batch effects.
+
+    We want to model these batch effects. To do this we will:
+    1. Partition our simulated data into n batches
+    2. For each partition we will shift all genes using a vector of values
+    sampled from a gaussian distribution centered around 0.
+    3. Repeat this for each partition
+    4. Append all batch effect partitions together
+
+    Arguments
+    ----------
+    simulated_data: df
+        Dataframe containing simulated gene expression data
+
+    num_experiments: list
+        List of different numbers of experiments to add to
+        simulated data
+
+    local_dir: str
+        Parent directory containing data files
+
+    analysis_name: str
+        Name of analysis. Format 'analysis_<int>'
+
+
+    Returns
+    --------
+    Files of simulated data with different numbers of experiments added.
+    Each file named as "Experiment_<number of experiments added>"
+    '''
+
+    # Add batch effects
+    num_simulated_samples = simulated_data.shape[0]
+    num_genes = simulated_data.shape[1]
+
+    # Create an array of the simulated data indices
+    simulated_ind = np.array(simulated_data.index)
+
+    # Create list to store multiple compendia
+    #ls_compendia = []
+
+    # Create list to store mapping associated with each compendia
+    #ls_compendia_labels = []
+
+    for i in num_experiments:
+        print('Creating simulated data with {} experiments..'.format(i))
+
+        experiment_file = os.path.join(
+            local_dir,
+            "Data",
+            "Batch_effects",
+            "experiment_simulated",
+            analysis_name,
+            "Experiment_" + str(i) + "_" + str(run) + ".txt.xz")
+
+        experiment_map_file = os.path.join(
+            local_dir,
+            "Data",
+            "Batch_effects",
+            "experiment_simulated",
+            analysis_name,
+            "Experiment_map_" + str(i) + "_" + str(run) + ".txt.xz")
+
+        # Create dataframe with grouping
+        experiment_data_map = simulated_data.copy()
+
+        if i == 1:
+            # ls_compendia.append(simulated_data)
+            simulated_data.to_csv(experiment_file, sep='\t', compression='xz')
+
+            # Add experiment id to map dataframe
+            experiment_data_map['experiment'] = str(i)
+            experiment_data_map_df = pd.DataFrame(
+                data=experiment_data_map['experiment'], index=simulated_ind.sort())
+
+            # ls_compendia_labels.append(experiment_data_map_df)
+            experiment_data_map_df.to_csv(
+                experiment_map_file, sep='\t', compression='xz')
+
+        else:
+            experiment_data = simulated_data.copy()
+
+            # Shuffle indices
+            np.random.shuffle(simulated_ind)
+
+            # Partition indices to batch
+            # Note: 'array_split' will chunk data into almost equal sized chunks.
+            # Returns arrays of size N % i and one array with the remainder
+            partition = np.array_split(simulated_ind, i)
+
+            for j in range(i):
+                # Scalar to shift gene expressiond data
+                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
+
+                # Tile stretch_factor to be able to add to batches
+                num_samples_per_experiment = len(partition[j])
+                stretch_factor_tile = pd.DataFrame(
+                    pd.np.tile(
+                        stretch_factor,
+                        (num_samples_per_experiment, 1)),
+                    index=experiment_data.loc[partition[j].tolist()].index,
+                    columns=experiment_data.loc[partition[j].tolist()].columns)
+
+                # Add experiments
+                experiment_data.loc[partition[j].tolist(
+                )] = experiment_data.loc[partition[j].tolist()] + stretch_factor_tile
+
+                # Add experiment id to map dataframe
+                experiment_data_map.loc[partition[j], 'experiment'] = str(j)
+
+            experiment_data_map_df = pd.DataFrame(
+                data=experiment_data_map['experiment'], index=simulated_ind.sort())
+
+            # Save
+            # ls_compendia.append(experiment_data)
+            # ls_compendia_labels.append(experiment_data_map_df)
+            experiment_data.to_csv(
+                experiment_file, float_format='%.3f', sep='\t', compression='xz')
+
+            experiment_data_map_df.to_csv(
+                experiment_map_file, sep='\t', compression='xz')
 
 
 def add_experiments_grped(
@@ -806,7 +894,10 @@ def add_experiments_grped(
                 partition_map_file, sep='\t', compression='xz')
 
 
-def apply_correction(num_experiments,
+def apply_correction(local_dir,
+                     run,
+                     analysis_name,
+                     num_experiments,
                      ls_compendia,
                      ls_compendia_labels):
 
@@ -836,6 +927,67 @@ def apply_correction(num_experiments,
 
             ls_corrected_compendia.append(corrected_experiment_data_df)
 
-    del ls_compendia
+        return ls_corrected_compendia
 
-    return ls_corrected_compendia
+
+def apply_correction_io(local_dir,
+                        run,
+                        analysis_name,
+                        num_experiments):
+
+    for i in range(len(num_experiments)):
+        print('Correcting for {} experiments..'.format(num_experiments[i]))
+
+        experiment_file = os.path.join(
+            local_dir,
+            "Data",
+            "Batch_effects",
+            "experiment_simulated",
+            analysis_name,
+            "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+
+        experiment_map_file = os.path.join(
+            local_dir,
+            "Data",
+            "Batch_effects",
+            "experiment_simulated",
+            analysis_name,
+            "Experiment_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+
+        # Read in data
+        # data transposed to form gene x sample for R package
+        experiment_data = pd.read_table(
+            experiment_file,
+            header=0,
+            index_col=0,
+            sep='\t').T
+
+        experiment_map = pd.read_table(
+            experiment_map_file,
+            header=0,
+            index_col=0,
+            sep='\t')["experiment"]
+
+        if i == 0:
+            corrected_experiment_data_df = experiment_data.copy()
+
+        else:
+            # Correct for technical variation
+            corrected_experiment_data = limma.removeBatchEffect(
+                experiment_data, batch=experiment_map)
+
+            # Convert R object to pandas df
+            corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
+                corrected_experiment_data)
+
+        # Write out corrected files
+        experiment_corrected_file = os.path.join(
+            local_dir,
+            "Data",
+            "Batch_effects",
+            "experiment_simulated",
+            analysis_name,
+            "Experiment_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+
+        corrected_experiment_data_df.to_csv(
+            experiment_corrected_file, float_format='%.3f', sep='\t', compression='xz')
