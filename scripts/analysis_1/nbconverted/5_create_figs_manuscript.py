@@ -11,7 +11,6 @@ get_ipython().run_line_magic('autoreload', '2')
 get_ipython().run_line_magic('load_ext', 'rpy2.ipython')
 
 import rpy2
-from rpy2.robjects.packages import importr
 
 import os
 import sys
@@ -19,7 +18,6 @@ import glob
 import pickle
 import pandas as pd
 import numpy as np
-import rpy2.robjects.lib.ggplot2 as ggplot2
 from plotnine import (ggplot,
                       labs,  
                       geom_line, 
@@ -48,9 +46,21 @@ randomState = 123
 seed(randomState)
 
 
+# In[2]:
+
+
+get_ipython().run_cell_magic('R', '', 'devtools::install_github("wilkelab/cowplot")')
+
+
+# In[3]:
+
+
+get_ipython().run_cell_magic('R', '', 'suppressPackageStartupMessages(library(dplyr))\nsuppressPackageStartupMessages(library(ggplot2))\nsuppressPackageStartupMessages(library(cowplot))')
+
+
 # ## Load data
 
-# In[2]:
+# In[4]:
 
 
 # File directories
@@ -62,7 +72,7 @@ similarity_uncorrected_file = os.path.join(
     "Batch_effects",
     "output",
     "saved variables",
-    "analysis_0_similarity_uncorrected.pickle")
+    "analysis_1_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     local_dir,
@@ -70,14 +80,14 @@ ci_uncorrected_file = os.path.join(
     "Batch_effects",
     "output",
     "saved variables",
-    "analysis_0_ci_uncorrected.pickle")
+    "analysis_1_ci_uncorrected.pickle")
 
 compendia_dir = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
-    "experiment_simulated",
-    "analysis_0")
+    "partition_simulated",
+    "analysis_1")
 
 similarity_corrected_file = os.path.join(
     local_dir,
@@ -85,7 +95,7 @@ similarity_corrected_file = os.path.join(
     "Batch_effects",
     "output",
     "saved variables",
-    "analysis_0_similarity_corrected.pickle")
+    "analysis_1_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     local_dir,
@@ -93,7 +103,7 @@ ci_corrected_file = os.path.join(
     "Batch_effects",
     "output",
     "saved variables",
-    "analysis_0_ci_corrected.pickle")
+    "analysis_1_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
     local_dir,
@@ -101,10 +111,10 @@ permuted_score_file = os.path.join(
     "Batch_effects",
     "output",
     "saved variables",
-    "analysis_0_permuted.txt.npy")
+    "analysis_1_permuted.txt.npy")
 
 
-# In[3]:
+# In[5]:
 
 
 # Output files
@@ -114,7 +124,7 @@ svcca_file = os.path.join(
     "Batch_effects",
     "output",
     "manuscript figures",
-    "analysis_0_svcca.png")
+    "analysis_1_svcca.png")
 
 pca_uncorrected_file = os.path.join(
     local_dir,
@@ -122,7 +132,7 @@ pca_uncorrected_file = os.path.join(
     "Batch_effects",
     "output",
     "manuscript figures",
-    "analysis_0_pca_uncorrected.png")
+    "analysis_1_pca_uncorrected.png")
 
 pca_corrected_file = os.path.join(
     local_dir,
@@ -130,10 +140,10 @@ pca_corrected_file = os.path.join(
     "Batch_effects",
     "output",
     "manuscript figures",
-    "analysis_0_pca_uncorrected.png")
+    "analysis_1_pca_uncorrected.png")
 
 
-# In[4]:
+# In[6]:
 
 
 # Load pickled files
@@ -145,7 +155,7 @@ err_corrected_svcca = pd.read_pickle(ci_corrected_file)
 permuted_score = np.load(permuted_score_file)
 
 
-# In[5]:
+# In[7]:
 
 
 # Concatenate error bars
@@ -153,7 +163,7 @@ uncorrected_svcca_err = pd.concat([uncorrected_svcca, err_uncorrected_svcca], ax
 corrected_svcca_err = pd.concat([corrected_svcca, err_corrected_svcca], axis=1)
 
 
-# In[6]:
+# In[8]:
 
 
 # Add group label
@@ -161,7 +171,7 @@ uncorrected_svcca_err['Group'] = 'uncorrected'
 corrected_svcca_err['Group'] = 'corrected'
 
 
-# In[7]:
+# In[9]:
 
 
 # Concatenate dataframes
@@ -171,37 +181,37 @@ all_svcca
 
 # ## SVCCA panel
 
-# In[8]:
+# In[10]:
 
 
 # Plot
-lst_num_experiments = list(all_svcca.index)
+lst_num_partitions = list(all_svcca.index)
 
 threshold = pd.DataFrame(
     pd.np.tile(
         permuted_score,
-        (len(lst_num_experiments), 1)),
-    index=lst_num_experiments,
+        (len(lst_num_partitions), 1)),
+    index=lst_num_partitions,
     columns=['score'])
 
 panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
-                aes(x=lst_num_experiments, y='score', color='Group'),
+                aes(x=lst_num_partitions, y='score', color='Group'),
                 size=1.5) \
-    + geom_point(aes(x=lst_num_experiments, y='score'), 
+    + geom_point(aes(x=lst_num_partitions, y='score'), 
                  color ='darkgrey',
                 size=0.5) \
     + geom_errorbar(all_svcca,
-                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                  aes(x=lst_num_partitions, ymin='ymin', ymax='ymax'),
                    color='darkgrey') \
     + geom_line(threshold, 
-                aes(x=lst_num_experiments, y='score'), 
+                aes(x=lst_num_partitions, y='score'), 
                 linetype='dashed',
-                size=1.5,
+                size=1,
                 color="darkgrey",
                 show_legend=False) \
-    + labs(x = "Number of Experiments", 
+    + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
-           title = "Similarity across varying numbers of experiments") \
+           title = "Similarity across varying numbers of partitions") \
     + theme(plot_title=element_text(weight='bold'),
             plot_background=element_rect(fill="white"),
             panel_background=element_rect(fill="white"),
@@ -210,7 +220,7 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
             axis_line=element_line(color="grey"),
             legend_key=element_rect(fill='white', colour='white')
            ) \
-    + scale_color_manual(['#1976d2', '#b3e5fc'])
+    + scale_color_manual(['#1976d2', '#b3e5fc']) \
 
 print(panel_A)
 ggsave(plot=panel_A, filename=svcca_file, dpi=300)
@@ -218,59 +228,59 @@ ggsave(plot=panel_A, filename=svcca_file, dpi=300)
 
 # ## Uncorrected PCA panel
 
-# In[9]:
+# In[11]:
 
 
-lst_num_experiments = [1,2,5,10,3000,6000]
+lst_num_partitions =[1,2,3,400,500,600]
 
 all_data_df = pd.DataFrame()
 
 # Get batch 1 data
-experiment_1_file = os.path.join(
+partition_1_file = os.path.join(
     compendia_dir,
-    "Experiment_1_0.txt.xz")
+    "Partition_1_0.txt.xz")
 
-experiment_1 = pd.read_table(
-    experiment_1_file,
+partition_1 = pd.read_table(
+    partition_1_file,
     header=0,
     index_col=0,
     sep='\t')
 
 
-for i in lst_num_experiments:
-    print('Plotting PCA of 1 experiment vs {} experiments...'.format(i))
+for i in lst_num_partitions:
+    print('Plotting PCA of 1 parition vs {} partition...'.format(i))
     
     # Simulated data with all samples in a single batch
-    original_data_df =  experiment_1.copy()
+    original_data_df =  partition_1.copy()
     
     # Add grouping column for plotting
-    original_data_df['num_experiments'] = '1'
+    original_data_df['num_partitions'] = '1'
     
     # Get data with additional batch effects added
-    experiment_other_file = os.path.join(
+    partition_other_file = os.path.join(
         compendia_dir,
-        "Experiment_"+str(i)+"_0.txt.xz")
+        "Partition_"+str(i)+"_0.txt.xz")
 
-    experiment_other = pd.read_table(
-        experiment_other_file,
+    partition_other = pd.read_table(
+        partition_other_file,
         header=0,
         index_col=0,
         sep='\t')
     
     # Simulated data with i batch effects
-    experiment_data_df =  experiment_other
+    partition_data_df =  partition_other
     
     # Add grouping column for plotting
-    experiment_data_df['num_experiments'] = 'multiple'
+    partition_data_df['num_partitions'] = 'multiple'
     
     # Concatenate datasets together
-    combined_data_df = pd.concat([original_data_df, experiment_data_df])
+    combined_data_df = pd.concat([original_data_df, partition_data_df])
 
     # PCA projection
     pca = PCA(n_components=2)
 
     # Encode expression data into 2D PCA space
-    combined_data_numeric_df = combined_data_df.drop(['num_experiments'], axis=1)
+    combined_data_numeric_df = combined_data_df.drop(['num_partitions'], axis=1)
     combined_data_PCAencoded = pca.fit_transform(combined_data_numeric_df)
 
 
@@ -283,7 +293,7 @@ for i in lst_num_experiments:
     print(pca.explained_variance_ratio_)  
     
     # Add back in batch labels (i.e. labels = "batch_"<how many batch effects were added>)
-    combined_data_PCAencoded_df['num_experiments'] = combined_data_df['num_experiments']
+    combined_data_PCAencoded_df['num_partitions'] = combined_data_df['num_partitions']
     
     # Add column that designates which batch effect comparision (i.e. comparison of 1 batch vs 5 batches
     # is represented by label = 5)
@@ -293,39 +303,39 @@ for i in lst_num_experiments:
     all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])     
 
 
-# In[10]:
+# In[12]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
-lst_num_experiments_str = [str(i) for i in lst_num_experiments]
-num_experiments_cat = pd.Categorical(all_data_df['num_experiments'], categories=['1', 'multiple'])
+lst_num_partitions_str = [str(i) for i in lst_num_partitions]
+num_partitions_cat = pd.Categorical(all_data_df['num_partitions'], categories=['1', 'multiple'])
 
 # Convert 'comparison' into categories to preserve the ordering
-comparison_cat = pd.Categorical(all_data_df['comparison'], categories=lst_num_experiments_str)
+comparison_cat = pd.Categorical(all_data_df['comparison'], categories=lst_num_partitions_str)
 
 # Assign to a new column in the df
-all_data_df = all_data_df.assign(num_experiments_cat = num_experiments_cat)
+all_data_df = all_data_df.assign(num_partitions_cat = num_partitions_cat)
 all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[11]:
+# In[13]:
 
 
-all_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of experiments', 'Comparison']
+all_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[12]:
+# In[14]:
 
 
 # Plot all comparisons in one figure
 panel_B = ggplot(all_data_df[all_data_df['Comparison'] != '1'],
                  aes(x='PC1', y='PC2')) \
-    + geom_point(aes(color='No. of experiments'), 
+    + geom_point(aes(color='No. of partitions'), 
                  alpha=0.1) \
     + facet_wrap('~Comparison') \
     + labs(x = "PC 1", 
            y = "PC 2", 
-           title = "PCA of experiment 1 vs multiple experiments") \
+           title = "PCA of partition 1 vs multiple partitions") \
     + theme_bw() \
     + theme(
         legend_title_align = "center",
@@ -345,70 +355,70 @@ ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=300)
 
 # ## Corrected PCA panel
 
-# In[13]:
+# In[15]:
 
 
-lst_num_experiments = [1,2,5,10,3000,6000]
+lst_num_partitions = [1,2,3,400,500,600]
 
 all_corrected_data_df = pd.DataFrame()
 
 # Get batch 1 data
-experiment_1_file = os.path.join(
+partition_1_file = os.path.join(
     compendia_dir,
-    "Experiment_corrected_1_0.txt.xz")
+    "Partition_corrected_1_0.txt.xz")
 
-experiment_1 = pd.read_table(
-    experiment_1_file,
+partition_1 = pd.read_table(
+    partition_1_file,
     header=0,
     index_col=0,
     sep='\t')
 
 # Transpose data to df: sample x gene
-experiment_1 = experiment_1.T
+partition_1 = partition_1.T
 
-for i in lst_num_experiments:
-    print('Plotting PCA of 1 experiment vs {} experiments...'.format(i))
+for i in lst_num_partitions:
+    print('Plotting PCA of 1 partition vs {} partitions...'.format(i))
     
      # Simulated data with all samples in a single batch
-    original_data_df =  experiment_1.copy()
+    original_data_df =  partition_1.copy()
     
     # Match format of column names in before and after df
     original_data_df.columns = original_data_df.columns.astype(str)
     
     # Add grouping column for plotting
-    original_data_df['num_experiments'] = '1'
+    original_data_df['num_partitions'] = '1'
     
     # Get data with additional batch effects added and corrected
-    experiment_other_file = os.path.join(
+    partition_other_file = os.path.join(
         compendia_dir,
-        "Experiment_corrected_"+str(i)+"_0.txt.xz")
+        "Partition_corrected_"+str(i)+"_0.txt.xz")
 
-    experiment_other = pd.read_table(
-        experiment_other_file,
+    partition_other = pd.read_table(
+        partition_other_file,
         header=0,
         index_col=0,
         sep='\t')
     
     # Transpose data to df: sample x gene
-    experiment_other = experiment_other.T
+    partition_other = partition_other.T
     
     # Simulated data with i batch effects that are corrected
-    experiment_data_df =  experiment_other
-    
-    # Match format of column names in before and after df
-    experiment_data_df.columns = experiment_data_df.columns.astype(str)
+    partition_data_df =  partition_other
     
     # Add grouping column for plotting
-    experiment_data_df['num_experiments'] = 'multiple'
+    partition_data_df['num_partitions'] = 'multiple'
+    
+    # Match format of column names in before and after df
+    partition_data_df.columns = original_data_df.columns.astype(str)
         
     # Concatenate datasets together
-    combined_data_df = pd.concat([original_data_df, experiment_data_df])
+    combined_data_df = pd.concat([original_data_df, partition_data_df])
     
     # PCA projection
     pca = PCA(n_components=2)
 
     # Encode expression data into 2D PCA space    
-    combined_data_numeric_df = combined_data_df.drop(['num_experiments'], axis=1)    
+    combined_data_numeric_df = combined_data_df.drop(['num_partitions'], axis=1)    
     combined_data_PCAencoded = pca.fit_transform(combined_data_numeric_df)
 
     
@@ -418,7 +428,7 @@ for i in lst_num_experiments:
                                               )
     
     # Add back in batch labels (i.e. labels = "batch_"<how many batch effects were added>)
-    combined_data_PCAencoded_df['num_experiments'] = combined_data_df['num_experiments']
+    combined_data_PCAencoded_df['num_partitions'] = combined_data_df['num_partitions']
     
     # Add column that designates which batch effect comparision (i.e. comparison of 1 batch vs 5 batches
     # is represented by label = 5)
@@ -428,46 +438,47 @@ for i in lst_num_experiments:
     all_corrected_data_df = pd.concat([all_corrected_data_df, combined_data_PCAencoded_df])
 
 
-# In[14]:
+# In[16]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
-lst_num_experiments_str = [str(i) for i in lst_num_experiments]
-num_experiments_cat = pd.Categorical(all_corrected_data_df['num_experiments'], categories=['1', 'multiple'])
+lst_num_partitions_str = [str(i) for i in lst_num_partitions]
+num_partitions_cat = pd.Categorical(all_corrected_data_df['num_partitions'], categories=['1', 'multiple'])
 
 # Convert 'comparison' into categories to preserve the ordering
-comparison_cat = pd.Categorical(all_corrected_data_df['comparison'], categories=lst_num_experiments_str)
+comparison_cat = pd.Categorical(all_corrected_data_df['comparison'], categories=lst_num_partitions_str)
 
 # Assign to a new column in the df
-all_corrected_data_df = all_corrected_data_df.assign(num_experiments_cat = num_experiments_cat)
+all_corrected_data_df = all_corrected_data_df.assign(num_partitions_cat = num_partitions_cat)
 all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[15]:
+# In[17]:
 
 
-all_corrected_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of experiments', 'Comparison']
+all_corrected_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[16]:
+# In[21]:
 
 
 # Plot all comparisons in one figure
 panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1'],
-                 aes(x='PC1', y='PC2')) \
-    + geom_point(aes(color='No. of experiments'), 
+                 aes(x='PC1', 
+                     y='PC2')) \
+    + geom_point(aes(color='No. of partitions'), 
                  alpha=0.1) \
     + facet_wrap('~Comparison') \
-    + labs(x = "PC 1",
+    + labs(x = "PC 1", 
            y = "PC 2", 
-           title = "PCA of experiment 1 vs multiple experiments") \
+           title = "PCA of partition 1 vs multiple partitions") \
     + theme_bw() \
     + theme(
         legend_title_align = "center",
         plot_background=element_rect(fill='white'),
         legend_key=element_rect(fill='white', colour='white'), 
         plot_title=element_text(weight='bold')
-    )\
+    ) \
     + guides(colour=guide_legend(override_aes={'alpha': 1})) \
     + scale_color_manual(['#bdbdbd', '#1976d2']) \
     + geom_point(data=all_corrected_data_df[all_corrected_data_df['Comparison'] == '1'],

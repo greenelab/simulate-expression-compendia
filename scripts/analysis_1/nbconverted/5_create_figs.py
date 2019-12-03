@@ -16,6 +16,8 @@ import numpy as np
 from plotnine import (ggplot, 
                       labs,  
                       geom_line, 
+                      geom_point,
+                      geom_errorbar,
                       aes, 
                       ggsave, 
                       theme_bw,
@@ -44,20 +46,39 @@ similarity_uncorrected_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
+    "saved variables",
     "analysis_1_similarity_uncorrected.pickle")
+
+ci_uncorrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "saved variables",
+    "analysis_1_ci_uncorrected.pickle")
 
 similarity_corrected_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
+    "saved variables",
     "analysis_1_similarity_corrected.pickle")
+
+ci_corrected_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "saved variables",
+    "analysis_1_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
+    "saved variables",
     "analysis_1_permuted.txt.npy")
 
 
@@ -70,13 +91,23 @@ svcca_uncorrected_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
+    "talk figures",
     "analysis_1_svcca_uncorrected.png")
+
+svcca_uncorrected_blk_file = os.path.join(
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "output",
+    "talk figures",
+    "analysis_1_svcca_uncorrected_blk.png")
 
 svcca_overlay_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
+    "talk figures",
     "analysis_1_svcca_overlay.png")
 
 svcca_overlay_blk_file = os.path.join(
@@ -84,6 +115,7 @@ svcca_overlay_blk_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
+    "talk figures",
     "analysis_1_svcca_overlay_blk.png")
 
 svcca_overlay_long_file = os.path.join(
@@ -91,6 +123,7 @@ svcca_overlay_long_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
+    "talk figures",
     "analysis_1_svcca_overlay_long.png")
 
 svcca_overlay_long_blk_file = os.path.join(
@@ -98,6 +131,7 @@ svcca_overlay_long_blk_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
+    "talk figures",
     "analysis_1_svcca_overlay_long_blk.png")
 
 
@@ -106,27 +140,37 @@ svcca_overlay_long_blk_file = os.path.join(
 
 # Load pickled files
 uncorrected_svcca = pd.read_pickle(similarity_uncorrected_file)
+err_uncorrected_svcca = pd.read_pickle(ci_uncorrected_file)
 corrected_svcca = pd.read_pickle(similarity_corrected_file)
+err_corrected_svcca = pd.read_pickle(ci_corrected_file)
 permuted_score = np.load(permuted_score_file)
 
 
 # In[5]:
 
 
-# Add group label
-uncorrected_svcca['Group'] = 'uncorrected'
-corrected_svcca['Group'] = 'corrected'
+# Concatenate error bars
+uncorrected_svcca_err = pd.concat([uncorrected_svcca, err_uncorrected_svcca], axis=1)
+corrected_svcca_err = pd.concat([corrected_svcca, err_corrected_svcca], axis=1)
 
 
 # In[6]:
 
 
-# Concatenate dataframes
-all_svcca = pd.concat([uncorrected_svcca, corrected_svcca])
-all_svcca
+# Add group label
+uncorrected_svcca_err['Group'] = 'uncorrected'
+corrected_svcca_err['Group'] = 'corrected'
 
 
 # In[7]:
+
+
+# Concatenate dataframes
+all_svcca = pd.concat([uncorrected_svcca_err, corrected_svcca_err])
+all_svcca
+
+
+# In[8]:
 
 
 # Plot - uncorrected only
@@ -142,6 +186,12 @@ threshold = pd.DataFrame(
 g = ggplot(all_svcca[all_svcca['Group'] == 'uncorrected'])     + geom_line(all_svcca[all_svcca['Group'] == 'uncorrected'],
                 aes(x=lst_num_experiments, y='score', color='Group'),
                 size=1.5) \
+    + geom_point(aes(x=lst_num_experiments, y='score'), 
+                 color ='darkgrey',
+                size=0.5) \
+    + geom_errorbar(all_svcca[all_svcca['Group'] == 'uncorrected'],
+                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                   color='darkgrey') \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',
@@ -165,13 +215,60 @@ print(g)
 ggsave(plot=g, filename=svcca_uncorrected_file, dpi=300)
 
 
-# In[8]:
-
-
-all_svcca[all_svcca['Group'] == 'uncorrected']
-
-
 # In[9]:
+
+
+# Plot - black
+lst_num_experiments = list(all_svcca.index[0:int(len(all_svcca.index)/2)])
+
+threshold = pd.DataFrame(
+    pd.np.tile(
+        permuted_score,
+        (len(lst_num_experiments), 1)),
+    index=lst_num_experiments,
+    columns=['score'])
+
+g = ggplot(all_svcca[all_svcca['Group'] == 'uncorrected'])     + geom_line(all_svcca[all_svcca['Group'] == 'uncorrected'],
+                aes(x=lst_num_experiments, y='score', color='Group'),
+                size=1.5) \
+    + geom_point(aes(x=lst_num_experiments, y='score'), 
+                 color ='darkgrey',
+                size=0.5) \
+    + geom_errorbar(all_svcca[all_svcca['Group'] == 'uncorrected'],
+                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                   color='darkgrey') \
+    + geom_line(threshold, 
+                aes(x=lst_num_experiments, y='score'), 
+                linetype='dashed',
+                size=1,
+                color="darkgrey",
+                show_legend=False) \
+    + labs(x = "Number of Partitions", 
+           y = "Similarity score (SVCCA)", 
+           title = "Similarity across varying numbers of partitions") \
+    + theme(plot_background=element_rect(fill='black'),
+        legend_title_align = "center",
+        legend_background=element_rect(fill='black', colour='black'),
+        legend_key=element_rect(fill='black', colour='black'), 
+        legend_title=element_text(colour="white"),
+        legend_text=element_text(colour="white"),
+        plot_title=element_text(weight='bold', colour="white"),
+        panel_background=element_rect(fill="black"),
+        axis_line=element_line(color="white"),
+        axis_text=element_text(color="white"),
+        axis_title=element_text(color="white"),
+        panel_grid_major_x=element_line(color="lightgrey"),
+        panel_grid_major_y=element_line(color="lightgrey"),
+        strip_text=element_text(colour="white"),
+        strip_background=element_blank()
+           ) \
+    + scale_color_manual(['#b3e5fc']) \
+
+print(g)
+ggsave(plot=g, filename=svcca_uncorrected_blk_file, dpi=300)
+
+
+# In[10]:
 
 
 # Plot
@@ -187,6 +284,12 @@ threshold = pd.DataFrame(
 g = ggplot(all_svcca)     + geom_line(all_svcca,
                 aes(x=lst_num_experiments, y='score', color='Group'),
                 size=1.5) \
+    + geom_point(aes(x=lst_num_experiments, y='score'), 
+                 color ='darkgrey',
+                size=0.5) \
+    + geom_errorbar(all_svcca,
+                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                   color='darkgrey') \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',
@@ -210,7 +313,7 @@ print(g)
 ggsave(plot=g, filename=svcca_overlay_file, dpi=300)
 
 
-# In[10]:
+# In[11]:
 
 
 # Plot - black
@@ -226,6 +329,12 @@ threshold = pd.DataFrame(
 g = ggplot(all_svcca)     + geom_line(all_svcca,
                 aes(x=lst_num_experiments, y='score', color='Group'),
                 size=1.5) \
+    + geom_point(aes(x=lst_num_experiments, y='score'), 
+                 color ='darkgrey',
+                size=0.5) \
+    + geom_errorbar(all_svcca,
+                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                   color='darkgrey') \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',
@@ -257,7 +366,7 @@ print(g)
 ggsave(plot=g, filename=svcca_overlay_blk_file, dpi=300)
 
 
-# In[13]:
+# In[12]:
 
 
 # Plot - elongated
@@ -273,6 +382,12 @@ threshold = pd.DataFrame(
 g = ggplot(all_svcca)     + geom_line(all_svcca,
                 aes(x=lst_num_experiments, y='score', color='Group'),
                 size=1) \
+    + geom_point(aes(x=lst_num_experiments, y='score'), 
+                 color ='darkgrey',
+                size=0.5) \
+    + geom_errorbar(all_svcca,
+                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                   color='darkgrey') \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',
@@ -297,7 +412,7 @@ print(g)
 ggsave(plot=g, filename=svcca_overlay_long_file, dpi=300)
 
 
-# In[14]:
+# In[13]:
 
 
 # Plot - black
@@ -313,6 +428,12 @@ threshold = pd.DataFrame(
 g = ggplot(all_svcca)     + geom_line(all_svcca,
                 aes(x=lst_num_experiments, y='score', color='Group'),
                 size=1) \
+    + geom_point(aes(x=lst_num_experiments, y='score'), 
+                 color ='darkgrey',
+                size=0.5) \
+    + geom_errorbar(all_svcca,
+                  aes(x=lst_num_experiments, ymin='ymin', ymax='ymax'),
+                   color='darkgrey') \
     + geom_line(threshold, 
                 aes(x=lst_num_experiments, y='score'), 
                 linetype='dashed',

@@ -34,28 +34,28 @@ seed(randomState)
 # Output files
 local_dir = "/home/alexandra/Documents/"
 
-similarity_corrected_file = os.path.join(
+similarity_uncorrected_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
-    "analysis_0_similarity_corrected.pickle")
+    "analysis_1_similarity_uncorrected.pickle")
 
-ci_corrected_file = os.path.join(
+ci_uncorrected_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
-    "analysis_0_ci_corrected.pickle")
+    "analysis_1_ci_uncorrected.pickle")
 
 
 # In[3]:
 
 
-# Run multiple simulations - corrected
+# Run multiple simulations - uncorrected
 iterations = range(10) 
 num_cores = 5
-results = Parallel(n_jobs=num_cores, verbose=100)(delayed(pipelines.simple_simulation_experiment_corrected)(i) for i in iterations)
+results = Parallel(n_jobs=num_cores, verbose=100)(delayed(pipelines.matched_simulation_experiment_uncorrected)(i) for i in iterations)
 
 
 # In[4]:
@@ -70,7 +70,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[1]:
+# In[5]:
 
 
 # Get median for each row (number of experiments)
@@ -79,7 +79,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[ ]:
+# In[6]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -89,15 +89,14 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[ ]:
+# In[7]:
 
 
 # Get confidence interval for each row (number of experiments)
-# z-score for 95% confidence interval
-err = std_scores*1.96
+err = std_scores*2.262
 
 
-# In[ ]:
+# In[8]:
 
 
 # Get boundaries of confidence interval
@@ -109,16 +108,16 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[ ]:
+# In[9]:
 
 
 mean_scores
 
 
-# In[ ]:
+# In[10]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval
-mean_scores.to_pickle(similarity_corrected_file)
-ci.to_pickle(ci_corrected_file)
+mean_scores.to_pickle(similarity_uncorrected_file)
+ci.to_pickle(ci_uncorrected_file)
 
