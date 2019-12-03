@@ -94,6 +94,76 @@ def simple_simulation_experiment_uncorrected():
   return permuted_score, similarity_score_df, lst_compendia
 
 
+def matched_simulation_experiment_uncorrected(run):
+
+  # Parameters
+  NN_architecture = 'NN_2500_30'
+  analysis_name = 'analysis_1'
+  file_prefix = "Partition"
+  num_simulated_experiments = 600
+  lst_num_partitions = [1, 2, 3, 5, 10, 20,
+                        30, 50, 70, 100, 200, 300, 400, 500, 600]
+  corrected = False
+  use_pca = True
+  num_PCs = 10
+
+  # Input files
+  base_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../.."))    # base dir on repo
+
+  local_dir = "/home/alexandra/Documents/"
+
+  normalized_data_file = os.path.join(
+      base_dir,
+      "data",
+      "input",
+      "train_set_normalized.pcl")
+
+  # Main
+
+  # Generate simulated data
+  simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,
+                                                              normalized_data_file,
+                                                              NN_architecture,
+                                                              analysis_name)
+
+  # Permute simulated data to be used as a negative control
+  permuted_data = generate_data_parallel.permute_data(simulated_data,
+                                                      local_dir,
+                                                      analysis_name)
+
+  # Add technical variation
+  generate_data_parallel.add_experiments_grped_io(simulated_data,
+                                                  lst_num_partitions,
+                                                  run,
+                                                  local_dir,
+                                                  analysis_name)
+
+ # Calculate similarity between compendium and compendium + noise
+  batch_scores, permuted_score = similarity_metric_parallel.sim_svcca_io(simulated_data,
+                                                                         permuted_data,
+                                                                         corrected,
+                                                                         file_prefix,
+                                                                         run,
+                                                                         lst_num_partitions,
+                                                                         use_pca,
+                                                                         num_PCs,
+                                                                         local_dir,
+                                                                         analysis_name)
+
+  # Convert similarity scores to pandas dataframe
+  similarity_score_df = pd.DataFrame(data={'score': batch_scores},
+                                     index=lst_num_partitions,
+                                     columns=['score'])
+
+  similarity_score_df.index.name = 'number of partitions'
+  similarity_score_df
+
+  # Return similarity scores and permuted score
+  return permuted_score, similarity_score_df
+
+
 def simple_simulation_experiment_corrected(run):
   # Parameters
   NN_architecture = 'NN_2500_30'
@@ -166,6 +236,83 @@ def simple_simulation_experiment_corrected(run):
                                      columns=['score'])
 
   similarity_score_df.index.name = 'number of experiments'
+  similarity_score_df
+
+  # Return similarity scores and permuted score
+  return permuted_score, similarity_score_df
+
+
+def matched_simulation_experiment_corrected(run):
+  # Parameters
+  NN_architecture = 'NN_2500_30'
+  analysis_name = 'analysis_1'
+  file_prefix = 'Partition_corrected'
+  num_simulated_experiments = 600
+  lst_num_partitions = [1, 2, 3, 5, 10, 20,
+                        30, 50, 70, 100, 200, 300, 400, 500, 600]
+  corrected = True
+  use_pca = True
+  num_PCs = 10
+
+  # Input files
+  base_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../.."))    # base dir on repo
+
+  local_dir = "/home/alexandra/Documents/"
+
+  normalized_data_file = os.path.join(
+      base_dir,
+      "data",
+      "input",
+      "train_set_normalized.pcl")
+
+  # Main
+
+  # Generate simulated data
+  simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,
+                                                              normalized_data_file,
+                                                              NN_architecture,
+                                                              analysis_name)
+
+  # Permute simulated data to be used as a negative control
+  permuted_data = generate_data_parallel.permute_data(simulated_data,
+                                                      local_dir,
+                                                      analysis_name)
+
+  # Add technical variation
+  generate_data_parallel.add_experiments_grped_io(simulated_data,
+                                                  lst_num_partitions,
+                                                  run,
+                                                  local_dir,
+                                                  analysis_name)
+
+  # Remove technical variation
+  generate_data_parallel.apply_correction_io(local_dir,
+                                             run,
+                                             analysis_name,
+                                             lst_num_partitions)
+
+  # Calculate similarity between compendium and compendium + noise
+  batch_scores, permuted_score = similarity_metric_parallel.sim_svcca_io(simulated_data,
+                                                                         permuted_data,
+                                                                         corrected,
+                                                                         file_prefix,
+                                                                         run,
+                                                                         lst_num_partitions,
+                                                                         use_pca,
+                                                                         num_PCs,
+                                                                         local_dir,
+                                                                         analysis_name)
+
+  # batch_scores, permuted_score
+
+  # Convert similarity scores to pandas dataframe
+  similarity_score_df = pd.DataFrame(data={'score': batch_scores},
+                                     index=lst_num_partitions,
+                                     columns=['score'])
+
+  similarity_score_df.index.name = 'number of partitions'
   similarity_score_df
 
   # Return similarity scores and permuted score

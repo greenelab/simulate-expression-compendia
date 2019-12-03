@@ -52,7 +52,6 @@ def get_sample_ids(experiment_id):
 
 
 def simulate_compendium(
-    experiment_ids_file,
     num_simulated_experiments,
     normalized_data_file,
     NN_architecture,
@@ -141,6 +140,12 @@ def simulate_compendium(
 
     loaded_model.load_weights(weights_encoder_file)
     loaded_decode_model.load_weights(weights_decoder_file)
+
+    experiment_ids_file = os.path.join(
+        base_dir,
+        "data",
+        "metadata",
+        "experiment_ids.txt")
 
     # Read data
     experiment_ids = pd.read_table(
@@ -261,16 +266,7 @@ def simulate_compendium(
         simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
 
     # Save
-    simulated_data_file = os.path.join(
-        local_dir,
-        "Data",
-        "Batch_effects",
-        "simulated",
-        analysis_name,
-        "simulated_data.txt.xz")
-
-    simulated_data_scaled_df.to_csv(
-        simulated_data_file, float_format='%.3f', sep='\t', compression='xz')
+    return simulated_data_scaled_df
 
 
 def simulate_data(
@@ -400,16 +396,6 @@ def simulate_data(
 
     # Output
     return simulated_data
-    # simulated_data_file = os.path.join(
-    #    local_dir,
-    #    "Data",
-    #    "Batch_effects",
-    #    "simulated",
-    #    analysis_name,
-    #    "simulated_data.txt.xz")
-
-    # simulated_data.to_csv(
-    #    simulated_data_file, float_format='%.3f', sep='\t', compression='xz')
 
 
 def permute_data(simulated_data,
@@ -445,7 +431,10 @@ def permute_data(simulated_data,
     #    sep='\t')
 
     if "experiment_id" in list(simulated_data.columns):
-        simulated_data.drop(columns="experiment_id", inplace=True)
+        simulated_data_tmp = simulated_data.drop(
+            columns="experiment_id", inplace=False)
+    else:
+        simulated_data_tmp = simulated_data.copy()
 
     # Shuffle values within each sample (row)
     # Each sample treated independently
@@ -453,26 +442,16 @@ def permute_data(simulated_data,
     num_samples = simulated_data.shape[0]
 
     for i in range(num_samples):
-        row = list(simulated_data.values[i])
+        row = list(simulated_data_tmp.values[i])
         shuffled_simulated_row = random.sample(row, len(row))
         shuffled_simulated_arr.append(shuffled_simulated_row)
 
     shuffled_simulated_data = pd.DataFrame(shuffled_simulated_arr,
-                                           index=simulated_data.index,
-                                           columns=simulated_data.columns)
+                                           index=simulated_data_tmp.index,
+                                           columns=simulated_data_tmp.columns)
 
     # Output
     return shuffled_simulated_data
-    # permuted_simulated_data_file = os.path.join(
-    #    local_dir,
-    #    "Data",
-    #    "Batch_effects",
-    #    "simulated",
-    #    analysis_name,
-    #    "permuted_simulated_data.txt.xz")
-
-    # shuffled_simulated_data.to_csv(
-    #    permuted_simulated_data_file, float_format='%.3f', sep='\t', compression='xz')
 
 
 def add_experiments(
@@ -725,8 +704,139 @@ def add_experiments_io(
 
 
 def add_experiments_grped(
-        simulated_data_file,
+        simulated_data,
         num_partitions,
+        local_dir,
+        analysis_name):
+    '''
+    Say we are interested in identifying genes that differentiate between
+    disease vs normal states. However our dataset includes samples from
+    different tissues or time points and there are variations
+    in gene expression that are due to these other conditions
+    and do not have to do with disease state.
+    These non-relevant variations in the data are called batch effects.
+
+    We want to model these batch effects. To do this we will:
+    1. Partition our simulated data into n batches
+        Here we are keeping track of experiment id and partitioning
+        such that all samples from an experiment are in the same
+        partition.
+
+        Note: Partition sizes will be different since experiment
+        sizes are different per experiment.
+    2. For each partition we will shift all genes using a vector of values
+    sampled from a gaussian distribution centered around 0.
+    3. Repeat this for each partition
+    4. Append all batch effect partitions together
+
+    Arguments
+    ----------
+    simulated_data_file: str
+        File containing simulated gene expression data
+
+    num_partitions: list
+        List of different numbers of partitions to add
+        technical variations to
+
+    local_dir: str
+        Parent directory containing data files
+
+    analysis_name: str
+        Name of analysis. Format 'analysis_<int>'
+
+
+    Returns
+    --------
+    Files of simulated data with different numbers of experiments added.
+    Each file named as "Experiment_<number of experiments added>"
+    '''
+
+    # Add batch effects
+    num_genes = simulated_data.shape[1] - 1
+
+    # Create an array of the simulated data indices
+    simulated_ind = np.array(simulated_data.index)
+
+    ls_compendia = []
+
+    ls_compendia_labels = []
+
+    for i in num_partitions:
+        print('Creating simulated data with {} partitions..'.format(i))
+
+        # Create dataframe with grouping
+        partition_data_map = simulated_data.copy()
+
+        if i == 1:
+            simulated_data_out = simulated_data.drop(columns="experiment_id")
+            ls_compendia.append(simulated_data_out)
+
+            # Add experiment id to map dataframe
+            partition_data_map['partition'] = str(i)
+
+            partition_data_map_df = pd.DataFrame(
+                data=partition_data_map['partition'], index=simulated_ind.sort())
+
+            ls_compendia_labels.append(partition_data_map_df)
+
+        else:
+            partition_data = simulated_data.copy()
+
+            # Shuffle experiment ids
+            experiment_ids = simulated_data["experiment_id"].unique()
+            np.random.shuffle(experiment_ids)
+
+            # Partition experiment ids
+            # Note: 'array_split' will chunk data into almost equal sized chunks.
+            # Returns arrays of size N % i and one array with the remainder
+            partition = np.array_split(experiment_ids, i)
+
+            for j in range(i):
+                # Randomly select experiment ids
+                selected_experiment_ids = partition[j]
+
+                # Get sample ids associated with experiment ids
+                sample_ids = list(simulated_data[simulated_data["experiment_id"].isin(
+                    partition[j])].index)
+
+                # Scalar to shift gene expressiond data
+                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
+
+                # Tile stretch_factor to be able to add to batches
+                num_samples_per_partition = len(sample_ids)
+
+                if j == 0:
+                    # Drop experiment_id label to do calculation
+                    partition_data.drop(columns="experiment_id", inplace=True)
+
+                stretch_factor_tile = pd.DataFrame(
+                    pd.np.tile(
+                        stretch_factor,
+                        (num_samples_per_partition, 1)),
+                    index=partition_data.loc[sample_ids].index,
+                    columns=partition_data.loc[sample_ids].columns)
+
+                # Add noise to partition
+                partition_data.loc[sample_ids] = partition_data.loc[sample_ids] + \
+                    stretch_factor_tile
+
+                # Add partition id to map dataframe
+                partition_data_map.loc[sample_ids, 'partition'] = str(j)
+
+            partition_data_map_df = pd.DataFrame(
+                data=partition_data_map['partition'], index=simulated_ind.sort())
+
+            # Save
+            ls_compendia.append(partition_data)
+            ls_compendia_labels.append(partition_data_map_df)
+
+    return ls_compendia, ls_compendia_labels
+
+
+def add_experiments_grped_io(
+        simulated_data,
+        num_partitions,
+        run,
         local_dir,
         analysis_name):
     '''
@@ -789,14 +899,6 @@ def add_experiments_grped(
 
     print('\n')
 
-    # Read in data
-    simulated_data = pd.read_table(
-        simulated_data_file,
-        header=0,
-        index_col=0,
-        compression='xz',
-        sep='\t')
-
     # Add batch effects
     num_genes = simulated_data.shape[1] - 1
 
@@ -812,7 +914,7 @@ def add_experiments_grped(
             "Batch_effects",
             "partition_simulated",
             analysis_name,
-            "Partition_" + str(i) + ".txt.xz")
+            "Partition_" + str(i) + "_" + str(run) + ".txt.xz")
 
         partition_map_file = os.path.join(
             local_dir,
@@ -820,7 +922,7 @@ def add_experiments_grped(
             "Batch_effects",
             "partition_simulated",
             analysis_name,
-            "Partition_map_" + str(i) + ".txt.xz")
+            "Partition_map_" + str(i) + "_" + str(run) + ".txt.xz")
 
         # Create dataframe with grouping
         partition_data_map = simulated_data.copy()
@@ -936,37 +1038,71 @@ def apply_correction_io(local_dir,
                         num_experiments):
 
     for i in range(len(num_experiments)):
-        print('Correcting for {} experiments..'.format(num_experiments[i]))
 
-        experiment_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "experiment_simulated",
-            analysis_name,
-            "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+        if analysis_name.split("_")[-1] == '0':
+            print('Correcting for {} experiments..'.format(num_experiments[i]))
 
-        experiment_map_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "experiment_simulated",
-            analysis_name,
-            "Experiment_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+            experiment_file = os.path.join(
+                local_dir,
+                "Data",
+                "Batch_effects",
+                "experiment_simulated",
+                analysis_name,
+                "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
-        # Read in data
-        # data transposed to form gene x sample for R package
-        experiment_data = pd.read_table(
-            experiment_file,
-            header=0,
-            index_col=0,
-            sep='\t').T
+            experiment_map_file = os.path.join(
+                local_dir,
+                "Data",
+                "Batch_effects",
+                "experiment_simulated",
+                analysis_name,
+                "Experiment_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
-        experiment_map = pd.read_table(
-            experiment_map_file,
-            header=0,
-            index_col=0,
-            sep='\t')["experiment"]
+            # Read in data
+            # data transposed to form gene x sample for R package
+            experiment_data = pd.read_table(
+                experiment_file,
+                header=0,
+                index_col=0,
+                sep='\t').T
+
+            experiment_map = pd.read_table(
+                experiment_map_file,
+                header=0,
+                index_col=0,
+                sep='\t')["experiment"]
+        else:
+            print('Correcting for {} Partition..'.format(num_experiments[i]))
+
+            experiment_file = os.path.join(
+                local_dir,
+                "Data",
+                "Batch_effects",
+                "partition_simulated",
+                analysis_name,
+                "Partition_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+
+            experiment_map_file = os.path.join(
+                local_dir,
+                "Data",
+                "Batch_effects",
+                "partition_simulated",
+                analysis_name,
+                "Partition_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+
+            # Read in data
+            # data transposed to form gene x sample for R package
+            experiment_data = pd.read_table(
+                experiment_file,
+                header=0,
+                index_col=0,
+                sep='\t').T
+
+            experiment_map = pd.read_table(
+                experiment_map_file,
+                header=0,
+                index_col=0,
+                sep='\t')["partition"]
 
         if i == 0:
             corrected_experiment_data_df = experiment_data.copy()
@@ -980,14 +1116,28 @@ def apply_correction_io(local_dir,
             corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
                 corrected_experiment_data)
 
-        # Write out corrected files
-        experiment_corrected_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "experiment_simulated",
-            analysis_name,
-            "Experiment_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+        if analysis_name.split("_")[-1] == '0':
+            # Write out corrected files
+            experiment_corrected_file = os.path.join(
+                local_dir,
+                "Data",
+                "Batch_effects",
+                "experiment_simulated",
+                analysis_name,
+                "Experiment_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
-        corrected_experiment_data_df.to_csv(
-            experiment_corrected_file, float_format='%.3f', sep='\t', compression='xz')
+            corrected_experiment_data_df.to_csv(
+                experiment_corrected_file, float_format='%.3f', sep='\t', compression='xz')
+
+        else:
+            # Write out corrected files
+            experiment_corrected_file = os.path.join(
+                local_dir,
+                "Data",
+                "Batch_effects",
+                "partition_simulated",
+                analysis_name,
+                "Partition_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
+
+            corrected_experiment_data_df.to_csv(
+                experiment_corrected_file, float_format='%.3f', sep='\t', compression='xz')

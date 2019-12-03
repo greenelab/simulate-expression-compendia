@@ -177,6 +177,10 @@ def sim_svcca(simulated_data,
     if corrected:
         compendium_1 = compendium_1.T
 
+    if analysis_name.split("_")[-1] == "1":
+        simulated_data.drop(
+            columns="experiment_id", inplace=True)
+
     for i in range(len(num_experiments)):
         if "0" in analysis_name:
             print(
