@@ -29,8 +29,6 @@ def simple_simulation_experiment_uncorrected():
   # Parameters
   NN_architecture = 'NN_2500_30'
   analysis_name = 'analysis_0'
-  # num_simulated_samples = 6000
-  # lst_num_experiments = [1, 2, 5, 10, 20]
   num_simulated_samples = 6000
   lst_num_experiments = [1, 2, 5, 10, 20,
                          50, 100, 500, 1000, 2000, 3000, 6000]

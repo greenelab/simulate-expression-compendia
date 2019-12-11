@@ -70,7 +70,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[1]:
+# In[5]:
 
 
 # Get median for each row (number of experiments)
@@ -79,7 +79,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[ ]:
+# In[6]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -89,7 +89,7 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[ ]:
+# In[7]:
 
 
 # Get confidence interval for each row (number of experiments)
@@ -97,7 +97,7 @@ std_scores
 err = std_scores*1.96
 
 
-# In[ ]:
+# In[8]:
 
 
 # Get boundaries of confidence interval
@@ -109,13 +109,13 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[ ]:
+# In[9]:
 
 
 mean_scores
 
 
-# In[ ]:
+# In[10]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval

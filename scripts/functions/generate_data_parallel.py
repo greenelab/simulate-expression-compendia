@@ -423,13 +423,6 @@ def permute_data(simulated_data,
         to be used as a negative control in similarity analysis.
     '''
 
-    # Read in data
-    # simulated_data = pd.read_table(
-    #    simulated_data_file,
-    #    header=0,
-    #    index_col=0,
-    #    sep='\t')
-
     if "experiment_id" in list(simulated_data.columns):
         simulated_data_tmp = simulated_data.drop(
             columns="experiment_id", inplace=False)
@@ -516,7 +509,6 @@ def add_experiments(
 
         if i == 1:
             ls_compendia.append(simulated_data)
-            #simulated_data.to_csv(experiment_file, sep='\t', compression='xz')
 
             # Add experiment id to map dataframe
             experiment_data_map['experiment'] = str(i)
@@ -524,8 +516,6 @@ def add_experiments(
                 data=experiment_data_map['experiment'], index=simulated_ind.sort())
 
             ls_compendia_labels.append(experiment_data_map_df)
-            # experiment_data_map_df.to_csv(
-            #    experiment_map_file, sep='\t', compression='xz')
 
         else:
             experiment_data = simulated_data.copy()
@@ -618,12 +608,6 @@ def add_experiments_io(
     # Create an array of the simulated data indices
     simulated_ind = np.array(simulated_data.index)
 
-    # Create list to store multiple compendia
-    #ls_compendia = []
-
-    # Create list to store mapping associated with each compendia
-    #ls_compendia_labels = []
-
     for i in num_experiments:
         print('Creating simulated data with {} experiments..'.format(i))
 
@@ -647,7 +631,6 @@ def add_experiments_io(
         experiment_data_map = simulated_data.copy()
 
         if i == 1:
-            # ls_compendia.append(simulated_data)
             simulated_data.to_csv(experiment_file, sep='\t', compression='xz')
 
             # Add experiment id to map dataframe
@@ -655,7 +638,6 @@ def add_experiments_io(
             experiment_data_map_df = pd.DataFrame(
                 data=experiment_data_map['experiment'], index=simulated_ind.sort())
 
-            # ls_compendia_labels.append(experiment_data_map_df)
             experiment_data_map_df.to_csv(
                 experiment_map_file, sep='\t', compression='xz')
 
@@ -694,8 +676,6 @@ def add_experiments_io(
                 data=experiment_data_map['experiment'], index=simulated_ind.sort())
 
             # Save
-            # ls_compendia.append(experiment_data)
-            # ls_compendia_labels.append(experiment_data_map_df)
             experiment_data.to_csv(
                 experiment_file, float_format='%.3f', sep='\t', compression='xz')
 

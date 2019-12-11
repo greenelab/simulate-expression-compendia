@@ -93,7 +93,7 @@ std_scores
 
 
 # Get confidence interval for each row (number of experiments)
-err = std_scores*2.262
+err = std_scores*1.96
 
 
 # In[8]:
