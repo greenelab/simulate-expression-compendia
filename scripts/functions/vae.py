@@ -40,46 +40,46 @@ def tybalt_2layer_model(
     Arguments
     ----------
     learning_rate: float
-    	Step size used for gradient descent. In other words, it's how quickly the  methods is learning
-    
+        Step size used for gradient descent. In other words, it's how quickly the  methods is learning
+
     batch_size: int
-    	Training is performed in batches. So this determines the number of samples to consider at a given time.
-    
+        Training is performed in batches. So this determines the number of samples to consider at a given time.
+
     epochs: int
-    	The number of times to train over the entire input dataset.
-    
+        The number of times to train over the entire input dataset.
+
     kappa: float
-    	How fast to linearly ramp up KL loss 
-    
+        How fast to linearly ramp up KL loss 
+
     intermediate_dim: int
-    	Size of the hidden layer
-    
+        Size of the hidden layer
+
     latent_dim: int
-    	Size of the bottleneck layer
-    
+        Size of the bottleneck layer
+
     epsilon_std: float
-    	Standard deviation of Normal distribution to sample latent space
-    
+        Standard deviation of Normal distribution to sample latent space
+
     rnaseq: pandas.dataframe 
-    	Gene expression data
+        Gene expression data
 
     base_dir: str
-    	Parent directory where data/, scripts/, models/ are subdirectories
-    
+        Parent directory where data/, scripts/, models/ are subdirectories
+
     analysis_name: str
-    	Name that will be used to create a subdirectory where results and models will be stored
+        Name that will be used to create a subdirectory where results and models will be stored
 
     Returns
     --------
     model_decoder_file, weights_decoder_file: .h5 file
-    	Files used to generate decoding neural networks to use in downstream analysis
+        Files used to generate decoding neural networks to use in downstream analysis
 
     model_encoder_file, weights_encoder_file: .h5 file
-    	Files used to generate encoding neural networks to use in downstream analysis
+        Files used to generate encoding neural networks to use in downstream analysis
 
     encoded_file: .txt file
-    	File containing input data encoded into latent space using encoder neural network
-    
+        File containing input data encoded into latent space using encoder neural network
+
     """
 
     # The below is necessary in Python 3.2.3 onwards to
@@ -287,7 +287,7 @@ def tybalt_2layer_model(
     ax.set_xlabel('Epochs')
     ax.set_ylabel('VAE Loss')
     fig = ax.get_figure()
-    fig.savefig(hist_plot_file)
+    fig.savefig(hist_plot_file, dpi=300)
 
     del ax, fig
 

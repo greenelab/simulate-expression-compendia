@@ -600,6 +600,15 @@ def add_experiments_io(
     Files of simulated data with different numbers of experiments added.
     Each file named as "Experiment_<number of experiments added>"
     '''
+    new_dir = os.path.join(
+        local_dir, "Data", "Batch_effects", "experiment_simulated")
+    analysis_dir = os.path.join(new_dir, analysis_name)
+
+    if os.path.exists(analysis_dir):
+        print('Directory already exists: \n {}'.format(analysis_dir))
+    else:
+        print('Creating new directory: \n {}'.format(analysis_dir))
+    os.makedirs(analysis_dir, exist_ok=True)
 
     # Add batch effects
     num_simulated_samples = simulated_data.shape[0]
@@ -1019,7 +1028,7 @@ def apply_correction_io(local_dir,
 
     for i in range(len(num_experiments)):
 
-        if analysis_name.split("_")[-1] == '0':
+        if analysis_name.split("_")[-1] == '0' or analysis_name.split("_")[-1] == '2':
             print('Correcting for {} experiments..'.format(num_experiments[i]))
 
             experiment_file = os.path.join(
@@ -1096,7 +1105,7 @@ def apply_correction_io(local_dir,
             corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
                 corrected_experiment_data)
 
-        if analysis_name.split("_")[-1] == '0':
+        if analysis_name.split("_")[-1] == '0' or analysis_name.split("_")[-1] == '2':
             # Write out corrected files
             experiment_corrected_file = os.path.join(
                 local_dir,
