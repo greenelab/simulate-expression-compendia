@@ -28,6 +28,39 @@ randomState = 123
 seed(randomState)
 
 
+# In[ ]:
+
+
+# Parameters
+NN_architecture = 'NN_2500_30'
+analysis_name = 'analysis_1'
+file_prefix = 'Partition_corrected'
+num_simulated_experiments = 600
+lst_num_partitions = [1, 2, 3, 5, 10, 20,
+                    30, 50, 70, 100, 200, 300, 400, 500, 600]
+corrected = True
+use_pca = True
+num_PCs = 10
+
+iterations = range(10) 
+num_cores = 5
+
+
+# In[ ]:
+
+
+# Input files
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../.."))    # base dir on repo
+
+normalized_data_file = os.path.join(
+  base_dir,
+  "data",
+  "input",
+  "train_set_normalized.pcl")
+
+
 # In[2]:
 
 
@@ -53,9 +86,18 @@ ci_corrected_file = os.path.join(
 
 
 # Run multiple simulations - corrected
-iterations = range(10) 
-num_cores = 5
-results = Parallel(n_jobs=num_cores, verbose=100)(delayed(pipelines.matched_simulation_experiment_corrected)(i) for i in iterations)
+results = Parallel(n_jobs=num_cores, verbose=100)(
+    delayed(
+        pipelines.matched_simulation_experiment_corrected)(i,
+                                                           NN_architecture,
+                                                           analysis_name,
+                                                           num_simulated_samples,
+                                                           lst_num_experiments,
+                                                           corrected,
+                                                           use_pca,
+                                                           num_PCs,
+                                                           "Partition",
+                                                           normalized_data_file) for i in iterations)
 
 
 # In[4]:
