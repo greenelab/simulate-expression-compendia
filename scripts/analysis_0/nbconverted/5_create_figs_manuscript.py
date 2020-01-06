@@ -130,7 +130,7 @@ pca_corrected_file = os.path.join(
     "Batch_effects",
     "output",
     "manuscript figures",
-    "analysis_0_pca_uncorrected.png")
+    "analysis_0_pca_corrected.png")
 
 
 # In[4]:
@@ -477,5 +477,3 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
 print(panel_C)
 ggsave(plot=panel_C, filename=pca_corrected_file, dpi=300)
 
-
-# ## Compile panels into figure

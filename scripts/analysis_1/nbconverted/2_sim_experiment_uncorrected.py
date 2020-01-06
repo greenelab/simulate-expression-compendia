@@ -60,6 +60,12 @@ normalized_data_file = os.path.join(
       "input",
       "train_set_normalized.pcl")
 
+experiment_ids_file = os.path.join(
+      base_dir,
+      "data",
+      "metadata",
+      "experiment_ids.txt")
+
 
 # In[2]:
 
@@ -90,14 +96,15 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
         pipelines.matched_simulation_experiment_uncorrected)(i,
                                                              NN_architecture,
-                                                            analysis_name,
-                                                            num_simulated_samples,
-                                                            lst_num_experiments,
-                                                            corrected,
-                                                            use_pca,
-                                                            num_PCs,
+                                                             analysis_name,
+                                                             num_simulated_experiments,
+                                                             lst_num_partitions,
+                                                             corrected,
+                                                             use_pca,
+                                                             num_PCs,
                                                              "Partition",
-                                                            normalized_data_file) for i in iterations)
+                                                             normalized_data_file,
+                                                             experiment_ids_file) for i in iterations)
 
 
 # In[4]:
