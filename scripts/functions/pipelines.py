@@ -86,13 +86,14 @@ def simple_simulation_experiment_uncorrected(run,
 def matched_simulation_experiment_uncorrected(run,
                                               NN_architecture,
                                               analysis_name,
-                                              num_simulated_samples,
+                                              num_simulated_experiments,
                                               lst_num_partitions,
                                               corrected,
                                               use_pca,
                                               num_PCs,
                                               file_prefix,
-                                              input_file):
+                                              input_file,
+                                              experiment_ids_file):
 
   local_dir = "/home/alexandra/Documents/"
 
@@ -102,7 +103,8 @@ def matched_simulation_experiment_uncorrected(run,
   simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,
                                                               input_file,
                                                               NN_architecture,
-                                                              analysis_name)
+                                                              analysis_name,
+                                                              experiment_ids_file)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data,
@@ -209,13 +211,14 @@ def simple_simulation_experiment_corrected(run,
 def matched_simulation_experiment_corrected(run,
                                             NN_architecture,
                                             analysis_name,
-                                            num_simulated_samples,
+                                            num_simulated_experiments,
                                             lst_num_partitions,
                                             corrected,
                                             use_pca,
                                             num_PCs,
                                             file_prefix,
-                                            input_file):
+                                            input_file,
+                                            experiment_ids_file):
 
   local_dir = "/home/alexandra/Documents/"
 
@@ -225,7 +228,8 @@ def matched_simulation_experiment_corrected(run,
   simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,
                                                               input_file,
                                                               NN_architecture,
-                                                              analysis_name)
+                                                              analysis_name,
+                                                              experiment_ids_file)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data,

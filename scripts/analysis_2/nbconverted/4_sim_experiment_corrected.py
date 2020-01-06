@@ -97,7 +97,7 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
                                                           corrected,
                                                           use_pca,
                                                           num_PCs,
-                                                          "Experiment_corrected",
+                                                          file_prefix,
                                                           normalized_data_file) for i in iterations)
 
 

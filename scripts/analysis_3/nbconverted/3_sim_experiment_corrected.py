@@ -33,12 +33,12 @@ seed(randomState)
 
 # Parameters
 NN_architecture = 'NN_2500_30'
-analysis_name = 'analysis_2'
-file_prefix = "Experiment"
-num_simulated_samples = 500
-lst_num_experiments = [1, 2, 5, 10, 20,
-                     50, 100, 250, 500]
-corrected = False
+analysis_name = 'analysis_3'
+file_prefix = 'Partition_corrected'
+num_simulated_experiments = 50
+lst_num_partitions = [1, 2, 3, 5, 10, 20,
+                    30, 50]
+corrected = True
 use_pca = True
 num_PCs = 10
 
@@ -49,15 +49,27 @@ num_cores = 5
 # In[3]:
 
 
-# Input file
-local_dir = "/home/alexandra/Documents/"
+# Input files
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../.."))    # base dir on repo
+
+local_dir = local_dir = os.path.abspath(
+    os.path.join(
+        os.getcwd(), "../../../..")) 
 
 normalized_data_file = os.path.join(
-  local_dir,
-  "Data",
-  "Batch_effects",
-  "input",
-  "recount2_gene_normalized_data.tsv")
+    local_dir,
+    "Data",
+    "Batch_effects",
+    "input",
+    "recount2_gene_normalized_data.tsv")
+
+experiment_ids_file = os.path.join(
+      base_dir,
+      "data",
+      "metadata",
+      "recount2_experiment_ids.txt")
 
 
 # In[4]:
@@ -71,16 +83,14 @@ similarity_corrected_file = os.path.join(
     "Data",
     "Batch_effects",
     "output",
-    "saved variables",
-    "analysis_2_similarity_uncorrected.pickle")
+    "analysis_3_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
-    "saved variables",
-    "analysis_2_ci_uncorrected.pickle")
+    "analysis_3_ci_corrected.pickle")
 
 
 # In[5]:
@@ -89,16 +99,17 @@ ci_corrected_file = os.path.join(
 # Run multiple simulations - corrected
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
-        pipelines.simple_simulation_experiment_uncorrected)(i,
-                                                            NN_architecture,
-                                                            analysis_name,
-                                                            num_simulated_samples,
-                                                            lst_num_experiments,
-                                                            corrected,
-                                                            use_pca,
-                                                            num_PCs,
-                                                            file_prefix,
-                                                            normalized_data_file) for i in iterations)
+        pipelines.matched_simulation_experiment_corrected)(i,
+                                                           NN_architecture,
+                                                           analysis_name,
+                                                           num_simulated_experiments,
+                                                           lst_num_partitions,
+                                                           corrected,
+                                                           use_pca,
+                                                           num_PCs,
+                                                           file_prefix,
+                                                           normalized_data_file,
+                                                           experiment_ids_file) for i in iterations)
 
 
 # In[6]:
