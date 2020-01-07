@@ -25,29 +25,50 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 
-def get_sample_ids(experiment_id):
+def get_sample_ids(experiment_id,
+                   analysis_name):
     '''
     Return sample ids for a given experiment id
 
     '''
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
 
-    # metadata file
-    mapping_file = os.path.join(
-        base_dir,
-        "data",
-        "metadata",
-        "sample_annotations.tsv")
+    if analysis_name == "analysis_1":
+        # metadata file
+        mapping_file = os.path.join(
+            base_dir,
+            "data",
+            "metadata",
+            "sample_annotations.tsv")
 
-# Read in metadata
-    metadata = pd.read_table(
-        mapping_file,
-        header=0,
-        sep='\t',
-        index_col=0)
+        # Read in metadata
+        metadata = pd.read_table(
+            mapping_file,
+            header=0,
+            sep='\t',
+            index_col=0)
 
-    selected_metadata = metadata.loc[experiment_id]
-    sample_ids = list(selected_metadata['ml_data_source'])
+        selected_metadata = metadata.loc[experiment_id]
+        sample_ids = list(selected_metadata['ml_data_source'])
+
+    elif analysis_name == "analysis_3":
+        # metadata file
+        mapping_file = os.path.join(
+            base_dir,
+            "data",
+            "metadata",
+            "recount2_metadata.tsv")
+
+        # Read in metadata
+        metadata = pd.read_table(
+            mapping_file,
+            header=0,
+            sep='\t',
+            index_col=0)
+
+        selected_metadata = metadata.loc[experiment_id]
+        sample_ids = list(selected_metadata['run'])
+
     return sample_ids
 
 
@@ -55,7 +76,8 @@ def simulate_compendium(
     num_simulated_experiments,
     normalized_data_file,
     NN_architecture,
-    analysis_name
+    analysis_name,
+    experiment_ids_file
 ):
     '''
     Generate simulated data by randomly sampling some number of experiments
@@ -141,12 +163,6 @@ def simulate_compendium(
     loaded_model.load_weights(weights_encoder_file)
     loaded_decode_model.load_weights(weights_decoder_file)
 
-    experiment_ids_file = os.path.join(
-        base_dir,
-        "data",
-        "metadata",
-        "experiment_ids.txt")
-
     # Read data
     experiment_ids = pd.read_table(
         experiment_ids_file,
@@ -173,7 +189,7 @@ def simulate_compendium(
             experiment_ids['experiment_id'], size=1)[0]
 
         # Get corresponding sample ids
-        sample_ids = get_sample_ids(selected_experiment_id)
+        sample_ids = get_sample_ids(selected_experiment_id, analysis_name)
 
         # Remove any missing sample ids
         sample_ids = list(filter(str.strip, sample_ids))
@@ -600,6 +616,15 @@ def add_experiments_io(
     Files of simulated data with different numbers of experiments added.
     Each file named as "Experiment_<number of experiments added>"
     '''
+    new_dir = os.path.join(
+        local_dir, "Data", "Batch_effects", "experiment_simulated")
+    analysis_dir = os.path.join(new_dir, analysis_name)
+
+    if os.path.exists(analysis_dir):
+        print('Directory already exists: \n {}'.format(analysis_dir))
+    else:
+        print('Creating new directory: \n {}'.format(analysis_dir))
+    os.makedirs(analysis_dir, exist_ok=True)
 
     # Add batch effects
     num_simulated_samples = simulated_data.shape[0]
@@ -1019,7 +1044,7 @@ def apply_correction_io(local_dir,
 
     for i in range(len(num_experiments)):
 
-        if analysis_name.split("_")[-1] == '0':
+        if analysis_name.split("_")[-1] == '0' or analysis_name.split("_")[-1] == '2':
             print('Correcting for {} experiments..'.format(num_experiments[i]))
 
             experiment_file = os.path.join(
@@ -1096,7 +1121,7 @@ def apply_correction_io(local_dir,
             corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
                 corrected_experiment_data)
 
-        if analysis_name.split("_")[-1] == '0':
+        if analysis_name.split("_")[-1] == '0' or analysis_name.split("_")[-1] == '2':
             # Write out corrected files
             experiment_corrected_file = os.path.join(
                 local_dir,

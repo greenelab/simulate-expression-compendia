@@ -341,7 +341,7 @@ def sim_svcca_io(simulated_data,
     output_list = []
 
     for i in range(len(num_experiments)):
-        if "0" in analysis_name:
+        if ("0" in analysis_name) or ("2" in analysis_name):
             print(
                 'Calculating SVCCA score for 1 experiment vs {} experiments..'.format(num_experiments[i]))
         else:

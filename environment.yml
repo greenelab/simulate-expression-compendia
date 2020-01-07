@@ -32,3 +32,4 @@ dependencies:
   - torch>=0.4.0
   - matplotlib==3.0.0
   - pillow
+  - requests

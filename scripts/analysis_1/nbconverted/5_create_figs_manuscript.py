@@ -140,7 +140,7 @@ pca_corrected_file = os.path.join(
     "Batch_effects",
     "output",
     "manuscript figures",
-    "analysis_1_pca_uncorrected.png")
+    "analysis_1_pca_corrected.png")
 
 
 # In[6]:
@@ -459,7 +459,7 @@ all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison
 all_corrected_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[21]:
+# In[18]:
 
 
 # Plot all comparisons in one figure
