@@ -33,7 +33,8 @@ def tybalt_2layer_model(
         epsilon_std,
         rnaseq,
         base_dir,
-        analysis_name):
+        dataset_name,
+        NN_name):
     """
     Train 2-layer Tybalt model using input dataset
 
@@ -76,9 +77,6 @@ def tybalt_2layer_model(
 
     model_encoder_file, weights_encoder_file: .h5 file
         Files used to generate encoding neural networks to use in downstream analysis
-
-    encoded_file: .txt file
-        File containing input data encoded into latent space using encoder neural network
 
     """
 
@@ -130,47 +128,44 @@ def tybalt_2layer_model(
 
     stat_file = os.path.join(
         base_dir,
-        "output",
-        "stats",
-        analysis_name,
+        dataset_name,
+        "logs",
+        NN_name,
         "tybalt_2layer_{}latent_stats.tsv".format(latent_dim))
 
     hist_plot_file = os.path.join(
         base_dir,
-        "output",
-        "viz",
-        analysis_name,
+        dataset_name,
+        "logs",
+        NN_name,
         "tybalt_2layer_{}latent_hist.png".format(latent_dim))
-
-    encoded_file = os.path.join(
-        base_dir,
-        "data",
-        "encoded",
-        analysis_name,
-        "train_input_2layer_{}latent_encoded.txt".format(latent_dim))
 
     model_encoder_file = os.path.join(
         base_dir,
+        dataset_name,
         "models",
-        analysis_name,
+        NN_name,
         "tybalt_2layer_{}latent_encoder_model.h5".format(latent_dim))
 
     weights_encoder_file = os.path.join(
         base_dir,
+        dataset_name,
         "models",
-        analysis_name,
+        NN_name,
         "tybalt_2layer_{}latent_encoder_weights.h5".format(latent_dim))
 
     model_decoder_file = os.path.join(
         base_dir,
+        dataset_name,
         "models",
-        analysis_name,
+        NN_name,
         "tybalt_2layer_{}latent_decoder_model.h5".format(latent_dim))
 
     weights_decoder_file = os.path.join(
         base_dir,
+        dataset_name,
         "models",
-        analysis_name,
+        NN_name,
         "tybalt_2layer_{}latent_decoder_weights.h5".format(latent_dim))
 
     # Data initalizations
@@ -300,9 +295,6 @@ def tybalt_2layer_model(
     history_df = history_df.assign(epochs=epochs)
     history_df = history_df.assign(kappa=kappa)
     history_df.to_csv(stat_file, sep='\t', index=False)
-
-    # Save latent space representation
-    encoded_rnaseq_df.to_csv(encoded_file, sep='\t')
 
     # Save models
     # (source) https://machinelearningmastery.com/save-load-keras-deep-learning-models/

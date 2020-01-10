@@ -54,23 +54,42 @@ seed(randomState)
 
 
 # File directories
-local_dir = "/home/alexandra/Documents/"
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../..")) 
 
 similarity_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_0_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_0_ci_uncorrected.pickle")
+
+similarity_corrected_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_0_similarity_corrected.pickle")
+
+ci_corrected_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_0_ci_corrected.pickle")
+
+permuted_score_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_0_permuted.npy")
+
+# locally stored simulated compendia files
+local_dir = "/home/alexandra/Documents/"
 
 compendia_dir = os.path.join(
     local_dir,
@@ -79,57 +98,24 @@ compendia_dir = os.path.join(
     "experiment_simulated",
     "analysis_0")
 
-similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_0_similarity_corrected.pickle")
-
-ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_0_ci_corrected.pickle")
-
-permuted_score_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_0_permuted.txt.npy")
-
 
 # In[3]:
 
 
 # Output files
 svcca_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "manuscript figures",
+    base_dir,
+    "results",
     "analysis_0_svcca.png")
 
 pca_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "manuscript figures",
+    base_dir,
+    "results",
     "analysis_0_pca_uncorrected.png")
 
 pca_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "manuscript figures",
+    base_dir,
+    "results",
     "analysis_0_pca_corrected.png")
 
 

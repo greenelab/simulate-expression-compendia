@@ -288,6 +288,7 @@ def simulate_compendium(
 def simulate_data(
         normalized_data_file,
         NN_architecture,
+        dataset_name,
         analysis_name,
         num_simulated_samples
 ):
@@ -316,7 +317,7 @@ def simulate_data(
         Name of neural network architecture to use.
         Format 'NN_<intermediate layer>_<latent layer>'
 
-    analysis_name: str
+    dataset_name: str
         Name of analysis. Format 'analysis_<int>'
 
     number_simulated_samples: int
@@ -345,7 +346,7 @@ def simulate_data(
     print('\n')
 
     # Files
-    NN_dir = base_dir + "/models/" + NN_architecture
+    NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
     model_encoder_file = glob.glob(os.path.join(
         NN_dir,
         "*_encoder_model.h5"))[0]
@@ -414,9 +415,7 @@ def simulate_data(
     return simulated_data
 
 
-def permute_data(simulated_data,
-                 local_dir,
-                 analysis_name):
+def permute_data(simulated_data):
     '''
     Permute the simulated data
 

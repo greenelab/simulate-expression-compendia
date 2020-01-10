@@ -20,7 +20,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
+sys.path.append("../../")
 from functions import pipelines
 
 from numpy.random import seed
@@ -28,12 +28,13 @@ randomState = 123
 seed(randomState)
 
 
-# In[ ]:
+# In[2]:
 
 
 # Parameters
-NN_architecture = 'NN_2500_30'
+dataset_name = "Pseudomonas_analysis"
 analysis_name = 'analysis_0'
+NN_architecture = 'NN_2500_30'
 file_prefix = 'Experiment_corrected'
 num_simulated_samples = 6000
 lst_num_experiments = [1, 2, 5, 10, 20,
@@ -46,7 +47,7 @@ iterations = range(5)
 num_cores = 5
 
 
-# In[ ]:
+# In[3]:
 
 
 # Input files
@@ -56,41 +57,39 @@ base_dir = os.path.abspath(
 
 
 normalized_data_file = os.path.join(
-  base_dir,
-  "data",
-  "input",
-  "train_set_normalized.pcl")
+    base_dir,
+    dataset_name,
+    "data",
+    "input",
+    "train_set_normalized.pcl")
 
 
-# In[2]:
+# In[4]:
 
 
 # Output files
-local_dir = "/home/alexandra/Documents/"
-
 similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_0_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_0_ci_corrected.pickle")
 
 
-# In[3]:
+# In[5]:
 
 
-# Run multiple simulations - corrected
+# Run multiple simulations
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
         pipelines.simple_simulation_experiment_corrected)(i,
                                                           NN_architecture,
+                                                          dataset_name,
                                                           analysis_name,
                                                           num_simulated_samples,
                                                           lst_num_experiments,
@@ -101,7 +100,7 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
                                                           normalized_data_file) for i in iterations)
 
 
-# In[4]:
+# In[6]:
 
 
 # Concatenate output dataframes
@@ -113,7 +112,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[5]:
+# In[7]:
 
 
 # Get median for each row (number of experiments)
@@ -122,7 +121,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[6]:
+# In[8]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -132,7 +131,7 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[7]:
+# In[9]:
 
 
 # Get confidence interval for each row (number of experiments)
@@ -140,7 +139,7 @@ std_scores
 err = std_scores*1.96
 
 
-# In[8]:
+# In[10]:
 
 
 # Get boundaries of confidence interval
@@ -152,13 +151,13 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[9]:
+# In[11]:
 
 
 mean_scores
 
 
-# In[10]:
+# In[12]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval
