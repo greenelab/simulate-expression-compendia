@@ -18,14 +18,14 @@ This repository stores data and analysis modules to simulate compendia of gene e
 
 ## Analysis Modules
 
-There are 4 different analyses in the `scripts` directory:
+There are 2 analyses using Pseudomonas dataset in the `Pseudomonas_analysis` directory and 2 analyses using the recount2 dataset in the `Human_analysis` directory:
 
 | Name | Description |
 | :--- | :---------- |
-| [analysis_0](scripts/analysis_0/) | Pseudomonas sample-level gene expression simulation|
-| [analysis_1](scripts/analysis_1/) | Pseudomonas experiment-level gene expression simulation|
-| [analysis_2](scripts/analysis_2/) | Human sample-level gene expression simulation|
-| [analysis_3](scripts/analysis_3/) | Human experiment-level gene expression simulation|
+| [analysis_0](Pseudomonas_analysis/analysis_0/) | Pseudomonas sample-level gene expression simulation|
+| [analysis_1](Pseudomonas_analysis/analysis_1/) | Pseudomonas experiment-level gene expression simulation|
+| [analysis_2](Human_analysis/analysis_2/) | Human sample-level gene expression simulation|
+| [analysis_3](Human_analysis/analysis_3/) | Human experiment-level gene expression simulation|
 
 
 ## Computational Environment
