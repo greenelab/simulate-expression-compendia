@@ -46,41 +46,48 @@ randomState = 123
 seed(randomState)
 
 
+# ## Load data
+
 # In[2]:
 
 
-get_ipython().run_cell_magic('R', '', 'devtools::install_github("wilkelab/cowplot")')
-
-
-# In[3]:
-
-
-get_ipython().run_cell_magic('R', '', 'suppressPackageStartupMessages(library(dplyr))\nsuppressPackageStartupMessages(library(ggplot2))\nsuppressPackageStartupMessages(library(cowplot))')
-
-
-# ## Load data
-
-# In[4]:
-
-
 # File directories
-local_dir = "/home/alexandra/Documents/"
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../..")) 
 
 similarity_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_1_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_1_ci_uncorrected.pickle")
+
+similarity_corrected_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_1_similarity_corrected.pickle")
+
+ci_corrected_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_1_ci_corrected.pickle")
+
+permuted_score_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_1_permuted.npy")
+
+# locally stored simulated compendia files
+local_dir = "/home/alexandra/Documents/"
 
 compendia_dir = os.path.join(
     local_dir,
@@ -89,61 +96,28 @@ compendia_dir = os.path.join(
     "partition_simulated",
     "analysis_1")
 
-similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_1_similarity_corrected.pickle")
 
-ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_1_ci_corrected.pickle")
-
-permuted_score_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_1_permuted.txt.npy")
-
-
-# In[5]:
+# In[3]:
 
 
 # Output files
 svcca_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "manuscript figures",
+    base_dir,
+    "results",
     "analysis_1_svcca.png")
 
 pca_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "manuscript figures",
+    base_dir,
+    "results",
     "analysis_1_pca_uncorrected.png")
 
 pca_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "manuscript figures",
+    base_dir,
+    "results",
     "analysis_1_pca_corrected.png")
 
 
-# In[6]:
+# In[4]:
 
 
 # Load pickled files
@@ -155,7 +129,7 @@ err_corrected_svcca = pd.read_pickle(ci_corrected_file)
 permuted_score = np.load(permuted_score_file)
 
 
-# In[7]:
+# In[5]:
 
 
 # Concatenate error bars
@@ -163,7 +137,7 @@ uncorrected_svcca_err = pd.concat([uncorrected_svcca, err_uncorrected_svcca], ax
 corrected_svcca_err = pd.concat([corrected_svcca, err_corrected_svcca], axis=1)
 
 
-# In[8]:
+# In[6]:
 
 
 # Add group label
@@ -171,7 +145,7 @@ uncorrected_svcca_err['Group'] = 'uncorrected'
 corrected_svcca_err['Group'] = 'corrected'
 
 
-# In[9]:
+# In[7]:
 
 
 # Concatenate dataframes
@@ -181,7 +155,7 @@ all_svcca
 
 # ## SVCCA panel
 
-# In[10]:
+# In[8]:
 
 
 # Plot
@@ -228,7 +202,7 @@ ggsave(plot=panel_A, filename=svcca_file, dpi=300)
 
 # ## Uncorrected PCA panel
 
-# In[11]:
+# In[9]:
 
 
 lst_num_partitions =[1,2,3,400,500,600]
@@ -303,7 +277,7 @@ for i in lst_num_partitions:
     all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])     
 
 
-# In[12]:
+# In[10]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -318,13 +292,13 @@ all_data_df = all_data_df.assign(num_partitions_cat = num_partitions_cat)
 all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[13]:
+# In[11]:
 
 
 all_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[14]:
+# In[12]:
 
 
 # Plot all comparisons in one figure
@@ -355,7 +329,7 @@ ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=300)
 
 # ## Corrected PCA panel
 
-# In[15]:
+# In[13]:
 
 
 lst_num_partitions = [1,2,3,400,500,600]
@@ -438,7 +412,7 @@ for i in lst_num_partitions:
     all_corrected_data_df = pd.concat([all_corrected_data_df, combined_data_PCAencoded_df])
 
 
-# In[16]:
+# In[14]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -453,13 +427,13 @@ all_corrected_data_df = all_corrected_data_df.assign(num_partitions_cat = num_pa
 all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[17]:
+# In[15]:
 
 
 all_corrected_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[18]:
+# In[16]:
 
 
 # Plot all comparisons in one figure
@@ -488,5 +462,3 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
 print(panel_C)
 ggsave(plot=panel_C, filename=pca_corrected_file, dpi=300)
 
-
-# ## Compile panels into figure

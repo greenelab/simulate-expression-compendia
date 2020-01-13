@@ -39,53 +39,47 @@ seed(randomState)
 
 
 # File directories
-local_dir = "/home/alexandra/Documents/"
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../..")) 
 
 similarity_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_1_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_1_ci_uncorrected.pickle")
 
 similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_1_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_1_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
-    "analysis_1_permuted.txt.npy")
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_1_permuted.npy")
 
 
 # In[3]:
 
 
 # Output files
+local_dir = "/home/alexandra/Documents/"
+
 svcca_uncorrected_file = os.path.join(
     local_dir,
     "Data",

@@ -85,6 +85,7 @@ def simple_simulation_experiment_uncorrected(run,
 
 def matched_simulation_experiment_uncorrected(run,
                                               NN_architecture,
+                                              dataset_name,
                                               analysis_name,
                                               num_simulated_experiments,
                                               lst_num_partitions,
@@ -103,13 +104,12 @@ def matched_simulation_experiment_uncorrected(run,
   simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,
                                                               input_file,
                                                               NN_architecture,
+                                                              dataset_name,
                                                               analysis_name,
                                                               experiment_ids_file)
 
   # Permute simulated data to be used as a negative control
-  permuted_data = generate_data_parallel.permute_data(simulated_data,
-                                                      local_dir,
-                                                      analysis_name)
+  permuted_data = generate_data_parallel.permute_data(simulated_data)
 
   # Add technical variation
   generate_data_parallel.add_experiments_grped_io(simulated_data,
@@ -210,6 +210,7 @@ def simple_simulation_experiment_corrected(run,
 
 def matched_simulation_experiment_corrected(run,
                                             NN_architecture,
+                                            dataset_name,
                                             analysis_name,
                                             num_simulated_experiments,
                                             lst_num_partitions,
@@ -228,13 +229,12 @@ def matched_simulation_experiment_corrected(run,
   simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,
                                                               input_file,
                                                               NN_architecture,
+                                                              dataset_name,
                                                               analysis_name,
                                                               experiment_ids_file)
 
   # Permute simulated data to be used as a negative control
-  permuted_data = generate_data_parallel.permute_data(simulated_data,
-                                                      local_dir,
-                                                      analysis_name)
+  permuted_data = generate_data_parallel.permute_data(simulated_data)
 
   # Add technical variation
   generate_data_parallel.add_experiments_grped_io(simulated_data,

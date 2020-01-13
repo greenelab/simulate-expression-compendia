@@ -21,10 +21,6 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
-from functions import generate_data
-from functions import similarity_metric
-
 from numpy.random import seed
 randomState = 123
 seed(randomState)
@@ -33,34 +29,38 @@ seed(randomState)
 # In[2]:
 
 
+# User parameters
+dataset_name = "Pseudomonas_analysis"
+
+
+# In[3]:
+
+
 # Input files
-
-# base dir on repo
 base_dir = os.path.abspath(os.path.join(os.getcwd(),"../..")) 
-
-# base dir on local machine for data storage
-# os.makedirs doesn't recognize `~`
-local_dir = local_dir = os.path.abspath(os.path.join(os.getcwd(), "../../../..")) 
 
 mapping_file = os.path.join(
     base_dir,
+    dataset_name,
     "data",
     "metadata",
     "sample_annotations.tsv")
 
 normalized_data_file = os.path.join(
     base_dir,
+    dataset_name,
     "data",
     "input",
     "train_set_normalized.pcl")
 
 
-# In[3]:
+# In[4]:
 
 
 # Output file
 experiment_id_file = os.path.join(
     base_dir, 
+    dataset_name,
     "data",
     "metadata", 
     "experiment_ids.txt")
@@ -68,7 +68,7 @@ experiment_id_file = os.path.join(
 
 # ### Get experiment ids
 
-# In[4]:
+# In[5]:
 
 
 # Read in metadata
@@ -81,14 +81,14 @@ metadata = pd.read_table(
 metadata.head()
 
 
-# In[5]:
+# In[6]:
 
 
 map_experiment_sample = metadata[['sample_name', 'ml_data_source']]
 map_experiment_sample.head()
 
 
-# In[6]:
+# In[7]:
 
 
 experiment_ids = np.unique(np.array(map_experiment_sample.index))
@@ -97,7 +97,7 @@ print("There are {} experiments in the compendium".format(len(experiment_ids)))
 
 # ### Get sample ids from gene expression data
 
-# In[7]:
+# In[8]:
 
 
 normalized_data = pd.read_table(
@@ -109,7 +109,7 @@ normalized_data = pd.read_table(
 normalized_data.head()
 
 
-# In[8]:
+# In[9]:
 
 
 sample_ids_with_gene_expression = list(normalized_data.index)
@@ -117,7 +117,7 @@ sample_ids_with_gene_expression = list(normalized_data.index)
 
 # ### Get samples belonging to selected experiment
 
-# In[9]:
+# In[10]:
 
 
 experiment_ids_with_gene_expression = []
@@ -135,14 +135,14 @@ for experiment_id in experiment_ids:
 print('There are {} experiments with gene expression data'.format(len(experiment_ids_with_gene_expression)))
 
 
-# In[10]:
+# In[11]:
 
 
 experiment_ids_with_gene_expression_df = pd.DataFrame(experiment_ids_with_gene_expression, columns=['experiment_id'])
 experiment_ids_with_gene_expression_df.head()
 
 
-# In[11]:
+# In[12]:
 
 
 # Save simulated data

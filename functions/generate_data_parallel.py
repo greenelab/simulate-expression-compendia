@@ -26,17 +26,18 @@ warnings.filterwarnings(action='ignore')
 
 
 def get_sample_ids(experiment_id,
-                   analysis_name):
+                   dataset_name):
     '''
     Return sample ids for a given experiment id
 
     '''
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
 
-    if analysis_name == "analysis_1":
+    if dataset_name == "Pseudomonas_analysis":
         # metadata file
         mapping_file = os.path.join(
             base_dir,
+            dataset_name,
             "data",
             "metadata",
             "sample_annotations.tsv")
@@ -51,10 +52,11 @@ def get_sample_ids(experiment_id,
         selected_metadata = metadata.loc[experiment_id]
         sample_ids = list(selected_metadata['ml_data_source'])
 
-    elif analysis_name == "analysis_3":
+    elif dataset_name == "Human_analysis":
         # metadata file
         mapping_file = os.path.join(
             base_dir,
+            dataset_name,
             "data",
             "metadata",
             "recount2_metadata.tsv")
@@ -76,6 +78,7 @@ def simulate_compendium(
     num_simulated_experiments,
     normalized_data_file,
     NN_architecture,
+    dataset_name,
     analysis_name,
     experiment_ids_file
 ):
@@ -123,7 +126,7 @@ def simulate_compendium(
 
     # Create directory to output simulated data
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    local_dir = os.path.abspath(os.path.join(os.getcwd(), "../../../.."))
+    local_dir = "/home/alexandra/Documents/"
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
@@ -137,7 +140,7 @@ def simulate_compendium(
     print('\n')
 
     # Files
-    NN_dir = base_dir + "/models/" + NN_architecture
+    NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
     latent_dim = NN_architecture.split('_')[-1]
 
     model_encoder_file = glob.glob(os.path.join(
@@ -189,7 +192,7 @@ def simulate_compendium(
             experiment_ids['experiment_id'], size=1)[0]
 
         # Get corresponding sample ids
-        sample_ids = get_sample_ids(selected_experiment_id, analysis_name)
+        sample_ids = get_sample_ids(selected_experiment_id, dataset_name)
 
         # Remove any missing sample ids
         sample_ids = list(filter(str.strip, sample_ids))
@@ -332,7 +335,7 @@ def simulate_data(
 
     # Create directory to output simulated data
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    local_dir = os.path.abspath(os.path.join(os.getcwd(), "../../../.."))
+    local_dir = "/home/alexandra/Documents/"
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
