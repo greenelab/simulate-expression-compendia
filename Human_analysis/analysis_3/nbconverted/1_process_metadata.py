@@ -31,35 +31,40 @@ seed(randomState)
 # In[2]:
 
 
-# Input files
-
-# base dir on repo
-base_dir = os.path.abspath(os.path.join(os.getcwd(),"../..")) 
-
-# base dir on local machine for data storage
-# os.makedirs doesn't recognize `~`
-local_dir = local_dir = os.path.abspath(os.path.join(os.getcwd(), "../../../..")) 
-
-mapping_file = os.path.join(
-    base_dir,
-    "data",
-    "metadata",
-    "recount2_metadata.tsv")
-
-normalized_data_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "input",
-    "recount2_gene_normalized_data.tsv")
+# User parameters
+dataset_name = "Human_analysis"
 
 
 # In[3]:
 
 
+# Input files
+
+# base dir on repo
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))  
+
+mapping_file = os.path.join(
+    base_dir,
+    dataset_name,
+    "data",
+    "metadata",
+    "recount2_metadata.tsv")
+
+normalized_data_file = os.path.join(
+    base_dir,
+    dataset_name,
+    "data",
+    "input",
+    "recount2_gene_normalized_data.tsv.xz")
+
+
+# In[4]:
+
+
 # Output file
 experiment_id_file = os.path.join(
     base_dir, 
+    dataset_name,
     "data",
     "metadata", 
     "recount2_experiment_ids.txt")
@@ -67,7 +72,7 @@ experiment_id_file = os.path.join(
 
 # ### Get experiment ids
 
-# In[4]:
+# In[5]:
 
 
 # Read in metadata
@@ -80,14 +85,14 @@ metadata = pd.read_table(
 metadata.head()
 
 
-# In[5]:
+# In[6]:
 
 
 map_experiment_sample = metadata[['run']]
 map_experiment_sample.head()
 
 
-# In[6]:
+# In[7]:
 
 
 experiment_ids = np.unique(np.array(map_experiment_sample.index)).tolist()
@@ -96,7 +101,7 @@ print("There are {} experiments in the compendium".format(len(experiment_ids)))
 
 # ### Get sample ids from gene expression data
 
-# In[7]:
+# In[8]:
 
 
 normalized_data = pd.read_table(
@@ -108,7 +113,7 @@ normalized_data = pd.read_table(
 normalized_data.head()
 
 
-# In[8]:
+# In[9]:
 
 
 sample_ids_with_gene_expression = list(normalized_data.index)
@@ -116,7 +121,7 @@ sample_ids_with_gene_expression = list(normalized_data.index)
 
 # ### Get samples belonging to selected experiment
 
-# In[15]:
+# In[10]:
 
 
 experiment_ids_with_gene_expression = []
@@ -138,14 +143,14 @@ for experiment_id in experiment_ids:
 print('There are {} experiments with gene expression data'.format(len(experiment_ids_with_gene_expression)))
 
 
-# In[10]:
+# In[11]:
 
 
 experiment_ids_with_gene_expression_df = pd.DataFrame(experiment_ids_with_gene_expression, columns=['experiment_id'])
 experiment_ids_with_gene_expression_df.head()
 
 
-# In[11]:
+# In[12]:
 
 
 # Save simulated data

@@ -16,11 +16,12 @@ import multiprocessing
 import sys
 import os
 import pandas as pd
+import numpy as np
 
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
+sys.path.append("../../")
 from functions import pipelines
 
 from numpy.random import seed
@@ -32,8 +33,9 @@ seed(randomState)
 
 
 # Parameters
-NN_architecture = 'NN_2500_30'
+dataset_name = "Human_analysis"
 analysis_name = 'analysis_2'
+NN_architecture = 'NN_2500_30'
 file_prefix = "Experiment"
 num_simulated_samples = 500
 lst_num_experiments = [1, 2, 5, 10, 20,
@@ -50,37 +52,39 @@ num_cores = 5
 
 
 # Input file
-local_dir = "/home/alexandra/Documents/"
+base_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../.."))
 
 normalized_data_file = os.path.join(
-  local_dir,
-  "Data",
-  "Batch_effects",
-  "input",
-  "recount2_gene_normalized_data.tsv")
+    base_dir,
+    dataset_name,    
+    "data",
+    "input",
+    "recount2_gene_normalized_data.tsv.xz")
 
 
 # In[4]:
 
 
 # Output files
-local_dir = "/home/alexandra/Documents/"
-
-similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+similarity_uncorrected_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_2_similarity_uncorrected.pickle")
 
-ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+ci_uncorrected_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_2_ci_uncorrected.pickle")
+
+similarity_permuted_file = os.path.join(
+    base_dir,
+    "results",
+    "saved_variables",
+    "analysis_2_permuted")
 
 
 # In[5]:
@@ -91,6 +95,7 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
         pipelines.simple_simulation_experiment_uncorrected)(i,
                                                             NN_architecture,
+                                                            dataset_name,
                                                             analysis_name,
                                                             num_simulated_samples,
                                                             lst_num_experiments,
@@ -104,6 +109,13 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
 # In[6]:
 
 
+# permuted score
+permuted_score = results[0][0]
+
+
+# In[7]:
+
+
 # Concatenate output dataframes
 all_svcca_scores = pd.DataFrame()
 
@@ -113,7 +125,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[7]:
+# In[8]:
 
 
 # Get median for each row (number of experiments)
@@ -122,7 +134,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[8]:
+# In[9]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -132,14 +144,14 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[9]:
+# In[10]:
 
 
 # Get confidence interval for each row (number of experiments)
 err = std_scores*1.96
 
 
-# In[10]:
+# In[11]:
 
 
 # Get boundaries of confidence interval
@@ -151,16 +163,17 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[11]:
+# In[12]:
 
 
 mean_scores
 
 
-# In[12]:
+# In[14]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval
-mean_scores.to_pickle(similarity_corrected_file)
-ci.to_pickle(ci_corrected_file)
+mean_scores.to_pickle(similarity_uncorrected_file)
+ci.to_pickle(ci_uncorrected_file)
+np.save(similarity_permuted_file, permuted_score)
 

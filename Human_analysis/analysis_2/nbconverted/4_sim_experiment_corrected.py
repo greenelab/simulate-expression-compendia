@@ -20,7 +20,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
+sys.path.append("../../")
 from functions import pipelines
 
 from numpy.random import seed
@@ -32,8 +32,9 @@ seed(randomState)
 
 
 # Parameters
-NN_architecture = 'NN_2500_30'
+dataset_name = "Human_analysis"
 analysis_name = 'analysis_2'
+NN_architecture = 'NN_2500_30'
 file_prefix = 'Experiment_corrected'
 num_simulated_samples = 500
 lst_num_experiments = [1, 2, 5, 10, 20,
@@ -50,36 +51,33 @@ num_cores = 5
 
 
 # Input
-local_dir = "/home/alexandra/Documents/"
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../.."))    # base dir on repo
+
 
 normalized_data_file = os.path.join(
-  local_dir,
-  "Data",
-  "Batch_effects",
-  "input",
-  "recount2_gene_normalized_data.tsv")
+    base_dir,
+    dataset_name,
+    "data",
+    "input",
+    "recount2_gene_normalized_data.tsv.xz")
 
 
 # In[4]:
 
 
 # Output files
-local_dir = "/home/alexandra/Documents/"
-
 similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_2_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
-    "saved variables",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_2_ci_corrected.pickle")
 
 
@@ -91,6 +89,7 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
         pipelines.simple_simulation_experiment_corrected)(i,
                                                           NN_architecture,
+                                                          dataset_name,
                                                           analysis_name,
                                                           num_simulated_samples,
                                                           lst_num_experiments,

@@ -20,7 +20,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
+sys.path.append("../../")
 from functions import pipelines
 
 from numpy.random import seed
@@ -32,8 +32,9 @@ seed(randomState)
 
 
 # Parameters
-NN_architecture = 'NN_2500_30'
+dataset_name = "Human_analysis"
 analysis_name = 'analysis_3'
+NN_architecture = 'NN_2500_30'
 file_prefix = 'Partition_corrected'
 num_simulated_experiments = 50
 lst_num_partitions = [1, 2, 3, 5, 10, 20,
@@ -54,42 +55,35 @@ base_dir = os.path.abspath(
   os.path.join(
       os.getcwd(), "../.."))    # base dir on repo
 
-local_dir = local_dir = os.path.abspath(
-    os.path.join(
-        os.getcwd(), "../../../..")) 
-
 normalized_data_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
+    base_dir,
+    dataset_name,
+    "data",
     "input",
-    "recount2_gene_normalized_data.tsv")
+    "recount2_gene_normalized_data.tsv.xz")
 
 experiment_ids_file = os.path.join(
-      base_dir,
-      "data",
-      "metadata",
-      "recount2_experiment_ids.txt")
+    base_dir,
+    dataset_name,
+    "data",
+    "metadata",
+    "recount2_experiment_ids.txt")
 
 
 # In[4]:
 
 
 # Output files
-local_dir = "/home/alexandra/Documents/"
-
 similarity_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_3_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "output",
+    base_dir,
+    "results",
+    "saved_variables",
     "analysis_3_ci_corrected.pickle")
 
 
@@ -101,6 +95,7 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
         pipelines.matched_simulation_experiment_corrected)(i,
                                                            NN_architecture,
+                                                           dataset_name,
                                                            analysis_name,
                                                            num_simulated_experiments,
                                                            lst_num_partitions,

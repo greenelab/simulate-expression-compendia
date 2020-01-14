@@ -73,15 +73,14 @@ data_counts_all_rpkm <- t(data_counts_all_rpkm)
 data_counts_all_tpm <- t(data_counts_all_tpm)
 
 ## Save counts matrix to file
-write.table(data_counts_all_rpkm,
-            '~/Documents/Repos/Batch_effects_simulation/data/input/recount2_gene_RPKM_data.tsv',
+  write.table(data_counts_all_rpkm,
+            '~/Documents/Repos/Batch_effects_simulation/Human_analysis/data/input/recount2_gene_RPKM_data.tsv',
             sep='\t',
             row.names=TRUE,
             col.names=NA)
 
-write.table(data_counts_all_tpm,
-            '~/Documents/Repos/Batch_effects_simulation/data/input/recount2_gene_TPM_data.tsv',
-            sep='\t',
-            row.names=TRUE,
-            col.names=NA)
-
+#write.table(data_counts_all_tpm,
+#            '~/Documents/Repos/Batch_effects_simulation/Human_analysis/data/input/recount2_gene_TPM_data.tsv',
+#            sep='\t',
+#            row.names=TRUE,
+#            col.names=NA)

@@ -25,30 +25,37 @@ warnings.filterwarnings(action='ignore')
 # In[2]:
 
 
-# Load arguments
-local_dir = "/home/alexandra/Documents/"
-
-rpkm_data_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
-    "input",
-    "recount2_gene_RPKM_data.tsv")
+# User parameters
+dataset_name = "Human_analysis"
 
 
 # In[3]:
 
 
-# Output file
-out_data_file = os.path.join(
-    local_dir,
-    "Data",
-    "Batch_effects",
+# Load arguments
+base_dir = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+
+rpkm_data_file = os.path.join(
+    base_dir,
+    dataset_name,
+    "data",
     "input",
-    "recount2_gene_normalized_data.tsv")
+    "recount2_gene_RPKM_data.tsv")
 
 
 # In[4]:
+
+
+# Output file
+out_data_file = os.path.join(
+    base_dir,
+    dataset_name,
+    "data",
+    "input",
+    "recount2_gene_normalized_data.tsv.xz")
+
+
+# In[5]:
 
 
 # Read data
@@ -62,7 +69,7 @@ rpkm_data.head()
 print(rpkm_data.shape)
 
 
-# In[5]:
+# In[6]:
 
 
 # 0-1 normalize per gene
@@ -74,7 +81,7 @@ rnaseq_scaled_df = pd.DataFrame(rnaseq_scaled_df,
 rnaseq_scaled_df.head()
 
 
-# In[6]:
+# In[7]:
 
 
 # UMAP embedding of original input data
@@ -90,9 +97,9 @@ g_input = ggplot(input_data_UMAPencoded_df, aes(x='1',y='2'))     + geom_point(a
 print(g_input)
 
 
-# In[7]:
+# In[8]:
 
 
 # Save scaled data
-rnaseq_scaled_df.to_csv(out_data_file, sep='\t')
+rnaseq_scaled_df.to_csv(out_data_file, sep='\t', compression='xz')
 
