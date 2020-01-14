@@ -106,7 +106,7 @@ compendia_dir = os.path.join(
 svcca_file = os.path.join(
     base_dir,
     "results",
-    "analysis_0_svcca.png")
+    "analysis_0_svcca.svg")
 
 pca_uncorrected_file = os.path.join(
     base_dir,
@@ -199,7 +199,7 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
     + scale_color_manual(['#1976d2', '#b3e5fc'])
 
 print(panel_A)
-ggsave(plot=panel_A, filename=svcca_file, dpi=300)
+ggsave(plot=panel_A, filename=svcca_file, device="svg", dpi=300)
 
 
 # ## Uncorrected PCA panel
@@ -326,7 +326,7 @@ panel_B = ggplot(all_data_df[all_data_df['Comparison'] != '1'],
                  color='#bdbdbd')
 
 print(panel_B)
-ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=300)
+ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=500)
 
 
 # ## Corrected PCA panel
@@ -461,5 +461,5 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
                  color='#bdbdbd')
 
 print(panel_C)
-ggsave(plot=panel_C, filename=pca_corrected_file, dpi=300)
+ggsave(plot=panel_C, filename=pca_corrected_file, dpi=500)
 
