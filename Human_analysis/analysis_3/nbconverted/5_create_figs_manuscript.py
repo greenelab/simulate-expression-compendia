@@ -157,7 +157,7 @@ all_svcca
 
 # ## SVCCA panel
 
-# In[8]:
+# In[17]:
 
 
 # Plot
@@ -185,9 +185,9 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
                 size=1.5,
                 color="darkgrey",
                 show_legend=False) \
-    + labs(x = "Number of Experiments", 
+    + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
-           title = "Similarity across varying numbers of experiments") \
+           title = "Similarity across varying numbers of partitions") \
     + theme(plot_title=element_text(weight='bold'),
             plot_background=element_rect(fill="white"),
             panel_background=element_rect(fill="white"),
@@ -204,7 +204,7 @@ ggsave(plot=panel_A, filename=svcca_file, device="svg", dpi=300)
 
 # ## Uncorrected PCA panel
 
-# In[ ]:
+# In[9]:
 
 
 lst_num_experiments = [1, 2, 3, 5, 10, 20,
@@ -280,7 +280,7 @@ for i in lst_num_experiments:
     all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])     
 
 
-# In[ ]:
+# In[10]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -295,13 +295,13 @@ all_data_df = all_data_df.assign(num_experiments_cat = num_experiments_cat)
 all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[ ]:
+# In[11]:
 
 
 all_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[ ]:
+# In[12]:
 
 
 # Plot all comparisons in one figure
@@ -332,7 +332,7 @@ ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=500)
 
 # ## Corrected PCA panel
 
-# In[ ]:
+# In[13]:
 
 
 lst_num_experiments = [1, 2, 3, 5, 10, 20,
@@ -413,7 +413,7 @@ for i in lst_num_experiments:
     all_corrected_data_df = pd.concat([all_corrected_data_df, combined_data_PCAencoded_df])
 
 
-# In[ ]:
+# In[14]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -428,13 +428,13 @@ all_corrected_data_df = all_corrected_data_df.assign(num_experiments_cat = num_e
 all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[ ]:
+# In[15]:
 
 
 all_corrected_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[ ]:
+# In[16]:
 
 
 # Plot all comparisons in one figure

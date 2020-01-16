@@ -178,7 +178,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[36]:
+# In[78]:
 
 
 # Overlay original input vs simulated data
@@ -191,14 +191,19 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-g_input_sim = ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='dataset'), alpha=0.05) + labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and simulated data") + theme_bw() + theme(
+g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2')) + geom_point(color='#d5a6bd', 
+             alpha=0.15) \
++ labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and simulated data") \
++ theme_bw() \
++ theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
     plot_title=element_text(weight='bold')
 ) \
-+ guides(colour=guide_legend(override_aes={'alpha': 1})) \
-+ scale_colour_manual(['#d5a6bdff', "#ccccccff"]) 
++ geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
+                 alpha=0.09, 
+                 color='#cccccc')
 
 print(g_input_sim)
 ggsave(plot = g_input_sim, filename = umap_overlay_file, dpi=500)
