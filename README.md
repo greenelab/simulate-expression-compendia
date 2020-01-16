@@ -1,6 +1,7 @@
 # The impact of undesired technical variability on large-scale data compendia
 
-**Alexandra Lee and Casey Greene 2020**
+**Alexandra J Lee, YoSon Park, Georgia Doing, Deborah A Hogan and Casey S Greene**
+**January 2020**
 
 **University of Pennsylvania**
 
