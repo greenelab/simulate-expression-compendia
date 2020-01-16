@@ -178,7 +178,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[12]:
+# In[36]:
 
 
 # Overlay original input vs simulated data
@@ -191,7 +191,7 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-g_input_sim = ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='dataset'), alpha=0.2) + labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and simulated data") + theme_bw() + theme(
+g_input_sim = ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(aes(color='dataset'), alpha=0.05) + labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and simulated data") + theme_bw() + theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
