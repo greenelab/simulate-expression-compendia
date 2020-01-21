@@ -24,17 +24,17 @@ from functions import generate_data_parallel
 from functions import similarity_metric_parallel
 
 
-def simple_simulation_experiment_uncorrected(run,
-                                             NN_architecture,
-                                             dataset_name,
-                                             analysis_name,
-                                             num_simulated_samples,
-                                             lst_num_experiments,
-                                             corrected,
-                                             use_pca,
-                                             num_PCs,
-                                             file_prefix,
-                                             input_file):
+def sample_level_simulation_uncorrected(run,
+                                        NN_architecture,
+                                        dataset_name,
+                                        analysis_name,
+                                        num_simulated_samples,
+                                        lst_num_experiments,
+                                        corrected,
+                                        use_pca,
+                                        num_PCs,
+                                        file_prefix,
+                                        input_file):
 
   # Input files
   local_dir = "/home/alexandra/Documents/"
@@ -83,18 +83,18 @@ def simple_simulation_experiment_uncorrected(run,
   return permuted_score, similarity_score_df
 
 
-def matched_simulation_experiment_uncorrected(run,
-                                              NN_architecture,
-                                              dataset_name,
-                                              analysis_name,
-                                              num_simulated_experiments,
-                                              lst_num_partitions,
-                                              corrected,
-                                              use_pca,
-                                              num_PCs,
-                                              file_prefix,
-                                              input_file,
-                                              experiment_ids_file):
+def experiment_level_simulation_uncorrected(run,
+                                            NN_architecture,
+                                            dataset_name,
+                                            analysis_name,
+                                            num_simulated_experiments,
+                                            lst_num_partitions,
+                                            corrected,
+                                            use_pca,
+                                            num_PCs,
+                                            file_prefix,
+                                            input_file,
+                                            experiment_ids_file):
 
   local_dir = "/home/alexandra/Documents/"
 
@@ -142,17 +142,17 @@ def matched_simulation_experiment_uncorrected(run,
   return permuted_score, similarity_score_df
 
 
-def simple_simulation_experiment_corrected(run,
-                                           NN_architecture,
-                                           dataset_name,
-                                           analysis_name,
-                                           num_simulated_samples,
-                                           lst_num_experiments,
-                                           corrected,
-                                           use_pca,
-                                           num_PCs,
-                                           file_prefix,
-                                           input_file):
+def sample_level_simulation_corrected(run,
+                                      NN_architecture,
+                                      dataset_name,
+                                      analysis_name,
+                                      num_simulated_samples,
+                                      lst_num_experiments,
+                                      corrected,
+                                      use_pca,
+                                      num_PCs,
+                                      file_prefix,
+                                      input_file):
 
   local_dir = "/home/alexandra/Documents/"
 
@@ -208,18 +208,18 @@ def simple_simulation_experiment_corrected(run,
   return permuted_score, similarity_score_df
 
 
-def matched_simulation_experiment_corrected(run,
-                                            NN_architecture,
-                                            dataset_name,
-                                            analysis_name,
-                                            num_simulated_experiments,
-                                            lst_num_partitions,
-                                            corrected,
-                                            use_pca,
-                                            num_PCs,
-                                            file_prefix,
-                                            input_file,
-                                            experiment_ids_file):
+def experiment_level_simulation_corrected(run,
+                                          NN_architecture,
+                                          dataset_name,
+                                          analysis_name,
+                                          num_simulated_experiments,
+                                          lst_num_partitions,
+                                          corrected,
+                                          use_pca,
+                                          num_PCs,
+                                          file_prefix,
+                                          input_file,
+                                          experiment_ids_file):
 
   local_dir = "/home/alexandra/Documents/"
 
