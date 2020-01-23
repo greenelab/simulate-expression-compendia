@@ -35,6 +35,58 @@ def sample_level_simulation_uncorrected(run,
                                         num_PCs,
                                         file_prefix,
                                         input_file):
+  '''
+    Description
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of experiments that to add to
+        simulated data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+
+    '''
 
   # Input files
   local_dir = "/home/alexandra/Documents/"
@@ -95,6 +147,61 @@ def experiment_level_simulation_uncorrected(run,
                                             file_prefix,
                                             input_file,
                                             experiment_ids_file):
+  '''
+    Description
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of partitions to add to
+        simulated data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+
+    '''
 
   local_dir = "/home/alexandra/Documents/"
 
@@ -153,6 +260,58 @@ def sample_level_simulation_corrected(run,
                                       num_PCs,
                                       file_prefix,
                                       input_file):
+  '''
+    Description
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of experiments that to add to
+        simulated data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+
+    '''
 
   local_dir = "/home/alexandra/Documents/"
 
@@ -220,6 +379,62 @@ def experiment_level_simulation_corrected(run,
                                           file_prefix,
                                           input_file,
                                           experiment_ids_file):
+
+'''
+    Description
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of partitions to add to
+        simulated data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+
+    '''
 
   local_dir = "/home/alexandra/Documents/"
 

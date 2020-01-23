@@ -28,7 +28,15 @@ warnings.filterwarnings(action='ignore')
 def get_sample_ids(experiment_id,
                    dataset_name):
     '''
-    Return sample ids for a given experiment id
+    Arguments
+    ----------
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    Returns sample ids for a given experiment id
 
     '''
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
@@ -96,9 +104,6 @@ def simulate_compendium(
 
     Arguments
     ----------
-    experiment_ids_file: str
-        File containing all cleaned experiment ids
-
     number_simulated_experiments: int
         Number of experiments to simulate
 
@@ -114,8 +119,15 @@ def simulate_compendium(
         Name of neural network architecture to use.
         Format 'NN_<intermediate layer>_<latent layer>'
 
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
 
     Returns
     --------
@@ -321,7 +333,11 @@ def simulate_data(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
     number_simulated_samples: int
         Number of samples to simulate
@@ -427,13 +443,6 @@ def permute_data(simulated_data):
     simulated_data: df
         Dataframe containing simulated gene expression data
 
-    local_dir: str
-        Parent directory containing data files
-
-    analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
-
-
     Returns
     --------
     permuted_simulated_data_file: str
@@ -495,12 +504,15 @@ def add_experiments_io(
         List of different numbers of experiments to add to
         simulated data
 
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
     local_dir: str
-        Parent directory containing data files
+        Root directory where simulated data with experiments/partitionings are be stored
 
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
-
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
     Returns
     --------
@@ -635,11 +647,15 @@ def add_experiments_grped_io(
         List of different numbers of partitions to add
         technical variations to
 
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
     local_dir: str
-        Parent directory containing data files
+        Root directory where simulated data with experiments/partitionings are be stored
 
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
 
     Returns
@@ -766,6 +782,32 @@ def apply_correction_io(local_dir,
                         run,
                         analysis_name,
                         num_experiments):
+
+'''
+    Description
+
+    Arguments
+    ----------
+    local_dir: str
+        Root directory where simulated data with experiments/partitionings are be stored
+
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_experiments: list
+        List of different numbers of experiments/partitions to add
+        technical variations to
+
+
+    Returns
+    --------
+    Files of simulated data with different numbers of experiments added.
+    Each file named as "Experiment_<number of experiments added>"
+    '''
 
     for i in range(len(num_experiments)):
 

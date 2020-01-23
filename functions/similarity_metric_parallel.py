@@ -29,8 +29,8 @@ def read_data(simulated_data,
     """
     Script used by all similarity metrics to:
 
-    1. Read in simulated, permuted data into data
-    2. Generate directory for simulated experiment data to be stored
+    1. Read in simulated data into data
+    2. Generate directory where simulated experiment data is already stored
     3. Read in simulated data with a single experiment/partitioning
 
     Returns
@@ -38,18 +38,19 @@ def read_data(simulated_data,
     simulated_data: dataframe
         Dataframe containing simulated gene expression data
 
-    permuted_simulated_data: dataframe
-        Dataframe containing simulated gene expression data that has been permuted
-
     file_prefix: str
         File prefix to determine whether to use data before correction ("Experiment" or "Partition")
         or after correction ("Experiment_corrected" or "Parition_corrected")
 
-    compendium_dir: str
-        Directory path where simulated data with experiments/partitionings will be stored
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
 
-    compendium_1: dataframe
-        Dataframe containing simulated gene expression data from a single experiment/partitioning
+    local_dir: str
+        Root directory where simulated data with experiments/partitionings are be stored
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
     """
 
@@ -136,15 +137,18 @@ def sim_svcca_io(simulated_data,
     permuted_simulated_data: df
         Dataframe containing permuted simulated gene expression data
 
-    lst_compendia: list
-        list of dataframes containing simulated gene expression data
-        with varying amount of technical variation added
-
     corrected: bool
         True if correction was applied
 
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
     num_experiments: list
-        List of different numbers of experiments/partitions to add to
+        List of different numbers of experiments/partitions that were added to
         simulated data
 
     use_pca: bool
@@ -155,16 +159,17 @@ def sim_svcca_io(simulated_data,
         Number of top PCs to use to represent expression data
 
     local_dir: str
-        Parent directory containing data files
+        Root directory where simulated data with experiments/partitionings are be stored
 
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
 
     Returns
     --------
     output_list: array
-        Similarity scores for each number of experiments added
+        Similarity scores for each number of experiment/partition added
 
     permuted_svcca: float
         Similarity score comparing the permuted data to the simulated data
