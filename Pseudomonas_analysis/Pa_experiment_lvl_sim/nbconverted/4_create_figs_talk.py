@@ -1,7 +1,11 @@
 
 # coding: utf-8
 
-# In[1]:
+# # Create figures for talk
+# 
+# Generate figures for talk using stored variables from simulation experiments
+
+# In[ ]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -47,31 +51,31 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_similarity_uncorrected.pickle")
+    "Pa_experiment_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_ci_uncorrected.pickle")
+    "Pa_experiment_lvl_sim_ci_uncorrected.pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_similarity_corrected.pickle")
+    "Pa_experiment_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_ci_corrected.pickle")
+    "Pa_experiment_lvl_sim_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_permuted.npy")
+    "Pa_experiment_lvl_sim_permuted.npy")
 
 
 # In[3]:
@@ -86,7 +90,7 @@ svcca_uncorrected_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "analysis_1_svcca_uncorrected.png")
+    "Pa_experiment_lvl_sim_svcca_uncorrected.png")
 
 svcca_uncorrected_blk_file = os.path.join(
     local_dir,
@@ -94,7 +98,7 @@ svcca_uncorrected_blk_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "analysis_1_svcca_uncorrected_blk.png")
+    "Pa_experiment_lvl_sim_svcca_uncorrected_blk.png")
 
 svcca_overlay_file = os.path.join(
     local_dir,
@@ -102,7 +106,7 @@ svcca_overlay_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "analysis_1_svcca_overlay.png")
+    "Pa_experiment_lvl_sim_svcca_overlay.png")
 
 svcca_overlay_blk_file = os.path.join(
     local_dir,
@@ -110,7 +114,7 @@ svcca_overlay_blk_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "analysis_1_svcca_overlay_blk.png")
+    "Pa_experiment_lvl_sim_svcca_overlay_blk.png")
 
 svcca_overlay_long_file = os.path.join(
     local_dir,
@@ -118,7 +122,7 @@ svcca_overlay_long_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "analysis_1_svcca_overlay_long.png")
+    "Pa_experiment_lvl_sim_svcca_overlay_long.png")
 
 svcca_overlay_long_blk_file = os.path.join(
     local_dir,
@@ -126,7 +130,7 @@ svcca_overlay_long_blk_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "analysis_1_svcca_overlay_long_blk.png")
+    "Pa_experiment_lvl_sim_svcca_overlay_long_blk.png")
 
 
 # In[4]:

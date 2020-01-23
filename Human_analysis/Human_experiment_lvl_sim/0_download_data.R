@@ -21,7 +21,7 @@ write.table(metadata, '~/Documents/Repos/Batch_effects_simulation/data/metadata/
 # Based on definitions from NCBI and blog post: 
 # https://www.ncbi.nlm.nih.gov/books/NBK56913/#search.what_do_the_different_sra_accessi
 # https://www.ccdatalab.org/blog/2019/3/29/gene-expression-repos-explained
-# Project: A sequencing study (i.e. GTEx).    
+# Project: A sequencing study (i.e. NCBI sequencing study).    
 # Sample: Physical biospecimen on which sequencing was performed, biological source material (i.e. HeLa cell line).  
 #         A project contains many samples
 # Experiment: Unique sequencing library for a specific sample.  A sample can have multiple experiments, most have 1 experiment.

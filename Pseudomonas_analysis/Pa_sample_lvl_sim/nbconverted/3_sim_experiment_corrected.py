@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# # Simulation experiment 
+# # Simulation experiment using noise-corrected data
 # 
 # Run entire simulation experiment multiple times to generate confidence interval
 
@@ -33,12 +33,14 @@ seed(randomState)
 
 # Parameters
 dataset_name = "Pseudomonas_analysis"
-analysis_name = 'analysis_0'
+analysis_name = 'Pa_sample_lvl_sim'
 NN_architecture = 'NN_2500_30'
 file_prefix = 'Experiment_corrected'
 num_simulated_samples = 6000
 lst_num_experiments = [1, 2, 5, 10, 20,
-                     50, 100, 500, 1000, 2000, 3000, 6000]
+ 50, 100, 500, 1000, 2000, 3000, 6000]
+
+
 corrected = True
 use_pca = True
 num_PCs = 10
@@ -72,13 +74,13 @@ similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_0_similarity_corrected.pickle")
+    "Pa_sample_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_0_ci_corrected.pickle")
+    "Pa_sample_lvl_sim_ci_corrected.pickle")
 
 
 # In[5]:
@@ -87,17 +89,17 @@ ci_corrected_file = os.path.join(
 # Run multiple simulations
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
-        pipelines.simple_simulation_experiment_corrected)(i,
-                                                          NN_architecture,
-                                                          dataset_name,
-                                                          analysis_name,
-                                                          num_simulated_samples,
-                                                          lst_num_experiments,
-                                                          corrected,
-                                                          use_pca,
-                                                          num_PCs,
-                                                          file_prefix,
-                                                          normalized_data_file) for i in iterations)
+        pipelines.sample_level_simulation_corrected)(i,
+                                                     NN_architecture,
+                                                     dataset_name,
+                                                     analysis_name,
+                                                     num_simulated_samples,
+                                                     lst_num_experiments,
+                                                     corrected,
+                                                     use_pca,
+                                                     num_PCs,
+                                                     file_prefix,
+                                                     normalized_data_file) for i in iterations)
 
 
 # In[6]:

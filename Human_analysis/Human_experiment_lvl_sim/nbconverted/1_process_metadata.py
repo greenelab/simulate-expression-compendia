@@ -3,7 +3,7 @@
 
 # # Process metadata
 # 
-# Not all experiment ids in the metadata file have corresponding gene expression data.  This notebook checks each experiment id and returns a clean list of experiment ids that have gene expression data.  This file will be used in ```2_generate_data.ipynb```
+# This notebook checks each experiment id is associated with gene expression data, via the run id, and returns a clean list of experiment ids that have gene expression data.  
 
 # In[1]:
 

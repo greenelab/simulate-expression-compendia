@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# # Simulation experiment 
+# # Simulation experiment using noisy data
 # 
 # Run entire simulation experiment multiple times to generate confidence interval
 
@@ -34,12 +34,13 @@ seed(randomState)
 
 # Parameters
 dataset_name = "Human_analysis"
-analysis_name = 'analysis_3'
+analysis_name = 'Human_experiment_lvl_sim'
 NN_architecture = 'NN_2500_30'
 file_prefix = "Partition"
 num_simulated_experiments = 50
 lst_num_partitions = [1, 2, 3, 5, 10, 20,
                     30, 50]
+
 corrected = False
 use_pca = True
 num_PCs = 10
@@ -79,19 +80,19 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_3_similarity_uncorrected.pickle")
+    "Human_experiment_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_3_ci_uncorrected.pickle")
+    "Human_experiment_lvl_sim_ci_uncorrected.pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_3_permuted")
+    "Human_experiment_lvl_sim_permuted")
 
 
 # In[5]:
@@ -100,18 +101,18 @@ similarity_permuted_file = os.path.join(
 # Run multiple simulations - uncorrected
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
-        pipelines.matched_simulation_experiment_uncorrected)(i,
-                                                             NN_architecture,
-                                                             dataset_name,
-                                                             analysis_name,
-                                                             num_simulated_experiments,
-                                                             lst_num_partitions,
-                                                             corrected,
-                                                             use_pca,
-                                                             num_PCs,
-                                                             file_prefix,
-                                                             normalized_data_file,
-                                                             experiment_ids_file) for i in iterations)
+        pipelines.experiment_level_simulation_uncorrected)(i,
+                                                           NN_architecture,
+                                                           dataset_name,
+                                                           analysis_name,
+                                                           num_simulated_experiments,
+                                                           lst_num_partitions,
+                                                           corrected,
+                                                           use_pca,
+                                                           num_PCs,
+                                                           file_prefix,
+                                                           normalized_data_file,
+                                                           experiment_ids_file) for i in iterations)
 
 
 # In[6]:

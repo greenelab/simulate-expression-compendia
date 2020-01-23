@@ -1,11 +1,11 @@
 
 # coding: utf-8
 
-# # Simulation experiment 
+# # Simulation experiment using noisy data 
 # 
 # Run entire simulation experiment multiple times to generate confidence interval
 
-# In[14]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -34,12 +34,13 @@ seed(randomState)
 
 # Parameters
 dataset_name = "Pseudomonas_analysis"
-analysis_name = 'analysis_1'
+analysis_name = 'Pa_experiment_lvl_sim'
 NN_architecture = 'NN_2500_30'
 file_prefix = "Partition"
 num_simulated_experiments = 600
 lst_num_partitions = [1, 2, 3, 5, 10, 20,
-                    30, 50, 70, 100, 200, 300, 400, 500, 600]
+                      30, 50, 70, 100, 200, 300, 400, 500, 600]
+
 corrected = False
 use_pca = True
 num_PCs = 10
@@ -79,19 +80,19 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_similarity_uncorrected.pickle")
+    "Pa_experiment_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_ci_uncorrected.pickle")
+    "Pa_experiment_lvl_sim_ci_uncorrected.pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_permuted")
+    "Pa_experiment_lvl_sim_permuted")
 
 
 # In[5]:
@@ -100,18 +101,18 @@ similarity_permuted_file = os.path.join(
 # Run multiple simulations - uncorrected
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
-        pipelines.matched_simulation_experiment_uncorrected)(i,
-                                                             NN_architecture,
-                                                             dataset_name,
-                                                             analysis_name,
-                                                             num_simulated_experiments,
-                                                             lst_num_partitions,
-                                                             corrected,
-                                                             use_pca,
-                                                             num_PCs,
-                                                             file_prefix,
-                                                             normalized_data_file,
-                                                             experiment_ids_file) for i in iterations)
+        pipelines.experiment_level_simulation_uncorrected)(i,
+                                                           NN_architecture,
+                                                           dataset_name,
+                                                           analysis_name,
+                                                           num_simulated_experiments,
+                                                           lst_num_partitions,
+                                                           corrected,
+                                                           use_pca,
+                                                           num_PCs,
+                                                           file_prefix,
+                                                           normalized_data_file,
+                                                           experiment_ids_file) for i in iterations)
 
 
 # In[6]:
@@ -177,7 +178,7 @@ ci
 mean_scores
 
 
-# In[15]:
+# In[13]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# # Simulation experiment 
+# # Simulation experiment using noise-corrected data 
 # 
 # Run entire simulation experiment multiple times to generate confidence interval
 
@@ -33,12 +33,13 @@ seed(randomState)
 
 # Parameters
 dataset_name = "Pseudomonas_analysis"
-analysis_name = 'analysis_1'
+analysis_name = 'Pa_experiment_lvl_sim'
 NN_architecture = 'NN_2500_30'
 file_prefix = 'Partition_corrected'
 num_simulated_experiments = 600
 lst_num_partitions = [1, 2, 3, 5, 10, 20,
                     30, 50, 70, 100, 200, 300, 400, 500, 600]
+
 corrected = True
 use_pca = True
 num_PCs = 10
@@ -78,13 +79,13 @@ similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_similarity_corrected.pickle")
+    "Pa_experiment_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_1_ci_corrected.pickle")
+    "Pa_experiment_lvl_sim_ci_corrected.pickle")
 
 
 # In[5]:
@@ -93,18 +94,18 @@ ci_corrected_file = os.path.join(
 # Run multiple simulations - corrected
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
-        pipelines.matched_simulation_experiment_corrected)(i,
-                                                           NN_architecture,
-                                                           dataset_name,
-                                                           analysis_name,
-                                                           num_simulated_experiments,
-                                                           lst_num_partitions,
-                                                           corrected,
-                                                           use_pca,
-                                                           num_PCs,
-                                                           file_prefix,
-                                                           normalized_data_file,
-                                                           experiment_ids_file) for i in iterations)
+        pipelines.experiment_level_simulation_corrected)(i,
+                                                         NN_architecture,
+                                                         dataset_name,
+                                                         analysis_name,
+                                                         num_simulated_experiments,
+                                                         lst_num_partitions,
+                                                         corrected,
+                                                         use_pca,
+                                                         num_PCs,
+                                                         file_prefix,
+                                                         normalized_data_file,
+                                                         experiment_ids_file) for i in iterations)
 
 
 # In[6]:

@@ -2,6 +2,8 @@
 # coding: utf-8
 
 # ## Import data and normalize
+# 
+# Normalize RPKM count data generated from ```0_download_data.R``` script.
 
 # In[1]:
 

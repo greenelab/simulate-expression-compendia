@@ -2,6 +2,8 @@
 # coding: utf-8
 
 # # Create figures for manuscript
+# 
+# Generate figures for manuscript
 
 # In[1]:
 
@@ -62,31 +64,31 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_2_similarity_uncorrected.pickle")
+    "Human_sample_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_2_ci_uncorrected.pickle")
+    "Human_sample_lvl_sim_ci_uncorrected.pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_2_similarity_corrected.pickle")
+    "Human_sample_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_2_ci_corrected.pickle")
+    "Human_sample_lvl_sim_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_2_permuted.npy")
+    "Human_sample_lvl_sim_permuted.npy")
 
 # locally stored simulated compendia files
 local_dir = "/home/alexandra/Documents/"
@@ -96,7 +98,7 @@ compendia_dir = os.path.join(
     "Data",
     "Batch_effects",
     "experiment_simulated",
-    "analysis_2")
+    "Human_sample_lvl_sim")
 
 
 # In[3]:
@@ -106,17 +108,17 @@ compendia_dir = os.path.join(
 svcca_file = os.path.join(
     base_dir,
     "results",
-    "analysis_2_svcca.svg")
+    "Human_sample_lvl_sim_svcca.svg")
 
 pca_uncorrected_file = os.path.join(
     base_dir,
     "results",
-    "analysis_2_pca_uncorrected.png")
+    "Human_sample_lvl_sim_pca_uncorrected.png")
 
 pca_corrected_file = os.path.join(
     base_dir,
     "results",
-    "analysis_2_pca_corrected.png")
+    "Human_sample_lvl_sim_pca_corrected.png")
 
 
 # In[4]:

@@ -1,11 +1,11 @@
 
 # coding: utf-8
 
-# # Simulation experiment 
+# # Simulation experiment using noisy data 
 # 
 # Run entire simulation experiment multiple times to generate confidence interval
 
-# In[31]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -34,12 +34,13 @@ seed(randomState)
 
 # Parameters
 dataset_name = "Pseudomonas_analysis"
-analysis_name = 'analysis_0'
+analysis_name = 'Pa_sample_lvl_sim'
 NN_architecture = 'NN_2500_30'
 file_prefix = "Experiment"
 num_simulated_samples = 6000
 lst_num_experiments = [1, 2, 5, 10, 20,
                      50, 100, 500, 1000, 2000, 3000, 6000]
+
 corrected = False
 use_pca = True
 num_PCs = 10
@@ -64,7 +65,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[35]:
+# In[4]:
 
 
 # Output files
@@ -72,19 +73,19 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_0_similarity_uncorrected.pickle")
+    "Pa_sample_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_0_ci_uncorrected.pickle")
+    "Pa_sample_lvl_sim_ci_uncorrected.pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "analysis_0_permuted")
+    "Pa_sample_lvl_sim_permuted")
 
 
 # In[5]:
@@ -93,27 +94,27 @@ similarity_permuted_file = os.path.join(
 # Run multiple simulations
 results = Parallel(n_jobs=num_cores, verbose=100)(
     delayed(
-        pipelines.simple_simulation_experiment_uncorrected)(i,
-                                                            NN_architecture,
-                                                            dataset_name,
-                                                            analysis_name,
-                                                            num_simulated_samples,
-                                                            lst_num_experiments,
-                                                            corrected,
-                                                            use_pca,
-                                                            num_PCs,
-                                                            file_prefix,
-                                                            normalized_data_file) for i in iterations)
+        pipelines.sample_level_simulation_uncorrected)(i,
+                                                       NN_architecture,
+                                                       dataset_name,
+                                                       analysis_name,
+                                                       num_simulated_samples,
+                                                       lst_num_experiments,
+                                                       corrected,
+                                                       use_pca,
+                                                       num_PCs,
+                                                       file_prefix,
+                                                       normalized_data_file) for i in iterations)
 
 
-# In[22]:
+# In[6]:
 
 
 # permuted score
 permuted_score = results[0][0]
 
 
-# In[23]:
+# In[7]:
 
 
 # Concatenate output dataframes
@@ -125,7 +126,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[24]:
+# In[8]:
 
 
 # Get mean svcca score for each row (number of experiments)
@@ -134,7 +135,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[25]:
+# In[9]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -144,7 +145,7 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[26]:
+# In[10]:
 
 
 # Get confidence interval for each row (number of experiments)
@@ -152,7 +153,7 @@ std_scores
 err = std_scores*1.96
 
 
-# In[27]:
+# In[11]:
 
 
 # Get boundaries of confidence interval
@@ -164,13 +165,13 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[28]:
+# In[12]:
 
 
 mean_scores
 
 
-# In[36]:
+# In[13]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval
