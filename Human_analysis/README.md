@@ -24,7 +24,7 @@ Given a compendium of gene expression experiments, how will increasing the numbe
 **Conclusions:**
 Having some number of technical variation confounded our ability to extract our original biological signal and we need to apply correction.  However, interestingly, as the number of technical variation increased, it became easier to discover the underlying biological patterns and applying correction removes some of the biology of interest.  Our ability to extract biological signal is defined by our ability to retain the structure of the biological data -- in other words, is our representation of the simulated data with a single experiment similar to the representation with multiple experiments?  
 
-![Similarity](https://raw.githubusercontent.com/ajlee21/Batch_effects_simulation/clean_repo/results/Human_sample_lvl_sim_svcca.svg)
+![Similarity](https://raw.github.com/ajlee21/Batch_effects_simulation/clean_repo/results/Human_sample_lvl_sim_svcca.svg?sanitize=true)
 
 
 ## Experiment-level simulation experiment 
@@ -49,4 +49,4 @@ Given a compendium of gene expression experiments, how will increasing the numbe
 **Conclusions:**
 We observed the same trend as before.  
 
-![Similarity](https://raw.githubusercontent.com/ajlee21/Batch_effects_simulation/clean_repo/results/Human_experiment_lvl_sim_svcca.svg)
+![Similarity](https://raw.github.com/ajlee21/Batch_effects_simulation/clean_repo/results/Human_experiment_lvl_sim_svcca.svg?sanitize=true)
