@@ -36,7 +36,11 @@ def sample_level_simulation_uncorrected(run,
                                         file_prefix,
                                         input_file):
   '''
-    Description
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, ignorning the sample-experiment relationship
+    2. Add varying numbers of technical variation
+    3. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + technical variation.  
 
     Arguments
     ----------
@@ -148,7 +152,12 @@ def experiment_level_simulation_uncorrected(run,
                                             input_file,
                                             experiment_ids_file):
   '''
-    Description
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, keeping track of which sample is associated
+        with a given experiment
+    2. Add varying numbers of technical variation
+    3. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + technical variation. 
 
     Arguments
     ----------
@@ -261,7 +270,12 @@ def sample_level_simulation_corrected(run,
                                       file_prefix,
                                       input_file):
   '''
-    Description
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, ignoring sample-experiment relationship
+    2. Add varying numbers of technical variation
+    3. Correct for the technical variation added
+    4. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + corrected technical variation. 
 
     Arguments
     ----------
@@ -381,7 +395,13 @@ def experiment_level_simulation_corrected(run,
                                           experiment_ids_file):
 
 '''
-    Description
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, keeping track of which sample is associated
+        with a given experiment
+    2. Add varying numbers of technical variation
+    3. Correcting for the technical variation added
+    4. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + corrected technical variation.  
 
     Arguments
     ----------
