@@ -62,8 +62,10 @@ def sample_level_simulation_uncorrected(run,
           Number of samples to simulate
 
       lst_num_experiments: list
-          List of different numbers of experiments that to add to
-          simulated data
+          List of different numbers of experiments to add to
+          simulated data.  These are the number of sources of 
+          technical variation that are added to the simulated
+          data
 
       corrected: bool
           True if correction was applied
@@ -182,7 +184,9 @@ def experiment_level_simulation_uncorrected(run,
 
       lst_num_experiments: list
           List of different numbers of partitions to add to
-          simulated data
+          simulated data.  These are the number of sources of 
+          technical variation that are added to the simulated
+          data
 
       corrected: bool
           True if correction was applied
@@ -301,8 +305,10 @@ def sample_level_simulation_corrected(run,
           Number of samples to simulate
 
       lst_num_experiments: list
-          List of different numbers of experiments that to add to
-          simulated data
+          List of different numbers of experiments to add to
+          simulated data.  These are the number of sources of 
+          technical variation that are added to the simulated
+          data
 
       corrected: bool
           True if correction was applied
@@ -430,7 +436,9 @@ def experiment_level_simulation_corrected(run,
 
     lst_num_experiments: list
         List of different numbers of partitions to add to
-        simulated data
+        simulated data.  These are the number of sources of 
+          technical variation that are added to the simulated
+          data
 
     corrected: bool
         True if correction was applied

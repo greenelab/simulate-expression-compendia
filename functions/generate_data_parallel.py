@@ -98,7 +98,7 @@ def simulate_compendium(
     the relationship between samples within an experiment.
 
     Workflow:
-    1. Ranomly select 1 experiment and get the gene expression data for that experiment
+    1. Randomly select 1 experiment and get the gene expression data for that experiment
     (here we are assuming that there is only biological variation within this experiment)
     2. Encode this experiment into a latent space using the trained VAE model
     3. Encode the entire dataset from the <normalized_data_file>
