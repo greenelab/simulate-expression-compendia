@@ -149,8 +149,12 @@ def simulate_compendium(
     '''
 
     # Create directory to output simulated data
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    local_dir = "/home/alexandra/Documents/"
+    base_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../.."))
+    local_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../../.."))
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
@@ -361,8 +365,13 @@ def simulate_data(
     '''
 
     # Create directory to output simulated data
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    local_dir = "/home/alexandra/Documents/"
+    base_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../.."))
+    local_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../../.."))
+
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
