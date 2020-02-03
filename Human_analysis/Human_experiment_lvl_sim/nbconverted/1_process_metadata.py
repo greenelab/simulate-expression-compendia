@@ -3,7 +3,7 @@
 
 # # Process metadata
 # 
-# This notebook checks each experiment id is associated with gene expression data, via the run id, and returns a clean list of experiment ids that have gene expression data.  
+# This notebook checks each experiment id is associated with gene expression data, via its run id, and returns a clean list of experiment ids that have gene expression data.  
 
 # In[1]:
 

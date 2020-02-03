@@ -3,7 +3,7 @@
 
 # # Simulation experiment using noise-corrected data
 # 
-# Run entire simulation experiment multiple times to generate confidence interval
+# Run entire simulation experiment multiple times to generate confidence interval.  The simulation experiment can be found in ```functions/pipeline.py```
 
 # In[1]:
 
