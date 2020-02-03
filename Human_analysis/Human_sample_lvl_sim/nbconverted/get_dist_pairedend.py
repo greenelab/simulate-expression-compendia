@@ -1,7 +1,10 @@
 
 # coding: utf-8
 
-# In[1]:
+# # Get number of experiments using pairedend reads
+# This notebook parses the metadata file associated with the recount2 data to determine the number of experiments using pairedend vs single-end reads.
+
+# In[ ]:
 
 
 import os
