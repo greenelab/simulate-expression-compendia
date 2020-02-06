@@ -813,7 +813,7 @@ def apply_correction_io(local_dir,
                         analysis_name,
                         num_experiments):
 
-'''
+    '''
     This function uses the limma R package to correct for the technical variation
     we added using <add_experiments_io> or <add_experiments_grped_io>
 
