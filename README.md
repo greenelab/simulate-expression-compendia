@@ -1,6 +1,7 @@
 # The impact of undesired technical variability on large-scale data compendia
 
 **Alexandra J Lee, YoSon Park, Georgia Doing, Deborah A Hogan and Casey S Greene**
+
 **January 2020**
 
 **University of Pennsylvania**
@@ -23,10 +24,10 @@ There are 2 analyses using Pseudomonas dataset in the `Pseudomonas_analysis` dir
 
 | Name | Description |
 | :--- | :---------- |
-| [analysis_0](Pseudomonas_analysis/analysis_0/) | Pseudomonas sample-level gene expression simulation|
-| [analysis_1](Pseudomonas_analysis/analysis_1/) | Pseudomonas experiment-level gene expression simulation|
-| [analysis_2](Human_analysis/analysis_2/) | Human sample-level gene expression simulation|
-| [analysis_3](Human_analysis/analysis_3/) | Human experiment-level gene expression simulation|
+| [Pa_sample_lvl_sim](Pseudomonas_analysis/Pa_sample_lvl_sim/) | Pseudomonas sample-level gene expression simulation|
+| [Pa_experiment_lvl_sim](Pseudomonas_analysis/Pa_experiment_lvl_sim/) | Pseudomonas experiment-level gene expression simulation|
+| [Human_sample_lvl_sim](Human_analysis/Human_sample_lvl_sim/) | Human sample-level gene expression simulation|
+| [Human_experiment_lvl_sim](Human_analysis/Human_experiment_lvl_sim/) | Human experiment-level gene expression simulation|
 
 
 ## Computational Environment

@@ -19,25 +19,84 @@ limma = importr('limma')
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
 from functions import generate_data_parallel
 from functions import similarity_metric_parallel
 
 
-def simple_simulation_experiment_uncorrected(run,
-                                             NN_architecture,
-                                             dataset_name,
-                                             analysis_name,
-                                             num_simulated_samples,
-                                             lst_num_experiments,
-                                             corrected,
-                                             use_pca,
-                                             num_PCs,
-                                             file_prefix,
-                                             input_file):
+def sample_level_simulation_uncorrected(run,
+                                        NN_architecture,
+                                        dataset_name,
+                                        analysis_name,
+                                        num_simulated_samples,
+                                        lst_num_experiments,
+                                        corrected,
+                                        use_pca,
+                                        num_PCs,
+                                        file_prefix,
+                                        input_file):
+  '''
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, ignorning the sample-experiment relationship
+    2. Add varying numbers of technical variation
+    3. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + technical variation.  
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of experiments to add to
+        simulated data.  These are the number of sources of 
+        technical variation that are added to the simulated
+        data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+
+    '''
 
   # Input files
-  local_dir = "/home/alexandra/Documents/"
+  local_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../../.."))
 
   # Main
 
@@ -83,20 +142,84 @@ def simple_simulation_experiment_uncorrected(run,
   return permuted_score, similarity_score_df
 
 
-def matched_simulation_experiment_uncorrected(run,
-                                              NN_architecture,
-                                              dataset_name,
-                                              analysis_name,
-                                              num_simulated_experiments,
-                                              lst_num_partitions,
-                                              corrected,
-                                              use_pca,
-                                              num_PCs,
-                                              file_prefix,
-                                              input_file,
-                                              experiment_ids_file):
+def experiment_level_simulation_uncorrected(run,
+                                            NN_architecture,
+                                            dataset_name,
+                                            analysis_name,
+                                            num_simulated_experiments,
+                                            lst_num_partitions,
+                                            corrected,
+                                            use_pca,
+                                            num_PCs,
+                                            file_prefix,
+                                            input_file,
+                                            experiment_ids_file):
 
-  local_dir = "/home/alexandra/Documents/"
+  '''
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, keeping track of which sample is associated
+        with a given experiment
+    2. Add varying numbers of technical variation
+    3. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + technical variation. 
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of partitions to add to
+        simulated data.  These are the number of sources of 
+        technical variation that are added to the simulated
+        data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+    '''
+
+  local_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../../.."))
 
   # Main
 
@@ -142,19 +265,80 @@ def matched_simulation_experiment_uncorrected(run,
   return permuted_score, similarity_score_df
 
 
-def simple_simulation_experiment_corrected(run,
-                                           NN_architecture,
-                                           dataset_name,
-                                           analysis_name,
-                                           num_simulated_samples,
-                                           lst_num_experiments,
-                                           corrected,
-                                           use_pca,
-                                           num_PCs,
-                                           file_prefix,
-                                           input_file):
+def sample_level_simulation_corrected(run,
+                                      NN_architecture,
+                                      dataset_name,
+                                      analysis_name,
+                                      num_simulated_samples,
+                                      lst_num_experiments,
+                                      corrected,
+                                      use_pca,
+                                      num_PCs,
+                                      file_prefix,
+                                      input_file):
+  '''
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, ignoring sample-experiment relationship
+    2. Add varying numbers of technical variation
+    3. Correct for the technical variation added
+    4. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + corrected technical variation. 
 
-  local_dir = "/home/alexandra/Documents/"
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of experiments to add to
+        simulated data.  These are the number of sources of 
+        technical variation that are added to the simulated
+        data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+
+    '''
+
+  local_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../../.."))
 
   # Main
 
@@ -208,20 +392,85 @@ def simple_simulation_experiment_corrected(run,
   return permuted_score, similarity_score_df
 
 
-def matched_simulation_experiment_corrected(run,
-                                            NN_architecture,
-                                            dataset_name,
-                                            analysis_name,
-                                            num_simulated_experiments,
-                                            lst_num_partitions,
-                                            corrected,
-                                            use_pca,
-                                            num_PCs,
-                                            file_prefix,
-                                            input_file,
-                                            experiment_ids_file):
+def experiment_level_simulation_corrected(run,
+                                          NN_architecture,
+                                          dataset_name,
+                                          analysis_name,
+                                          num_simulated_experiments,
+                                          lst_num_partitions,
+                                          corrected,
+                                          use_pca,
+                                          num_PCs,
+                                          file_prefix,
+                                          input_file,
+                                          experiment_ids_file):
 
-  local_dir = "/home/alexandra/Documents/"
+  '''
+    This function performs runs series of scripts that performs the following steps:
+    1. Simulate gene expression data, keeping track of which sample is associated
+        with a given experiment
+    2. Add varying numbers of technical variation
+    3. Correcting for the technical variation added
+    4. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + corrected technical variation.  
+
+    Arguments
+    ----------
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    NN_architecture: str
+        Name of neural network architecture to use.
+        Format 'NN_<intermediate layer>_<latent layer>'
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
+
+    num_simulated_samples: int
+        Number of samples to simulate
+
+    lst_num_experiments: list
+        List of different numbers of partitions to add to
+        simulated data.  These are the number of sources of 
+          technical variation that are added to the simulated
+          data
+
+    corrected: bool
+        True if correction was applied
+
+    use_pca: bool
+        True if want to represent expression data in top PCs before
+        calculating similarity
+
+    num_PCs: int
+        Number of top PCs to use to represent expression data
+
+    file_prefix: str
+        File prefix to determine whether to use data before correction ("Experiment" or "Partition")
+        or after correction ("Experiment_corrected" or "Parition_corrected")
+
+    input_file: str
+        File name containing normalized gene expressiond data
+
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
+
+    Returns
+    --------
+    similarity_score_df: df
+        Similarity scores for each number of experiment/partition added per run
+
+    permuted_scre: df
+        Similarity score comparing the permuted data to the simulated data per run
+  '''
+
+  local_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../../.."))
 
   # Main
 

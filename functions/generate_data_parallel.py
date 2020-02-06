@@ -28,8 +28,18 @@ warnings.filterwarnings(action='ignore')
 def get_sample_ids(experiment_id,
                    dataset_name):
     '''
-    Return sample ids for a given experiment id
+    Returns sample ids (found in gene expression df) associated with
+    a given list of experiment ids (found in the metadata)
 
+    Arguments
+    ----------
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
+
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    Returns sample ids for a given experiment id
     '''
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
 
@@ -84,21 +94,28 @@ def simulate_compendium(
 ):
     '''
     Generate simulated data by randomly sampling some number of experiments
-    and linearly shifting the gene expression in the VAE latent space.
+    and linearly shifting the gene expression in the VAE latent space, preserving
+    the relationship between samples within an experiment.
 
     Workflow:
-    1. Input gene expression data from 1 experiment (here we are assuming
-    that there is only biological variation within this experiment)
-    2. Encode this input into a latent space using the trained VAE model
-    3. For each encoded feature, sample from a distribution using the
-    the mean and standard deviation for that feature
-    4. Decode the samples
+    1. Randomly select 1 experiment and get the gene expression data for that experiment
+    (here we are assuming that there is only biological variation within this experiment)
+    2. Encode this experiment into a latent space using the trained VAE model
+    3. Encode the entire dataset from the <normalized_data_file>
+        3a. Select a random point in the encoded space. For each encoded feature, sample 
+        from a distribution using the mean and standard deviation for that feature
+    4. Calculate the shift_vec_cf = centroid(encoded experiment) - random encoded experiment
+    5. Shift all the samples from the experiment by the shift_vec_df
+    6. Decode the samples
+    7. Repeat steps 1-6 for <num_simulated_experiments>
+
+    This will generate a simulated compendium of different gene expression experiments that 
+    are of a similar type to the original data but with different perturbations
+
+    This function will return the a file with the simulated compendium.
 
     Arguments
     ----------
-    experiment_ids_file: str
-        File containing all cleaned experiment ids
-
     number_simulated_experiments: int
         Number of experiments to simulate
 
@@ -114,8 +131,15 @@ def simulate_compendium(
         Name of neural network architecture to use.
         Format 'NN_<intermediate layer>_<latent layer>'
 
+    dataset_name: str
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset_name>_<sample/experiment>_lvl_sim 
+
+    experiment_ids_file: str
+        File containing all cleaned experiment ids
 
     Returns
     --------
@@ -125,8 +149,12 @@ def simulate_compendium(
     '''
 
     # Create directory to output simulated data
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    local_dir = "/home/alexandra/Documents/"
+    base_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../.."))
+    local_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../../.."))
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
@@ -274,13 +302,6 @@ def simulate_compendium(
 
     print(simulated_data_scaled_df.shape)
 
-    # Remove expression data for samples that have duplicate sample id across
-    # different experiment ids
-    # We remove these because we are not sure which experiment the sample should
-    # belong to
-    # simulated_data_scaled_df = simulated_data_scaled_df.loc[~simulated_data_scaled_df.index.duplicated(
-    #    keep=False)]
-
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
         simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
 
@@ -299,12 +320,18 @@ def simulate_data(
     Generate simulated data by sampling from VAE latent space.
 
     Workflow:
-    1. Input gene expression data from 1 experiment (here we are assuming
-    that there is only biological variation within this experiment)
+    1. Input gene expression data the entire compendium from the <normalized_data_file>
     2. Encode this input into a latent space using the trained VAE model
-    3. For each encoded feature, sample from a distribution using the
-    the mean and standard deviation for that feature
+    3. Randomly sample <num_simulated_samples> samples from the latent space.
+        For each encoded feature, sample from a distribution using the
+        the mean and standard deviation for that feature
     4. Decode the samples
+
+    This compendium is generated by randomly sampling samples from the 
+    latent space distribution of the compendium.  All samples are treated equal, where 
+    association with a specific experiment is ignored.
+
+    This function will return the a file with the simulated compendium.
 
     Arguments
     ----------
@@ -321,7 +348,11 @@ def simulate_data(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Either "Human_analysis" or "Pseudomonas_analysis"
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings will be stored.
+        Format of the directory name is <dataset_name>_<sample/experiment>_lvl_sim 
 
     number_simulated_samples: int
         Number of samples to simulate
@@ -334,8 +365,13 @@ def simulate_data(
     '''
 
     # Create directory to output simulated data
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-    local_dir = "/home/alexandra/Documents/"
+    base_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../.."))
+    local_dir = os.path.abspath(
+        os.path.join(
+            os.getcwd(), "../../.."))
+
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
@@ -427,13 +463,6 @@ def permute_data(simulated_data):
     simulated_data: df
         Dataframe containing simulated gene expression data
 
-    local_dir: str
-        Parent directory containing data files
-
-    analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
-
-
     Returns
     --------
     permuted_simulated_data_file: str
@@ -465,117 +494,6 @@ def permute_data(simulated_data):
     return shuffled_simulated_data
 
 
-def add_experiments(
-        simulated_data,
-        num_experiments,
-        local_dir,
-        analysis_name):
-    '''
-    Say we are interested in identifying genes that differentiate between
-    disease vs normal states. However our dataset includes samples from
-    different tissues or time points and there are variations
-    in gene expression that are due to these other conditions
-    and do not have to do with disease state.
-    These non-relevant variations in the data are called batch effects.
-
-    We want to model these batch effects. To do this we will:
-    1. Partition our simulated data into n batches
-    2. For each partition we will shift all genes using a vector of values
-    sampled from a gaussian distribution centered around 0.
-    3. Repeat this for each partition
-    4. Append all batch effect partitions together
-
-    Arguments
-    ----------
-    simulated_data: df
-        Dataframe containing simulated gene expression data
-
-    num_experiments: list
-        List of different numbers of experiments to add to
-        simulated data
-
-    local_dir: str
-        Parent directory containing data files
-
-    analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
-
-
-    Returns
-    --------
-    Files of simulated data with different numbers of experiments added.
-    Each file named as "Experiment_<number of experiments added>"
-    '''
-    # Add batch effects
-    num_simulated_samples = simulated_data.shape[0]
-    num_genes = simulated_data.shape[1]
-
-    # Create an array of the simulated data indices
-    simulated_ind = np.array(simulated_data.index)
-
-    # Create list to store multiple compendia
-    ls_compendia = []
-
-    # Create list to store mapping associated with each compendia
-    ls_compendia_labels = []
-
-    for i in num_experiments:
-        print('Creating simulated data with {} experiments..'.format(i))
-
-        # Create dataframe with grouping
-        experiment_data_map = simulated_data.copy()
-
-        if i == 1:
-            ls_compendia.append(simulated_data)
-
-            # Add experiment id to map dataframe
-            experiment_data_map['experiment'] = str(i)
-            experiment_data_map_df = pd.DataFrame(
-                data=experiment_data_map['experiment'], index=simulated_ind.sort())
-
-            ls_compendia_labels.append(experiment_data_map_df)
-
-        else:
-            experiment_data = simulated_data.copy()
-
-            # Shuffle indices
-            np.random.shuffle(simulated_ind)
-
-            # Partition indices to batch
-            # Note: 'array_split' will chunk data into almost equal sized chunks.
-            # Returns arrays of size N % i and one array with the remainder
-            partition = np.array_split(simulated_ind, i)
-
-            for j in range(i):
-                # Scalar to shift gene expressiond data
-                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
-
-                # Tile stretch_factor to be able to add to batches
-                num_samples_per_experiment = len(partition[j])
-                stretch_factor_tile = pd.DataFrame(
-                    pd.np.tile(
-                        stretch_factor,
-                        (num_samples_per_experiment, 1)),
-                    index=experiment_data.loc[partition[j].tolist()].index,
-                    columns=experiment_data.loc[partition[j].tolist()].columns)
-
-                # Add experiments
-                experiment_data.loc[partition[j].tolist(
-                )] = experiment_data.loc[partition[j].tolist()] + stretch_factor_tile
-
-                # Add experiment id to map dataframe
-                experiment_data_map.loc[partition[j], 'experiment'] = str(j)
-
-            experiment_data_map_df = pd.DataFrame(
-                data=experiment_data_map['experiment'], index=simulated_ind.sort())
-
-            # Save
-            ls_compendia.append(experiment_data)
-            ls_compendia_labels.append(experiment_data_map_df)
-
-    return ls_compendia, ls_compendia_labels
-
-
 def add_experiments_io(
         simulated_data,
         num_experiments,
@@ -585,17 +503,21 @@ def add_experiments_io(
     '''
     Say we are interested in identifying genes that differentiate between
     disease vs normal states. However our dataset includes samples from
-    different tissues or time points and there are variations
+    different labs or protocols and there are variations
     in gene expression that are due to these other conditions
-    and do not have to do with disease state.
-    These non-relevant variations in the data are called batch effects.
+    that do not have to do with disease state.
 
-    We want to model these batch effects. To do this we will:
-    1. Partition our simulated data into n batches
+    These non-relevant variations in the data are called technical variations
+    that we want to model.  To do this we will:
+
+    1. Partition our simulated data into <num_experiments> 
     2. For each partition we will shift all genes using a vector of values
     sampled from a gaussian distribution centered around 0.
     3. Repeat this for each partition
-    4. Append all batch effect partitions together
+    4. Append all shifted partitions together
+
+    This function will return the files with compendia with different numbers
+    of technical variation added with one file per compendia.
 
     Arguments
     ----------
@@ -606,12 +528,15 @@ def add_experiments_io(
         List of different numbers of experiments to add to
         simulated data
 
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
     local_dir: str
-        Parent directory containing data files
+        Root directory where simulated data with experiments/partitionings are be stored
 
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
-
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
     Returns
     --------
@@ -710,136 +635,6 @@ def add_experiments_io(
                 experiment_map_file, sep='\t', compression='xz')
 
 
-def add_experiments_grped(
-        simulated_data,
-        num_partitions,
-        local_dir,
-        analysis_name):
-    '''
-    Say we are interested in identifying genes that differentiate between
-    disease vs normal states. However our dataset includes samples from
-    different tissues or time points and there are variations
-    in gene expression that are due to these other conditions
-    and do not have to do with disease state.
-    These non-relevant variations in the data are called batch effects.
-
-    We want to model these batch effects. To do this we will:
-    1. Partition our simulated data into n batches
-        Here we are keeping track of experiment id and partitioning
-        such that all samples from an experiment are in the same
-        partition.
-
-        Note: Partition sizes will be different since experiment
-        sizes are different per experiment.
-    2. For each partition we will shift all genes using a vector of values
-    sampled from a gaussian distribution centered around 0.
-    3. Repeat this for each partition
-    4. Append all batch effect partitions together
-
-    Arguments
-    ----------
-    simulated_data_file: str
-        File containing simulated gene expression data
-
-    num_partitions: list
-        List of different numbers of partitions to add
-        technical variations to
-
-    local_dir: str
-        Parent directory containing data files
-
-    analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
-
-
-    Returns
-    --------
-    Files of simulated data with different numbers of experiments added.
-    Each file named as "Experiment_<number of experiments added>"
-    '''
-
-    # Add batch effects
-    num_genes = simulated_data.shape[1] - 1
-
-    # Create an array of the simulated data indices
-    simulated_ind = np.array(simulated_data.index)
-
-    ls_compendia = []
-
-    ls_compendia_labels = []
-
-    for i in num_partitions:
-        print('Creating simulated data with {} partitions..'.format(i))
-
-        # Create dataframe with grouping
-        partition_data_map = simulated_data.copy()
-
-        if i == 1:
-            simulated_data_out = simulated_data.drop(columns="experiment_id")
-            ls_compendia.append(simulated_data_out)
-
-            # Add experiment id to map dataframe
-            partition_data_map['partition'] = str(i)
-
-            partition_data_map_df = pd.DataFrame(
-                data=partition_data_map['partition'], index=simulated_ind.sort())
-
-            ls_compendia_labels.append(partition_data_map_df)
-
-        else:
-            partition_data = simulated_data.copy()
-
-            # Shuffle experiment ids
-            experiment_ids = simulated_data["experiment_id"].unique()
-            np.random.shuffle(experiment_ids)
-
-            # Partition experiment ids
-            # Note: 'array_split' will chunk data into almost equal sized chunks.
-            # Returns arrays of size N % i and one array with the remainder
-            partition = np.array_split(experiment_ids, i)
-
-            for j in range(i):
-                # Randomly select experiment ids
-                selected_experiment_ids = partition[j]
-
-                # Get sample ids associated with experiment ids
-                sample_ids = list(simulated_data[simulated_data["experiment_id"].isin(
-                    partition[j])].index)
-
-                # Scalar to shift gene expressiond data
-                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
-
-                # Tile stretch_factor to be able to add to batches
-                num_samples_per_partition = len(sample_ids)
-
-                if j == 0:
-                    # Drop experiment_id label to do calculation
-                    partition_data.drop(columns="experiment_id", inplace=True)
-
-                stretch_factor_tile = pd.DataFrame(
-                    pd.np.tile(
-                        stretch_factor,
-                        (num_samples_per_partition, 1)),
-                    index=partition_data.loc[sample_ids].index,
-                    columns=partition_data.loc[sample_ids].columns)
-
-                # Add noise to partition
-                partition_data.loc[sample_ids] = partition_data.loc[sample_ids] + \
-                    stretch_factor_tile
-
-                # Add partition id to map dataframe
-                partition_data_map.loc[sample_ids, 'partition'] = str(j)
-
-            partition_data_map_df = pd.DataFrame(
-                data=partition_data_map['partition'], index=simulated_ind.sort())
-
-            # Save
-            ls_compendia.append(partition_data)
-            ls_compendia_labels.append(partition_data_map_df)
-
-    return ls_compendia, ls_compendia_labels
-
-
 def add_experiments_grped_io(
         simulated_data,
         num_partitions,
@@ -849,13 +644,16 @@ def add_experiments_grped_io(
     '''
     Say we are interested in identifying genes that differentiate between
     disease vs normal states. However our dataset includes samples from
-    different tissues or time points and there are variations
+    different labs or protocols and there are variations
     in gene expression that are due to these other conditions
-    and do not have to do with disease state.
-    These non-relevant variations in the data are called batch effects.
+    that do not have to do with disease state.
 
-    We want to model these batch effects. To do this we will:
-    1. Partition our simulated data into n batches
+    These non-relevant variations in the data are called technical variations
+    that we want to model.  In this case, we will keep track of which samples
+    are associated with an experiment.
+
+    To do this we will:
+    1. Partition our simulated data into <num_partitions>
         Here we are keeping track of experiment id and partitioning
         such that all samples from an experiment are in the same
         partition.
@@ -865,7 +663,10 @@ def add_experiments_grped_io(
     2. For each partition we will shift all genes using a vector of values
     sampled from a gaussian distribution centered around 0.
     3. Repeat this for each partition
-    4. Append all batch effect partitions together
+    4. Append all partitions together
+
+    This function will return the files with compendia with different numbers
+    of technical variation added with one file per compendia.
 
     Arguments
     ----------
@@ -876,11 +677,15 @@ def add_experiments_grped_io(
         List of different numbers of partitions to add
         technical variations to
 
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
     local_dir: str
-        Parent directory containing data files
+        Root directory where simulated data with experiments/partitionings are be stored
 
     analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
 
 
     Returns
@@ -1003,50 +808,43 @@ def add_experiments_grped_io(
                 partition_map_file, sep='\t', compression='xz')
 
 
-def apply_correction(local_dir,
-                     run,
-                     analysis_name,
-                     num_experiments,
-                     ls_compendia,
-                     ls_compendia_labels):
-
-    ls_corrected_compendia = []
-
-    for i in range(len(num_experiments)):
-        print('Correcting for {} experiments..'.format(num_experiments[i]))
-
-        # Read in data
-        # data transposed to form gene x sample for R package
-        experiment_data = ls_compendia[i].T
-
-        # Read in map
-        experiment_map = ls_compendia_labels[i]['experiment']
-
-        if i == 0:
-            ls_corrected_compendia.append(experiment_data)
-
-        else:
-            # Correct for technical variation
-            corrected_experiment_data = limma.removeBatchEffect(
-                experiment_data, batch=experiment_map)
-
-            # Convert R object to pandas df
-            corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
-                corrected_experiment_data)
-
-            ls_corrected_compendia.append(corrected_experiment_data_df)
-
-        return ls_corrected_compendia
-
-
 def apply_correction_io(local_dir,
                         run,
                         analysis_name,
                         num_experiments):
 
+    '''
+    This function uses the limma R package to correct for the technical variation
+    we added using <add_experiments_io> or <add_experiments_grped_io>
+
+    This function will return the corrected gene expression files
+
+    Arguments
+    ----------
+    local_dir: str
+        Root directory where simulated data with experiments/partitionings are be stored
+
+    run: int
+        Unique core identifier that is used to create unique filenames for intermediate files
+
+    analysis_name: str
+        Parent directory where simulated data with experiments/partitionings are be stored.
+        Format of the directory name is <dataset_name>_<sample/experiment>_lvl_sim 
+
+    num_experiments: list
+        List of different numbers of experiments/partitions to add
+        technical variations to
+
+
+    Returns
+    --------
+    Files of simulated data with different numbers of experiments added.
+    Each file named as "Experiment_<number of experiments added>"
+    '''
+
     for i in range(len(num_experiments)):
 
-        if analysis_name.split("_")[-1] == '0' or analysis_name.split("_")[-1] == '2':
+        if "sample" in analysis_name:
             print('Correcting for {} experiments..'.format(num_experiments[i]))
 
             experiment_file = os.path.join(
@@ -1123,7 +921,7 @@ def apply_correction_io(local_dir,
             corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
                 corrected_experiment_data)
 
-        if analysis_name.split("_")[-1] == '0' or analysis_name.split("_")[-1] == '2':
+        if "sample" in analysis_name:
             # Write out corrected files
             experiment_corrected_file = os.path.join(
                 local_dir,
