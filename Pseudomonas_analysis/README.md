@@ -1,7 +1,7 @@
 # Simulation experiment using *Pseudomonas aeruginosa* (*P. aeruginosa*) dataset 
 
 ## Sample-level simulation experiment 
-Scripts can be found in [Pa_sample_lvl_sim](https://github.com/ajlee21/Batch_effects_simulation/tree/clean_repo/Pseudomonas_analysis/Pa_sample_lvl_sim)  
+Scripts can be found in [Pa_sample_lvl_sim](https://github.com/greenelab/Batch_effects_simulation/tree/master/Pseudomonas_analysis/Pa_sample_lvl_sim)  
 
 **Goal:** 
 To assess the impact of technical variation from increasing numbers of experiments in the simplest case.
@@ -23,11 +23,11 @@ Given a compendium of gene expression experiments, how will increasing the numbe
 **Conclusions:**
 Having some number of technical variation confounded our ability to extract our original biological signal and we need to apply correction.  However, as the number of technical variation increased, it became easier to discover the underlying biological patterns and applying correction removes some of the biology of interest.  Our ability to extract biological signal is defined by our ability to retain the structure of the biological data -- in other words, is our representation of the simulated data with a single experiment similar to the representation with multiple experiments?  
 
-![Similarity](https://raw.github.com/ajlee21/Batch_effects_simulation/clean_repo/results/Pa_sample_lvl_sim_svcca.svg?sanitize=true)
+![Similarity](https://raw.github.com/greenelab/Batch_effects_simulation/tree/master/results/Pa_sample_lvl_sim_svcca.svg?sanitize=true)
 
 
 ## Experiment-level simulation experiment 
-Scripts can be found in [scripts/analysis_1](https://github.com/ajlee21/Batch_effects_simulation/tree/clean_repo/Pseudomonas_analysis/Pa_experiment_lvl_sim)  
+Scripts can be found in [scripts/analysis_1](https://github.com/greenelab/Batch_effects_simulation/tree/master/Pseudomonas_analysis/Pa_experiment_lvl_sim)  
 
 **Goal:** 
 To assess the impact of technical variation from increasing numbers of experiments in the more complex case, in order to generate more realistic looking gene expression data.
@@ -48,4 +48,4 @@ Given a compendium of gene expression experiments, how will increasing the numbe
 **Conclusions:**
 We observed the same trend as before.  
 
-![Similarity](https://raw.github.com/ajlee21/Batch_effects_simulation/clean_repo/results/Pa_experiment_lvl_sim_svcca.svg?sanitize=true)
+![Similarity](https://raw.github.com/greenelab/Batch_effects_simulation/tree/master/results/Pa_experiment_lvl_sim_svcca.svg?sanitize=true)
