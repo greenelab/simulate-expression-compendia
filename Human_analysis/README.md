@@ -1,7 +1,7 @@
 # Simulation experiment using recount2 dataset 
 
 ## Sample-level simulation experiment 
-Scripts can be found in [Pa_sample_lvl_sim](https://github.com/greenelab/Batch_effects_simulation/tree/master/Human_analysis/Human_sample_lvl_sim)  
+Scripts can be found in [Human_sample_lvl_sim](https://github.com/greenelab/Batch_effects_simulation/tree/master/Human_analysis/Human_sample_lvl_sim)  
 
 **Goal:** 
 To assess the impact of technical variation from increasing numbers of experiments in the simplest case.
@@ -27,7 +27,7 @@ Having some number of technical variation confounded our ability to extract our 
 
 
 ## Experiment-level simulation experiment 
-Scripts can be found in [scripts/analysis_1](https://github.com/greenelab/Batch_effects_simulation/tree/master/Human_analysis/Human_experiment_lvl_sim)  
+Scripts can be found in [scripts/Human_experiment_lvl_sim](https://github.com/greenelab/Batch_effects_simulation/tree/master/Human_analysis/Human_experiment_lvl_sim)  
 
 **Goal:** 
 To assess the impact of technical variation from increasing numbers of experiments in the more complex case, in order to generate more realistic looking gene expression data.
