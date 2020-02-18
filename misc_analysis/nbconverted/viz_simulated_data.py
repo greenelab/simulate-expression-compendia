@@ -3,9 +3,11 @@
 
 # # Visualize simulated data
 # 
-# In order to start making interpretations we will generate two visualizations of our data
+# This notebook will verify that the simulated dataset is a good representation of our original input dataset by visually comparing the structures in the two datasets projected onto UMAP space.  This notebook is using the "P. aeruginosa* compendium.  
 # 
-# 1. We will verify that the simulated dataset is a good representation of our original input dataset by visually comparing the structures in the two datasets projected onto UMAP space.
+# The overlapping structure of the original (pink) and simulated (grey) datasets demonstrates that our generative model is capturing the same biological trends in the original dataset.  
+# 
+# This figure can be found the corresponding manuscript.
 
 # In[1]:
 
@@ -178,7 +180,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[78]:
+# In[12]:
 
 
 # Overlay original input vs simulated data
@@ -191,19 +193,22 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2')) + geom_point(color='#d5a6bd', 
-             alpha=0.15) \
-+ labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and simulated data") \
-+ theme_bw() \
-+ theme(
+g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2'))
+g_input_sim += geom_point(color='#d5a6bd', 
+                          alpha=0.15)
+g_input_sim += labs(x = "UMAP 1",
+                    y = "UMAP 2", 
+                    title = "UMAP of original and simulated data")
+g_input_sim += theme_bw()
+g_input_sim += theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
     plot_title=element_text(weight='bold')
-) \
-+ geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
-                 alpha=0.09, 
-                 color='#cccccc')
+)
+g_input_sim += geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
+                          alpha=0.09,
+                          color='#cccccc')
 
 print(g_input_sim)
 ggsave(plot = g_input_sim, filename = umap_overlay_file, dpi=500)

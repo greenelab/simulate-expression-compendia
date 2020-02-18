@@ -6,6 +6,8 @@
 # The goal of this notebook is to create a simulated compendium, keep track of the relationship between samples and experiments.
 # 
 # Then visualizing the placement of the original experiment and the simulated experiment
+# 
+# This figure can be found in the manuscript (Figure 4B)
 
 # In[1]:
 
@@ -118,7 +120,7 @@ experiment_ids_file = os.path.join(
 
 # ### Generate simulated data with experiment ids
 
-# In[ ]:
+# In[6]:
 
 
 # Generate simulated data
@@ -133,7 +135,7 @@ generate_data.simulate_compendium(experiment_ids_file,
 
 # ### Load simulated gene expression data
 
-# In[6]:
+# In[7]:
 
 
 # Simulated data file 
@@ -147,7 +149,7 @@ simulated_data_file = os.path.join(
 # Replace "simulated_data_labeled.txt.xz"
 
 
-# In[7]:
+# In[8]:
 
 
 # Read in simulated data
@@ -160,15 +162,7 @@ simulated_data = pd.read_table(
 simulated_data.head()
 
 
-# In[8]:
-
-
-for name in list(simulated_data['experiment_id']):
-    if "E-GEOD-51409" in name:
-        print(name)
-
-
-# In[9]:
+# In[10]:
 
 
 # Number of unique experiments in simulated dataset
@@ -176,15 +170,9 @@ ids = set([i.split("_")[0] for i in simulated_data['experiment_id']])
 len(ids)     
 
 
-# In[10]:
-
-
-"E-GEOD-51409" in ids
-
-
 # ### Add experiment ids to original gene expression data
 
-# In[11]:
+# In[12]:
 
 
 # Read original input
@@ -197,7 +185,7 @@ normalized_data = pd.read_table(
 normalized_data.head()
 
 
-# In[12]:
+# In[13]:
 
 
 # Read in metadata
@@ -208,7 +196,7 @@ metadata = pd.read_table(
     sep='\t')
 
 
-# In[13]:
+# In[14]:
 
 
 # Reset index to be referenced based on sample id
@@ -216,14 +204,14 @@ metadata = metadata.reset_index().set_index('ml_data_source')
 metadata.head()
 
 
-# In[14]:
+# In[15]:
 
 
 # Remove sample ids that have duplicates
 metadata = metadata.loc[~normalized_data.index.duplicated(keep=False)]
 
 
-# In[15]:
+# In[16]:
 
 
 # Add experiment id to original gene expression data
@@ -243,7 +231,7 @@ normalized_data_label.head()
 
 # ## Visualize data
 
-# In[16]:
+# In[17]:
 
 
 # Select example experiments
@@ -257,7 +245,7 @@ example_id = "E-GEOD-51409"
 #example_id = "E-MEXP-2606"
 
 
-# In[17]:
+# In[18]:
 
 
 # Only label selected example labels for simulated data
@@ -270,13 +258,13 @@ simulated_data.loc[simulated_data['experiment_id'] != example_id,'experiment_id'
 simulated_data.head()
 
 
-# In[18]:
+# In[19]:
 
 
 example_id in list(simulated_data['experiment_id'])
 
 
-# In[19]:
+# In[20]:
 
 
 # Only label selected example labels for original data
@@ -286,13 +274,13 @@ normalized_data_label.loc[normalized_data_label['experiment_id'] != example_id,'
 normalized_data_label.head()
 
 
-# In[20]:
+# In[21]:
 
 
 example_id in list(normalized_data_label['experiment_id'])
 
 
-# In[21]:
+# In[22]:
 
 
 # UMAP embedding of original input data
@@ -308,7 +296,7 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
 input_data_UMAPencoded_df['experiment_id'] = normalized_data_label['experiment_id']
 
 
-# In[22]:
+# In[23]:
 
 
 # UMAP embedding of simulated data
@@ -325,7 +313,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
 simulated_data_UMAPencoded_df['experiment_id'] = simulated_data['experiment_id']
 
 
-# In[28]:
+# In[24]:
 
 
 # Add label for input or simulated dataset
@@ -340,25 +328,27 @@ combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPenco
 #select_data = combined_data_df[combined_data_df['experiment_id'] != 'Not selected']
 
 # Plot
-fig = ggplot(combined_data_df, aes(x='1', y='2'))     + geom_point(aes(color='experiment_id'), alpha=0.1)     + facet_wrap('~dataset')     + labs(x ='UMAP 1',
-           y = 'UMAP 2',
-           title = 'UMAP of original and simulated data (gene space)') \
-    + theme_bw() \
-        + theme(
-            legend_title_align = "center",
-            plot_background=element_rect(fill='white'),
-            legend_key=element_rect(fill='white', colour='white'), 
-            plot_title=element_text(weight='bold')
-        ) \
-        + guides(colour=guide_legend(override_aes={'alpha': 1})) \
-        + scale_color_manual(['red', '#bdbdbd']) \
-        + geom_point(data=combined_data_df[combined_data_df['experiment_id'] == example_id],
-                     alpha=0.1, 
-                     color='red') \
+fig = ggplot(combined_data_df, aes(x='1', y='2'))
+fig += geom_point(aes(color='experiment_id'), alpha=0.1)
+fig += facet_wrap('~dataset')
+fig += labs(x ='UMAP 1',
+            y = 'UMAP 2',
+            title = 'UMAP of original and simulated data (gene space)')
+fig += theme_bw()
+fig += theme(
+    legend_title_align = "center",
+    plot_background=element_rect(fill='white'),
+    legend_key=element_rect(fill='white', colour='white'), 
+    plot_title=element_text(weight='bold')
+    )
+fig += guides(colour=guide_legend(override_aes={'alpha': 1}))
+fig += scale_color_manual(['red', '#bdbdbd'])
+fig += geom_point(data=combined_data_df[combined_data_df['experiment_id'] == example_id],
+                  alpha=0.1, 
+                  color='red')
     #+ xlim(-8,-5) \
-    #+ ylim(-11.5,-10.5) \
-        
+    #+ ylim(-11.5,-10.5) \  
 
 print(fig)
-ggsave(plot=fig, filename=experiment_simulated_file, dpi=500)
+#ggsave(plot=fig, filename=experiment_simulated_file, dpi=500)
 

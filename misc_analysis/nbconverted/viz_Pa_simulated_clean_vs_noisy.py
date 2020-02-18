@@ -3,7 +3,7 @@
 
 # # Visualize simulated data with and without noise added
 # 
-# This NB shows the how the structure of the gene expression data is affected in a few cases where noise is added
+# This noetbook shows the how the structure of the gene expression data is affected in a few cases where noise is added
 
 # In[1]:
 
@@ -49,7 +49,7 @@ seed(randomState)
 
 # User parameters
 dataset_name = "Pseudomonas_analysis"
-analysis_name = 'Pa_sample_lvl_sim'
+analysis_name = 'analysis_0'
 NN_architecture = 'NN_2500_30'
 
 
@@ -80,7 +80,7 @@ simulated_noisy_data_file = os.path.join(
     "Experiment_5_0.txt.xz")
 
 
-# In[5]:
+# In[4]:
 
 
 # Output files
@@ -90,7 +90,7 @@ umap_overlay_file = os.path.join(
     "Pa_umap_clean_vs_5noise.png")
 
 
-# In[6]:
+# In[5]:
 
 
 # Read data
@@ -110,19 +110,19 @@ print(simulated_data.shape)
 print(simulated_noisy_data.shape)
 
 
-# In[7]:
+# In[6]:
 
 
 simulated_data.head(10)
 
 
-# In[8]:
+# In[7]:
 
 
 simulated_noisy_data.head(10)
 
 
-# In[9]:
+# In[8]:
 
 
 # Get and save model
@@ -134,7 +134,7 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[10]:
+# In[9]:
 
 
 # UMAP embedding of simulated data
@@ -144,7 +144,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[11]:
+# In[10]:
 
 
 # Overlay original input vs simulated data
@@ -157,19 +157,22 @@ simulated_data_UMAPencoded_df['dataset'] = 'noisy simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'simulated'], aes(x='1', y='2')) + geom_point(color='#cccccc', 
-             alpha=0.3) \
-+ labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of simulated data with and without noise") \
-+ theme_bw() \
-+ theme(
+g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'simulated'], aes(x='1', y='2'))
+g_input_sim += geom_point(color='#cccccc', 
+                          alpha=0.3)
+g_input_sim += labs(x = "UMAP 1", 
+                    y = "UMAP 2", 
+                    title = "UMAP of simulated data with and without noise")
+g_input_sim += theme_bw()
+g_input_sim += theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
     plot_title=element_text(weight='bold')
-) \
-+ geom_point(combined_data_df[combined_data_df['dataset'] == 'noisy simulated'],
-                 alpha=0.15, 
-                 color='#b3e5fc')
+)
+g_input_sim += geom_point(combined_data_df[combined_data_df['dataset'] == 'noisy simulated'],
+                          alpha=0.15, 
+                          color='#b3e5fc')
 
 print(g_input_sim)
 ggsave(plot = g_input_sim, filename = umap_overlay_file, dpi=500)

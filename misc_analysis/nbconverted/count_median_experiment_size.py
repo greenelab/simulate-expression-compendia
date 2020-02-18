@@ -1,7 +1,11 @@
 
 # coding: utf-8
 
-# In[1]:
+# # Number of experiments
+# 
+# This notebook counts the number of unique *experiments* within the recount2 and *P. aeruginosa* compendia.  These statistics are used in the corresponding manuscript
+
+# In[ ]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')

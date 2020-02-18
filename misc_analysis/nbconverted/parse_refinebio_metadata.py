@@ -1,7 +1,13 @@
 
 # coding: utf-8
 
-# In[1]:
+# # Statistics of transcriptomic compendia
+# 
+# This notebook parses the refine.bio api, which is a repository of expression data collected from SRA, GEO and ArrayExpress.  
+# 
+# We generate a table showing the median number of experiments and samples per organism.  This table can be found in the corresponding manuscript
+
+# In[ ]:
 
 
 import pandas as pd

@@ -6,6 +6,9 @@
 # This Notebook is testing if the UMAP embedding is artifically distorting our simulated gene expression data to appear closer to our original gene expression data
 # 
 # This notebook was created after the observation that the UMAP embedding of the original gene expression data and the simulated gene expression data appeared very similar.  But this similarity might be because we are using the UMAP embedding that was fit to the original data.
+# 
+# **Conclusion**
+# Based on the plots, we conclude that the umap embedding is not completely forcing the simulated data to look similar to the original data.  However, further experiments will need to be performed in order to better understand the role fo the umap embedding and if there is better way to represent the structure of the original and simulated data to confirm that they look similar.
 
 # In[1]:
 
@@ -143,7 +146,7 @@ simulated_noise_data = simulate_noise(1000, 5549)
 # Get and save model
 model_original = umap.UMAP(random_state=randomState).fit(normalized_data)
 
-input_data_UMAPencoded = model.transform(normalized_data)
+input_data_UMAPencoded = model_original.transform(normalized_data)
 input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          index=normalized_data.index,
                                          columns=['1','2'])
@@ -166,25 +169,28 @@ simulated_data_noise_UMAPencoded_df = pd.DataFrame(data=simulated_noise_data_UMA
 
 # Add label for input or simulated dataset
 input_data_UMAPencoded_df['dataset'] = 'original'
-simulated_noise_data_UMAPencoded_df['dataset'] = 'simulated'
+simulated_data_noise_UMAPencoded_df['dataset'] = 'simulated'
 
 # Concatenate input and simulated dataframes together
-combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_noise_data_UMAPencoded_df])
+combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_noise_UMAPencoded_df])
 
 # Plot
-g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2')) + geom_point(color='#d5a6bd', 
-             alpha=0.15) \
-+ labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and noise data (using original embedding)") \
-+ theme_bw() \
-+ theme(
+g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2'))
+g_input_sim += geom_point(color='#d5a6bd',
+                          alpha=0.15)
+g_input_sim += labs(x = "UMAP 1", 
+                    y = "UMAP 2", 
+                    title = "UMAP of original and noise data (using original embedding)")
+g_input_sim += theme_bw()
+g_input_sim += theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
     plot_title=element_text(weight='bold')
-) \
-+ geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
-                 alpha=0.2, 
-                 color='#cccccc')
+)
+g_input_sim += geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
+                          alpha=0.2, 
+                          color='#cccccc')
 
 print(g_input_sim)
 
@@ -239,7 +245,7 @@ ggplot(combined_data_df, aes(x='1', y='2')) + geom_point(alpha=0.1) + facet_wrap
 # UMAP embedding of simulated data
 model_simulated = umap.UMAP(random_state=randomState).fit(simulated_data)
 
-simulated_data_UMAPencoded = model.transform(simulated_data)
+simulated_data_UMAPencoded = model_simulated.transform(simulated_data)
 simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          index=simulated_data.index,
                                          columns=['1','2'])
@@ -255,7 +261,7 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[16]:
+# In[15]:
 
 
 # Overlay original input vs simulated data
@@ -268,19 +274,22 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
 # Plot
-g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2')) + geom_point(color='#d5a6bd', 
-             alpha=0.2) \
-+ labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP of original and simulated data(using simulated embedding)") \
-+ theme_bw() \
-+ theme(
+g_input_sim2 = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2'))
+g_input_sim2 += geom_point(color='#d5a6bd',
+                           alpha=0.2)
+g_input_sim2 += labs(x = "UMAP 1", 
+                     y = "UMAP 2", 
+                     title = "UMAP of original and simulated data(using simulated embedding)")
+g_input_sim2 += theme_bw()
+g_input_sim2 += theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
     plot_title=element_text(weight='bold')
-) \
-+ geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
-                 alpha=0.2, 
-                 color='#cccccc')
+)
+g_input_sim2 += geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
+                           alpha=0.2, 
+                           color='#cccccc')
 
 print(g_input_sim)
 
