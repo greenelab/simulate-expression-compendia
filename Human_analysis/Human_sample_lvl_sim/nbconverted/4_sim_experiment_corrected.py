@@ -43,6 +43,9 @@ lst_num_experiments = [1, 2, 5, 10, 20,
 corrected = True
 use_pca = True
 num_PCs = 10
+local_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../../../../"))
 
 iterations = range(5) 
 num_cores = 5
@@ -98,7 +101,8 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
                                                      use_pca,
                                                      num_PCs,
                                                      file_prefix,
-                                                     normalized_data_file) for i in iterations)
+                                                     normalized_data_file,
+                                                     local_dir) for i in iterations)
 
 
 # In[6]:

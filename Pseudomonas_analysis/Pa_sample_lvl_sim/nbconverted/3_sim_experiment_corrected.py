@@ -44,6 +44,9 @@ lst_num_experiments = [1, 2, 5, 10, 20,
 corrected = True
 use_pca = True
 num_PCs = 10
+local_dir = os.path.abspath(
+      os.path.join(
+          os.getcwd(), "../../../../"))
 
 iterations = range(5) 
 num_cores = 5
@@ -83,7 +86,7 @@ ci_corrected_file = os.path.join(
     "Pa_sample_lvl_sim_ci_corrected.pickle")
 
 
-# In[5]:
+# In[ ]:
 
 
 # Run multiple simulations
@@ -99,10 +102,11 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
                                                      use_pca,
                                                      num_PCs,
                                                      file_prefix,
-                                                     normalized_data_file) for i in iterations)
+                                                     normalized_data_file,
+                                                     local_dir) for i in iterations)
 
 
-# In[6]:
+# In[ ]:
 
 
 # Concatenate output dataframes
@@ -114,7 +118,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[7]:
+# In[ ]:
 
 
 # Get median for each row (number of experiments)
@@ -123,7 +127,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[8]:
+# In[ ]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -133,7 +137,7 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[9]:
+# In[ ]:
 
 
 # Get confidence interval for each row (number of experiments)
@@ -141,7 +145,7 @@ std_scores
 err = std_scores*1.96
 
 
-# In[10]:
+# In[ ]:
 
 
 # Get boundaries of confidence interval
@@ -153,13 +157,13 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[11]:
+# In[ ]:
 
 
 mean_scores
 
 
-# In[12]:
+# In[ ]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval

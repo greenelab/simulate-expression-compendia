@@ -187,9 +187,9 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
                 size=1.5,
                 color="darkgrey",
                 show_legend=False) \
-    + labs(x = "Number of Experiments", 
+    + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
-           title = "Similarity across varying numbers of experiments") \
+           title = "Similarity across varying numbers of partitions") \
     + theme(plot_title=element_text(weight='bold'),
             plot_background=element_rect(fill="white"),
             panel_background=element_rect(fill="white"),

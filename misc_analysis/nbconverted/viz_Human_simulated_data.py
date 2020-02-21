@@ -3,13 +3,13 @@
 
 # # Visualize simulated data
 # 
-# This notebook will verify that the simulated dataset is a good representation of our original input dataset by visually comparing the structures in the two datasets projected onto UMAP space.  This notebook is using the "P. aeruginosa* compendium.  
+# This notebook will verify that the simulated dataset is a good representation of our original input dataset by visually comparing the structures in the two datasets projected onto UMAP space.  This notebook is using the recount2 compendium.  
 # 
 # The overlapping structure of the original (pink) and simulated (grey) datasets demonstrates that our generative model is capturing the same biological trends in the original dataset.  
 # 
-# This figure can be found the corresponding manuscript.
+# This figure can be found in the supplemental material of the manuscript.
 
-# In[1]:
+# In[17]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -25,7 +25,7 @@ from plotnine import (ggplot,
                       labs,
                       aes, 
                       facet_wrap, 
-                      scale_colour_manual,
+                      scale_color_manual,
                       guides, 
                       guide_legend, 
                       theme_bw, 
@@ -52,8 +52,8 @@ seed(randomState)
 
 
 # User parameters
-dataset_name = "Pseudomonas_analysis"
-analysis_name = 'analysis_0'
+dataset_name = "Human_analysis"
+analysis_name = 'Human_sample_lvl_sim'
 NN_architecture = 'NN_2500_30'
 
 
@@ -72,31 +72,15 @@ normalized_data_file = os.path.join(
     dataset_name,
     "data",
     "input",
-    "train_set_normalized.pcl")
-
-model_encoder_file = os.path.join( ## Make more explicit name here
-    NN_dir,
-    "tybalt_2layer_{}latent_encoder_model.h5".format(latent_dim))
-
-weights_encoder_file = os.path.join(
-    NN_dir,
-    "tybalt_2layer_{}latent_encoder_weights.h5".format(latent_dim))
-
-model_decoder_file = os.path.join(
-    NN_dir,
-    "tybalt_2layer_{}latent_decoder_model.h5".format(latent_dim))
-
-weights_decoder_file = os.path.join(
-    NN_dir,
-    "tybalt_2layer_{}latent_decoder_weights.h5".format(latent_dim))
+    "recount2_gene_normalized_data.tsv.xz")
 
 simulated_data_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
-    "simulated",
+    "experiment_simulated",
     analysis_name,
-    "simulated_data.txt.xz")
+    "Experiment_1_0.txt.xz")
 
 
 # In[4]:
@@ -112,21 +96,10 @@ NN_dir
 umap_overlay_file = os.path.join(
     base_dir,
     "results",
-    "Pa_umap_overlay.png")
+    "Human_umap_overlay.png")
 
 
 # In[6]:
-
-
-# Load saved models
-loaded_model = load_model(model_encoder_file)
-loaded_decode_model = load_model(model_decoder_file)
-
-loaded_model.load_weights(weights_encoder_file)
-loaded_decode_model.load_weights(weights_decoder_file)
-
-
-# In[7]:
 
 
 # Read data
@@ -146,19 +119,19 @@ print(normalized_data.shape)
 print(simulated_data.shape)
 
 
-# In[8]:
+# In[7]:
 
 
 normalized_data.head(10)
 
 
-# In[9]:
+# In[8]:
 
 
 simulated_data.head(10)
 
 
-# In[10]:
+# In[9]:
 
 
 # Get and save model
@@ -170,7 +143,7 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[11]:
+# In[10]:
 
 
 # UMAP embedding of simulated data
@@ -180,7 +153,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[12]:
+# In[24]:
 
 
 # Overlay original input vs simulated data
@@ -192,11 +165,14 @@ simulated_data_UMAPencoded_df['dataset'] = 'simulated'
 # Concatenate input and simulated dataframes together
 combined_data_df = pd.concat([input_data_UMAPencoded_df, simulated_data_UMAPencoded_df])
 
+#combined_data_df[combined_data_df['dataset'] == 'original']
 # Plot
 g_input_sim = ggplot(combined_data_df[combined_data_df['dataset'] == 'original'], aes(x='1', y='2'))
-g_input_sim += geom_point(color='#d5a6bd', 
-                          alpha=0.15)
-g_input_sim += labs(x = "UMAP 1",
+#g_input_sim += geom_point(aes(color='dataset'),
+#                         alpha=0.2)
+g_input_sim += geom_point(color='#d5a6bd',
+                          alpha=0.1)
+g_input_sim += labs(x = "UMAP 1", 
                     y = "UMAP 2", 
                     title = "UMAP of original and simulated data")
 g_input_sim += theme_bw()
@@ -206,8 +182,10 @@ g_input_sim += theme(
     legend_key=element_rect(fill='white', colour='white'), 
     plot_title=element_text(weight='bold')
 )
+#g_input_sim += guides(colour=guide_legend(override_aes={'alpha': 1}))
+#g_input_sim += scale_color_manual(['#d5a6bd', '#cccccc'])
 g_input_sim += geom_point(combined_data_df[combined_data_df['dataset'] == 'simulated'],
-                          alpha=0.09,
+                          alpha=0.5, 
                           color='#cccccc')
 
 print(g_input_sim)
