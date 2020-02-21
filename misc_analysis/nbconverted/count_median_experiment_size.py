@@ -48,7 +48,7 @@ else:
         "recount2_metadata.tsv")
 
 
-# In[4]:
+# In[6]:
 
 
 metadata = pd.read_table(
@@ -57,6 +57,7 @@ metadata = pd.read_table(
     sep='\t',
     index_col=0)
 
+print(metadata.shape)
 metadata.head()
 
 
