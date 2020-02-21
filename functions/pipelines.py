@@ -33,7 +33,8 @@ def sample_level_simulation_uncorrected(run,
                                         use_pca,
                                         num_PCs,
                                         file_prefix,
-                                        input_file):
+                                        input_file,
+                                        local_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, ignorning the sample-experiment relationship
@@ -93,11 +94,6 @@ def sample_level_simulation_uncorrected(run,
 
     '''
 
-  # Input files
-  local_dir = os.path.abspath(
-      os.path.join(
-          os.getcwd(), "../../.."))
-
   # Main
 
   # Generate simulated data
@@ -105,8 +101,8 @@ def sample_level_simulation_uncorrected(run,
                                                         NN_architecture,
                                                         dataset_name,
                                                         analysis_name,
-                                                        num_simulated_samples
-                                                        )
+                                                        num_simulated_samples,
+                                                        local_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -153,8 +149,8 @@ def experiment_level_simulation_uncorrected(run,
                                             num_PCs,
                                             file_prefix,
                                             input_file,
-                                            experiment_ids_file):
-
+                                            experiment_ids_file,
+                                            local_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, keeping track of which sample is associated
@@ -217,10 +213,6 @@ def experiment_level_simulation_uncorrected(run,
         Similarity score comparing the permuted data to the simulated data per run
     '''
 
-  local_dir = os.path.abspath(
-      os.path.join(
-          os.getcwd(), "../../.."))
-
   # Main
 
   # Generate simulated data
@@ -229,7 +221,8 @@ def experiment_level_simulation_uncorrected(run,
                                                               NN_architecture,
                                                               dataset_name,
                                                               analysis_name,
-                                                              experiment_ids_file)
+                                                              experiment_ids_file,
+                                                              local_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -275,7 +268,8 @@ def sample_level_simulation_corrected(run,
                                       use_pca,
                                       num_PCs,
                                       file_prefix,
-                                      input_file):
+                                      input_file,
+                                      local_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, ignoring sample-experiment relationship
@@ -336,10 +330,6 @@ def sample_level_simulation_corrected(run,
 
     '''
 
-  local_dir = os.path.abspath(
-      os.path.join(
-          os.getcwd(), "../../.."))
-
   # Main
 
   # Generate simulated data
@@ -347,8 +337,8 @@ def sample_level_simulation_corrected(run,
                                                         NN_architecture,
                                                         dataset_name,
                                                         analysis_name,
-                                                        num_simulated_samples
-                                                        )
+                                                        num_simulated_samples,
+                                                        local_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -403,8 +393,8 @@ def experiment_level_simulation_corrected(run,
                                           num_PCs,
                                           file_prefix,
                                           input_file,
-                                          experiment_ids_file):
-
+                                          experiment_ids_file,
+                                          local_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, keeping track of which sample is associated
@@ -468,10 +458,6 @@ def experiment_level_simulation_corrected(run,
         Similarity score comparing the permuted data to the simulated data per run
   '''
 
-  local_dir = os.path.abspath(
-      os.path.join(
-          os.getcwd(), "../../.."))
-
   # Main
 
   # Generate simulated data
@@ -480,7 +466,8 @@ def experiment_level_simulation_corrected(run,
                                                               NN_architecture,
                                                               dataset_name,
                                                               analysis_name,
-                                                              experiment_ids_file)
+                                                              experiment_ids_file,
+                                                              local_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)

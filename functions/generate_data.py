@@ -254,8 +254,6 @@ def simulate_compendium(
     # therefore we want to reset the index.
     simulated_data_scaled_df.reset_index(drop=True, inplace=True)
 
-    print(simulated_data_scaled_df.shape)
-
     # Remove expression data for samples that have duplicate sample id across
     # different experiment ids
     # We remove these because we are not sure which experiment the sample should

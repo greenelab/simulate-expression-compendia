@@ -90,7 +90,8 @@ def simulate_compendium(
     NN_architecture,
     dataset_name,
     analysis_name,
-    experiment_ids_file
+    experiment_ids_file,
+    local_dir
 ):
     '''
     Generate simulated data by randomly sampling some number of experiments
@@ -152,9 +153,7 @@ def simulate_compendium(
     base_dir = os.path.abspath(
         os.path.join(
             os.getcwd(), "../.."))
-    local_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../../.."))
+
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
     analysis_dir = os.path.join(new_dir, analysis_name)
@@ -314,7 +313,8 @@ def simulate_data(
         NN_architecture,
         dataset_name,
         analysis_name,
-        num_simulated_samples
+        num_simulated_samples,
+        local_dir
 ):
     '''
     Generate simulated data by sampling from VAE latent space.
@@ -368,9 +368,6 @@ def simulate_data(
     base_dir = os.path.abspath(
         os.path.join(
             os.getcwd(), "../.."))
-    local_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../../.."))
 
     new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
@@ -812,7 +809,6 @@ def apply_correction_io(local_dir,
                         run,
                         analysis_name,
                         num_experiments):
-
     '''
     This function uses the limma R package to correct for the technical variation
     we added using <add_experiments_io> or <add_experiments_grped_io>
