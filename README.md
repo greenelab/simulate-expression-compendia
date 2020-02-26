@@ -39,8 +39,55 @@ To build and activate this environment run:
 # conda version 4.6.12
 conda env create -f environment.yml
 
-conda activate batch_effects
+conda activate simulate_expression_compendia
 ```
 
+## How to run this simulation using your own data
+
+In order to run this simulation on your own gene expression data the following steps should be performed:
+
+First we need to set up your local repository: 
+1. Clone the ```simulate-expression-compendia``` repository
+2. Set up conda environment using the command above
+3. Create a new analysis folder in the main directory (i.e. "NAME_analysis")
+4. Within your analysis folder add the same folder as found in ```Pseudomonas_analysis``` (i.e. experiment_lvl_sim/, sample_lvl_sim/, data/, logs/, models/)
+5. Copy contents of ```Pseudomonas_analysis/Pa_sample_lvl_sim/``` into your respective folder.  
+6. Copy contents of ```Pseudomonas_analysis/Pa_experiment_lvl_sim/``` into your respective folder.  
+
+Next we need to modify the code for your analysis:
+1. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns.
+2. Add your metadata file to ```data/metadata/``` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another.
+3. In ```sample_lvl_sim/1_train_vae.ipynb``` change variables: ```dataset_name```, ```normalized_data_file``` according to your analysis folder name and dataset name.  Additionally you can also vary the training parameters in the ```VAE training parameters``` cell
+4. In ```sample_lvl_sim/2_simulated_experiment_uncorrected.ipynb``` change variables in ```Parameters```, ```Input file``` and ```Output files``` cells according to your analysis and dataset.
+5. In ```sample_lvl_sim/2_simulated_experiment_corrected.ipynb``` change variables in ```Parameters```, ```Input file``` and ```Output files``` cells according to your analysis and dataset.
+6. Finally you can run ```5_create_figs_manuscript.ipynb``` to generate result figures
+7. The same steps 3-6 can be used to run ```experiment_lvl_sim/``` scripts.  Here we need to also modify ```experiment_lvl_sim/0_clean_metadata.ipynb``` in order to parse our metadata file appropriately. 
+
+---Need to mention about metadata file---!!!!!!!!!!!!!!!
+
+## How to run this simulation using your own data AND different noise correction method
+
+The same steps above need to be performed with an additional modification for the correction method:
+
+First we need to set up your local repository: 
+1. Clone the ```simulate-expression-compendia``` repository
+2. Set up conda environment using the command above
+3. Create a new analysis folder in the main directory (i.e. "NAME_analysis")
+4. Within your analysis folder add the same folder as found in ```Pseudomonas_analysis``` (i.e. experiment_lvl_sim/, sample_lvl_sim/, data/, logs/, models/)
+5. Copy contents of ```Pseudomonas_analysis/Pa_sample_lvl_sim/``` into your respective folder.  
+6. Copy contents of ```Pseudomonas_analysis/Pa_experiment_lvl_sim/``` into your respective folder.  
+
+Next we need to modify the code for your analysis:
+1. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns.
+2. Add your metadata file to ```data/metadata/``` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another.
+3. In ```sample_lvl_sim/1_train_vae.ipynb``` change variables: ```dataset_name```, ```normalized_data_file``` according to your analysis folder name and dataset name.  Additionally you can also vary the training parameters in the ```VAE training parameters``` cell
+4. In ```sample_lvl_sim/2_simulated_experiment_uncorrected.ipynb``` change variables in ```Parameters```, ```Input file``` and ```Output files``` cells according to your analysis and dataset.
+5. The ```apply_correction_io``` function in the ```functions/generate_data_parallel.py``` file needs to be modified to use the different correction method.
+6. In ```sample_lvl_sim/2_simulated_experiment_corrected.ipynb``` change variables in ```Parameters```, ```Input file``` and ```Output files``` cells according to your analysis and dataset.
+7. Finally you can run ```5_create_figs_manuscript.ipynb``` to generate result figures
+8. The same steps 3-7 can be used to run ```experiment_lvl_sim/``` scripts.  Here we need to also modify ```experiment_lvl_sim/0_clean_metadata.ipynb``` in order to parse our metadata file appropriately. 
+
+
+
 ## Acknowledgements
-We would like to thank YoSon Park and David Nicholson for insightful discussions and code review
+We would like to thank YoSon Park, David Nicholson and Ben Heil for insightful discussions and code review
