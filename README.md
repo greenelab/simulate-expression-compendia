@@ -63,8 +63,6 @@ Next we need to modify the code for your analysis:
 6. Finally you can run ```5_create_figs_manuscript.ipynb``` to generate result figures
 7. The same steps 3-6 can be used to run ```experiment_lvl_sim/``` scripts.  Here we need to also modify ```experiment_lvl_sim/0_clean_metadata.ipynb``` in order to parse our metadata file appropriately. 
 
----Need to mention about metadata file---!!!!!!!!!!!!!!!
-
 ## How to run this simulation using your own data AND different noise correction method
 
 The same steps above need to be performed with an additional modification for the correction method:
