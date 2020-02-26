@@ -24,7 +24,7 @@ Given a compendium of gene expression partitions, how will increasing the number
 **Conclusions:**
 Having some number of technical variation confounded our ability to extract our original biological signal and we need to apply correction.  However, as the number of technical variation increased, it became easier to discover the underlying biological patterns and applying correction removes some of the biology of interest.  Our ability to extract biological signal is defined by our ability to retain the structure of the biological data -- in other words, is our representation of the simulated data with a single partition similar to the representation with multiple partition?  
 
-![Similarity](https://raw.github.com/greenelab/simulate-expression-compendia/blob/master/results/Pa_sample_lvl_pca_uncorrected.png)
+![Similarity](https://raw.githubusercontent.com/greenelab/simulate-expression-compendia/blob/master/results/Pa_sample_lvl_pca_uncorrected.png)
 
 
 ## Experiment-level simulation experiment 
