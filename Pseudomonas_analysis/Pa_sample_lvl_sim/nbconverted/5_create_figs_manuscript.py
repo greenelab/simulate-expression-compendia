@@ -110,6 +110,11 @@ svcca_file = os.path.join(
     "results",
     "Pa_sample_lvl_sim_svcca.svg")
 
+svcca_png_file = os.path.join(
+    base_dir,
+    "results",
+    "Pa_sample_lvl_sim_svcca.png")
+
 pca_uncorrected_file = os.path.join(
     base_dir,
     "results",
@@ -202,6 +207,7 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
 
 print(panel_A)
 ggsave(plot=panel_A, filename=svcca_file, device="svg", dpi=300)
+ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
 
 
 # ## Uncorrected PCA panel
