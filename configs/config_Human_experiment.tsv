@@ -1,0 +1,10 @@
+local_dir	"home/alexandra/Documents/Batch_effects/"
+dataset_name	"Human_analysis"
+analysis_name	"Human_experiment_lvl_sim"
+NN_architecture	"NN_2500_30"
+num_simulated_samples	50
+lst_num_experiments	[1, 2, 3, 5, 10, 20, 30, 50]
+use_pca	True
+num_PCs	10
+iterations	range(5)
+num_cores	5
