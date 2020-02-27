@@ -38,7 +38,11 @@ from plotnine import (ggplot,
                       element_rect,
                       element_line,
                       coords)
+
 from sklearn.decomposition import PCA
+
+sys.path.append("../../")
+from functions import utils
 
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -46,6 +50,23 @@ warnings.filterwarnings(action='ignore')
 from numpy.random import seed
 randomState = 123
 seed(randomState)
+
+
+# In[ ]:
+
+
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_experiment.tsv"))
+params = utils.read_config(config_file)
+
+
+# In[ ]:
+
+
+# Load parameters
+local_dir = params["local_dir"]
+dataset_name = params["dataset_name"]
+analysis_name = params["analysis_name"]
 
 
 # ## Load data
@@ -62,41 +83,38 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_uncorrected.pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_permuted.npy")
-
-# locally stored simulated compendia files
-local_dir = "/home/alexandra/Documents/"
+    dataset_name +"_experiment_lvl_sim_permuted.npy")
 
 compendia_dir = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "partition_simulated",
-    "Pa_experiment_lvl_sim")
+    analysis_name)
 
 
 # In[3]:
@@ -106,22 +124,22 @@ compendia_dir = os.path.join(
 svcca_file = os.path.join(
     base_dir,
     "results",
-    "Pa_experiment_lvl_sim_svcca.svg")
+    dataset_name +"_experiment_lvl_sim_svcca.svg")
 
 svcca_png_file = os.path.join(
     base_dir,
     "results",
-    "Pa_experiment_lvl_sim_svcca.png")
+    dataset_name +"_experiment_lvl_sim_svcca.png")
 
 pca_uncorrected_file = os.path.join(
     base_dir,
     "results",
-    "Pa_experiment_lvl_sim_pca_uncorrected.png")
+    dataset_name +"_experiment_lvl_sim_pca_uncorrected.png")
 
 pca_corrected_file = os.path.join(
     base_dir,
     "results",
-    "Pa_experiment_lvl_sim_pca_corrected.png")
+    dataset_name +"_experiment_lvl_sim_pca_corrected.png")
 
 
 # In[4]:

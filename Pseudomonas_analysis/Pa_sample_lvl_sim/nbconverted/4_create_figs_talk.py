@@ -31,12 +31,33 @@ from plotnine import (ggplot,
                       element_rect,
                       element_line,
                       coords)
+
+sys.path.append("../../")
+from functions import utils
+
 import warnings
 warnings.filterwarnings(action='ignore')
 
 from numpy.random import seed
 randomState = 123
 seed(randomState)
+
+
+# In[ ]:
+
+
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_sample.tsv"))
+params = utils.read_config(config_file)
+
+
+# In[ ]:
+
+
+# Load parameters
+local_dir = params["local_dir"]
+dataset_name = params["dataset_name"]
+analysis_name = params["analysis_name"]
 
 
 # In[2]:
@@ -51,46 +72,44 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_sample_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_sample_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_sample_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_sample_lvl_sim_ci_uncorrected.pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_sample_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_sample_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_ci_corrected.pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_sample_lvl_sim_permuted.npy")
+    dataset_name +"_sample_lvl_sim_permuted.npy")
 
 
 # In[3]:
 
 
 # Output files
-local_dir = "/home/alexandra/Documents/"
-
 svcca_uncorrected_file = os.path.join(
     local_dir,
     "Data",
     "Batch_effects",
     "output",
     "talk figures",
-    "Pa_sample_lvl_sim_svcca_uncorrected.png")
+    dataset_name +"_sample_lvl_sim_svcca_uncorrected.png")
 
 svcca_uncorrected_blk_file = os.path.join(
     local_dir,
@@ -98,7 +117,7 @@ svcca_uncorrected_blk_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "Pa_sample_lvl_sim_svcca_uncorrected_blk.png")
+    dataset_name +"_sample_lvl_sim_svcca_uncorrected_blk.png")
 
 svcca_overlay_file = os.path.join(
     local_dir,
@@ -106,7 +125,7 @@ svcca_overlay_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "Pa_sample_lvl_sim_svcca_overlay.png")
+    dataset_name +"_sample_lvl_sim_svcca_overlay.png")
 
 svcca_overlay_blk_file = os.path.join(
     local_dir,
@@ -114,7 +133,7 @@ svcca_overlay_blk_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "Pa_sample_lvl_sim_svcca_overlay_blk.png")
+    dataset_name +"_sample_lvl_sim_svcca_overlay_blk.png")
 
 svcca_overlay_long_file = os.path.join(
     local_dir,
@@ -122,7 +141,7 @@ svcca_overlay_long_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "Pa_sample_lvl_sim_svcca_overlay_long.png")
+    dataset_name +"_sample_lvl_sim_svcca_overlay_long.png")
 
 svcca_overlay_long_blk_file = os.path.join(
     local_dir,
@@ -130,7 +149,7 @@ svcca_overlay_long_blk_file = os.path.join(
     "Batch_effects",
     "output",
     "talk figures",
-    "Pa_sample_lvl_sim_svcca_overlay_long_blk.png")
+    dataset_name +"_sample_lvl_sim_svcca_overlay_long_blk.png")
 
 
 # In[4]:

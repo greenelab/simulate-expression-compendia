@@ -19,7 +19,7 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 sys.path.append("../../")
-from functions import vae
+from functions import vae, utils
 
 from numpy.random import seed
 randomState = 123
@@ -29,8 +29,16 @@ seed(randomState)
 # In[ ]:
 
 
-# User parameters
-dataset_name = "Human_analysis"
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Human_experiment.tsv"))
+params = utils.read_config(config_file)
+
+
+# In[ ]:
+
+
+# Load parameters
+dataset_name = params['dataset_name']
 
 
 # In[2]:

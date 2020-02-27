@@ -22,34 +22,44 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 sys.path.append("../../")
-from functions import pipelines
+from functions import pipelines, utils
 
 from numpy.random import seed
 randomState = 123
 seed(randomState)
 
 
-# In[2]:
+# In[ ]:
 
 
-# Parameters
-dataset_name = "Pseudomonas_analysis"
-analysis_name = 'Pa_experiment_lvl_sim'
-NN_architecture = 'NN_2500_30'
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_experiment.tsv"))
+params = utils.read_config(config_file)
+
+
+# In[ ]:
+
+
+# Load parameters
+dataset_name = params["dataset_name"]
+analysis_name = params["analysis_name"]
+NN_architecture = params["NN_architecture"]
+num_simulated_samples = params["num_simulated_samples"]
+lst_num_experiments = params["lst_num_experiments"]
+use_pca = params["use_pca"]
+num_PCs = params["num_PCs"]
+local_dir = params["local_dir"]
+
+iterations = params["iterations"] 
+num_cores = params["num_cores"]
+
+
+# In[ ]:
+
+
+# Additional parameters
 file_prefix = "Partition"
-num_simulated_experiments = 600
-lst_num_partitions = [1, 2, 3, 5, 10, 20,
-                      30, 50, 70, 100, 200, 300, 400, 500, 600]
-
 corrected = False
-use_pca = True
-num_PCs = 10
-local_dir = os.path.abspath(
-      os.path.join(
-          os.getcwd(), "../../../../"))
-
-iterations = range(5) 
-num_cores = 5
 
 
 # In[3]:
@@ -83,19 +93,19 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_uncorrected.pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_uncorrected.pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Pa_experiment_lvl_sim_permuted")
+    dataset_name +"_experiment_lvl_sim_permuted")
 
 
 # In[5]:

@@ -8,21 +8,33 @@
 
 
 import os
+import sys
 import pandas as pd
 
 from numpy.random import seed
 randomState = 123
 seed(randomState)
 
+sys.path.append("../../")
+from functions import utils
+
 import warnings
 warnings.filterwarnings(action='ignore')
+
+
+# In[ ]:
+
+
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../..", "config.tsv"))
+params = utils.read_config(config_file)
 
 
 # In[2]:
 
 
-# User parameters
-dataset_name = "Human_analysis"
+# Load parameters
+dataset_name = params["dataset_name"]
 
 
 # In[3]:

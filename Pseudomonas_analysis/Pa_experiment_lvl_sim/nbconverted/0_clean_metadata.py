@@ -18,6 +18,9 @@ import pandas as pd
 import numpy as np
 import random
 
+sys.path.append("../../")
+from functions import utils
+
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -26,11 +29,19 @@ randomState = 123
 seed(randomState)
 
 
-# In[2]:
+# In[ ]:
 
 
-# User parameters
-dataset_name = "Pseudomonas_analysis"
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_experiment.tsv"))
+params = utils.read_config(config_file)
+
+
+# In[ ]:
+
+
+# Load parameters
+dataset_name = params["dataset_name"]
 
 
 # In[3]:
