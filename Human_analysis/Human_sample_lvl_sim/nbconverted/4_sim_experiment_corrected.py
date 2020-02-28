@@ -21,34 +21,44 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 sys.path.append("../../")
-from functions import pipelines
+from functions import pipelines, utils
 
 from numpy.random import seed
 randomState = 123
 seed(randomState)
 
 
-# In[2]:
+# In[ ]:
 
 
-# Parameters
-dataset_name = "Human_analysis"
-analysis_name = 'Human_sample_lvl_sim'
-NN_architecture = 'NN_2500_30'
-file_prefix = 'Experiment_corrected'
-num_simulated_samples = 500
-lst_num_experiments = [1, 2, 5, 10, 20,
-                     50, 100, 250, 500]
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Human_sample.tsv"))
+params = utils.read_config(config_file)
 
+
+# In[ ]:
+
+
+# Load parameters
+dataset_name = params["dataset_name"]
+analysis_name = params["analysis_name"]
+NN_architecture = params["NN_architecture"]
+num_simulated_samples = params["num_simulated_samples"]
+lst_num_experiments = params["lst_num_experiments"]
+use_pca = params["use_pca"]
+num_PCs = params["num_PCs"]
+local_dir = params["local_dir"]
+
+iterations = params["iterations"] 
+num_cores = params["num_cores"]
+
+
+# In[ ]:
+
+
+# Additional parameters
+file_prefix = "Experiment_corrected"
 corrected = True
-use_pca = True
-num_PCs = 10
-local_dir = os.path.abspath(
-      os.path.join(
-          os.getcwd(), "../../../../"))
-
-iterations = range(5) 
-num_cores = 5
 
 
 # In[3]:
@@ -76,13 +86,13 @@ similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Human_sample_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_similarity_corrected.pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    "Human_sample_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_ci_corrected.pickle")
 
 
 # In[5]:

@@ -5,10 +5,11 @@
 # 
 # Normalize RPKM count data generated from ```0_download_data.R``` script.
 
-# In[1]:
+# In[3]:
 
 
 import os
+import sys
 import pandas as pd
 from sklearn import preprocessing
 import umap
@@ -20,15 +21,26 @@ from numpy.random import seed
 randomState = 123
 seed(randomState)
 
+sys.path.append("../../")
+from functions import utils
+
 import warnings
 warnings.filterwarnings(action='ignore')
+
+
+# In[4]:
+
+
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Human_sample.tsv"))
+params = utils.read_config(config_file)
 
 
 # In[2]:
 
 
-# User parameters
-dataset_name = "Human_analysis"
+# Load parameters
+dataset_name = params["dataset_name"]
 
 
 # In[3]:

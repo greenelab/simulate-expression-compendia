@@ -19,18 +19,26 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 sys.path.append("../../")
-from functions import vae
+from functions import vae, utils
 
 from numpy.random import seed
 randomState = 123
 seed(randomState)
 
 
+# In[ ]:
+
+
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_experiment.tsv"))
+params = utils.read_config(config_file)
+
+
 # In[2]:
 
 
-# User parameters
-dataset_name = "Pseudomonas_analysis"
+# Load parameters
+dataset_name = params["dataset_name"]
 
 
 # In[3]:

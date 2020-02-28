@@ -1,4 +1,4 @@
-name: batch_effects
+name: simulate_expression_compendia
 channels:
 - anaconda
 - conda-forge

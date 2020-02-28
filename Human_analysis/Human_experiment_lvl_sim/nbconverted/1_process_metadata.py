@@ -21,7 +21,8 @@ import random
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
+sys.path.append("../../")
+from functions import utils
 
 from numpy.random import seed
 randomState = 123
@@ -31,11 +32,19 @@ seed(randomState)
 # In[2]:
 
 
-# User parameters
-dataset_name = "Human_analysis"
+# Read in config variables
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Human_experiment.tsv"))
+params = utils.read_config(config_file)
 
 
 # In[3]:
+
+
+# Load parameters
+dataset_name = params["dataset_name"]
+
+
+# In[4]:
 
 
 # Input files
