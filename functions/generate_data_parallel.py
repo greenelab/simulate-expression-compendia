@@ -19,6 +19,7 @@ import rpy2.robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 limma = importr('limma')
+sva = importr('sva')
 pandas2ri.activate()
 
 import warnings
@@ -154,17 +155,15 @@ def simulate_compendium(
         os.path.join(
             os.getcwd(), "../.."))
 
-    new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
+    #analysis_dir = os.path.join(local_dir, "experiment_simulated", analysis_name)
 
-    analysis_dir = os.path.join(new_dir, analysis_name)
+    # if os.path.exists(analysis_dir):
+    #    print('Directory already exists: \n {}'.format(analysis_dir))
+    # else:
+    #    print('Creating new directory: \n {}'.format(analysis_dir))
+    #os.makedirs(analysis_dir, exist_ok=True)
 
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
-        print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
-
-    print('\n')
+    # print('\n')
 
     # Files
     NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
@@ -369,17 +368,17 @@ def simulate_data(
         os.path.join(
             os.getcwd(), "../.."))
 
-    new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
+    #new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 
-    analysis_dir = os.path.join(new_dir, analysis_name)
+    #analysis_dir = os.path.join(new_dir, analysis_name)
 
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
-        print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
+    # if os.path.exists(analysis_dir):
+    #    print('Directory already exists: \n {}'.format(analysis_dir))
+    # else:
+    #    print('Creating new directory: \n {}'.format(analysis_dir))
+    #os.makedirs(analysis_dir, exist_ok=True)
 
-    print('\n')
+    # print('\n')
 
     # Files
     NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
@@ -540,9 +539,8 @@ def add_experiments_io(
     Files of simulated data with different numbers of experiments added.
     Each file named as "Experiment_<number of experiments added>"
     '''
-    new_dir = os.path.join(
-        local_dir, "Data", "Batch_effects", "experiment_simulated")
-    analysis_dir = os.path.join(new_dir, analysis_name)
+    analysis_dir = os.path.join(
+        local_dir, "experiment_simulated", analysis_name)
 
     if os.path.exists(analysis_dir):
         print('Directory already exists: \n {}'.format(analysis_dir))
@@ -561,19 +559,11 @@ def add_experiments_io(
         print('Creating simulated data with {} experiments..'.format(i))
 
         experiment_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "experiment_simulated",
-            analysis_name,
+            analysis_dir,
             "Experiment_" + str(i) + "_" + str(run) + ".txt.xz")
 
         experiment_map_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "experiment_simulated",
-            analysis_name,
+            analysis_dir,
             "Experiment_map_" + str(i) + "_" + str(run) + ".txt.xz")
 
         # Create dataframe with grouping
@@ -603,7 +593,7 @@ def add_experiments_io(
 
             for j in range(i):
                 # Scalar to shift gene expressiond data
-                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
+                stretch_factor = np.random.normal(0.0, 0.025, [1, num_genes])
 
                 # Tile stretch_factor to be able to add to batches
                 num_samples_per_experiment = len(partition[j])
@@ -691,14 +681,8 @@ def add_experiments_grped_io(
     Each file named as "Experiment_<number of experiments added>"
     '''
 
-    # Create directories
-    new_dir = os.path.join(
-        local_dir,
-        "Data",
-        "Batch_effects",
-        "partition_simulated")
-
-    analysis_dir = os.path.join(new_dir, analysis_name)
+    analysis_dir = os.path.join(
+        local_dir, "partition_simulated", analysis_name)
 
     if os.path.exists(analysis_dir):
         print('Directory already exists: \n {}'.format(analysis_dir))
@@ -718,19 +702,11 @@ def add_experiments_grped_io(
         print('Creating simulated data with {} partitions..'.format(i))
 
         partition_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "partition_simulated",
-            analysis_name,
+            analysis_dir,
             "Partition_" + str(i) + "_" + str(run) + ".txt.xz")
 
         partition_map_file = os.path.join(
-            local_dir,
-            "Data",
-            "Batch_effects",
-            "partition_simulated",
-            analysis_name,
+            analysis_dir,
             "Partition_map_" + str(i) + "_" + str(run) + ".txt.xz")
 
         # Create dataframe with grouping
@@ -808,7 +784,8 @@ def add_experiments_grped_io(
 def apply_correction_io(local_dir,
                         run,
                         analysis_name,
-                        num_experiments):
+                        num_experiments,
+                        correction_method):
     '''
     This function uses the limma R package to correct for the technical variation
     we added using <add_experiments_io> or <add_experiments_grped_io>
@@ -831,6 +808,9 @@ def apply_correction_io(local_dir,
         List of different numbers of experiments/partitions to add
         technical variations to
 
+    correction_method: str
+        Either limma or COMBAT
+
 
     Returns
     --------
@@ -845,16 +825,12 @@ def apply_correction_io(local_dir,
 
             experiment_file = os.path.join(
                 local_dir,
-                "Data",
-                "Batch_effects",
                 "experiment_simulated",
                 analysis_name,
                 "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             experiment_map_file = os.path.join(
                 local_dir,
-                "Data",
-                "Batch_effects",
                 "experiment_simulated",
                 analysis_name,
                 "Experiment_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
@@ -877,16 +853,12 @@ def apply_correction_io(local_dir,
 
             experiment_file = os.path.join(
                 local_dir,
-                "Data",
-                "Batch_effects",
                 "partition_simulated",
                 analysis_name,
                 "Partition_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             experiment_map_file = os.path.join(
                 local_dir,
-                "Data",
-                "Batch_effects",
                 "partition_simulated",
                 analysis_name,
                 "Partition_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
@@ -910,8 +882,13 @@ def apply_correction_io(local_dir,
 
         else:
             # Correct for technical variation
-            corrected_experiment_data = limma.removeBatchEffect(
-                experiment_data, batch=experiment_map)
+            if correction_method == 'limma':
+                corrected_experiment_data = limma.removeBatchEffect(
+                    experiment_data, batch=experiment_map)
+
+            if correction_method == 'combat':
+                corrected_experiment_data = sva.ComBat(
+                    experiment_data, batch=experiment_map)
 
             # Convert R object to pandas df
             corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
@@ -921,8 +898,6 @@ def apply_correction_io(local_dir,
             # Write out corrected files
             experiment_corrected_file = os.path.join(
                 local_dir,
-                "Data",
-                "Batch_effects",
                 "experiment_simulated",
                 analysis_name,
                 "Experiment_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
@@ -934,8 +909,6 @@ def apply_correction_io(local_dir,
             # Write out corrected files
             experiment_corrected_file = os.path.join(
                 local_dir,
-                "Data",
-                "Batch_effects",
                 "partition_simulated",
                 analysis_name,
                 "Partition_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
