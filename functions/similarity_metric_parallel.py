@@ -60,16 +60,12 @@ def read_data(simulated_data,
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir,
-            "Data",
-            "Batch_effects",
             "partition_simulated",
             analysis_name)
     else:
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir,
-            "Data",
-            "Batch_effects",
             "experiment_simulated",
             analysis_name)
 
