@@ -48,6 +48,7 @@ lst_num_experiments = params["lst_num_experiments"]
 use_pca = params["use_pca"]
 num_PCs = params["num_PCs"]
 local_dir = params["local_dir"]
+correction_method = params["correction_method"]
 
 iterations = params["iterations"] 
 num_cores = params["num_cores"]
@@ -86,13 +87,13 @@ similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_similarity_corrected_"+correction_method+".pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_ci_corrected_"+correction_method+".pickle")
 
 
 # In[5]:
@@ -108,6 +109,7 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
                                                      num_simulated_samples,
                                                      lst_num_experiments,
                                                      corrected,
+                                                     correction_method,
                                                      use_pca,
                                                      num_PCs,
                                                      file_prefix,

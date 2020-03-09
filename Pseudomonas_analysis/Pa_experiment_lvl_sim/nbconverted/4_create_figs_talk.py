@@ -58,6 +58,7 @@ params = utils.read_config(config_file)
 local_dir = params["local_dir"]
 dataset_name = params["dataset_name"]
 analysis_name = params["analysis_name"]
+correction_method = params["correction_method"]
 
 
 # In[2]:
@@ -72,25 +73,25 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_uncorrected_"+correction_method+".pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_uncorrected_"+correction_method+".pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_corrected_"+correction_method+".pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_corrected_"+correction_method+".pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
@@ -103,55 +104,41 @@ permuted_score_file = os.path.join(
 
 
 # Output files
-local_dir = "/home/alexandra/Documents/"
-
 svcca_uncorrected_file = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "output",
     "talk figures",
-    dataset_name +"_experiment_lvl_sim_svcca_uncorrected.png")
+    dataset_name +"_experiment_lvl_sim_svcca_uncorrected_"+correction_method+".png")
 
 svcca_uncorrected_blk_file = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "output",
     "talk figures",
-    dataset_name +"_experiment_lvl_sim_svcca_uncorrected_blk.png")
+    dataset_name +"_experiment_lvl_sim_svcca_uncorrected_"+correction_method+"_blk.png")
 
 svcca_overlay_file = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "output",
     "talk figures",
-    dataset_name +"_experiment_lvl_sim_svcca_overlay.png")
+    dataset_name +"_experiment_lvl_sim_svcca_overlay_"+correction_method+".png")
 
 svcca_overlay_blk_file = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "output",
     "talk figures",
-    dataset_name +"_experiment_lvl_sim_svcca_overlay_blk.png")
+    dataset_name +"_experiment_lvl_sim_svcca_overlay_"+correction_method+"_blk.png")
 
 svcca_overlay_long_file = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "output",
     "talk figures",
-    dataset_name +"_experiment_lvl_sim_svcca_overlay_long.png")
+    dataset_name +"_experiment_lvl_sim_svcca_overlay_"+correction_method+"_long.png")
 
 svcca_overlay_long_blk_file = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "output",
     "talk figures",
-    dataset_name +"_experiment_lvl_sim_svcca_overlay_long_blk.png")
+    dataset_name +"_experiment_lvl_sim_svcca_overlay_"+correction_method+"_long_blk.png")
 
 
 # In[4]:

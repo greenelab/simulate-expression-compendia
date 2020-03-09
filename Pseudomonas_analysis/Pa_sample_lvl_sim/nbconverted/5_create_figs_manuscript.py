@@ -39,6 +39,8 @@ from plotnine import (ggplot,
                       element_text,
                       element_rect,
                       element_line,
+                      xlim,
+                      ylim,
                       coords)
 
 sys.path.append("../../")
@@ -54,26 +56,29 @@ randomState = 123
 seed(randomState)
 
 
-# In[ ]:
+# In[2]:
 
 
 # Read in config variables
-config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_sample.tsv"))
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_sample_combat.tsv"))
 params = utils.read_config(config_file)
 
 
-# In[ ]:
+# In[3]:
 
 
 # Load parameters
 local_dir = params["local_dir"]
 dataset_name = params["dataset_name"]
 analysis_name = params["analysis_name"]
+correction_method = params["correction_method"]
+lst_num_experiments = params["lst_num_experiments"]
+pca_ind = [0,1,2,-3,-2,-1]
 
 
 # ## Load data
 
-# In[2]:
+# In[4]:
 
 
 # File directories
@@ -85,25 +90,25 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_sample_lvl_sim_similarity_uncorrected_"+correction_method+".pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_sample_lvl_sim_ci_uncorrected_"+correction_method+".pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_similarity_corrected_"+correction_method+".pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_sample_lvl_sim_ci_corrected_"+correction_method+".pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
@@ -113,38 +118,36 @@ permuted_score_file = os.path.join(
 
 compendia_dir = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "experiment_simulated",
     analysis_name)
 
 
-# In[3]:
+# In[5]:
 
 
 # Output files
 svcca_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_sample_lvl_sim_svcca.svg")
+    dataset_name +"_sample_lvl_sim_svcca_"+correction_method+".svg")
 
 svcca_png_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_sample_lvl_sim_svcca.png")
+    dataset_name +"_sample_lvl_sim_svcca_"+correction_method+".png")
 
 pca_uncorrected_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_sample_lvl_sim_pca_uncorrected.png")
+    dataset_name +"_sample_lvl_sim_pca_uncorrected_"+correction_method+".png")
 
 pca_corrected_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_sample_lvl_sim_pca_corrected.png")
+    dataset_name +"_sample_lvl_sim_pca_corrected_"+correction_method+".png")
 
 
-# In[4]:
+# In[6]:
 
 
 # Load pickled files
@@ -156,7 +159,7 @@ err_corrected_svcca = pd.read_pickle(ci_corrected_file)
 permuted_score = np.load(permuted_score_file)
 
 
-# In[5]:
+# In[7]:
 
 
 # Concatenate error bars
@@ -164,7 +167,7 @@ uncorrected_svcca_err = pd.concat([uncorrected_svcca, err_uncorrected_svcca], ax
 corrected_svcca_err = pd.concat([corrected_svcca, err_corrected_svcca], axis=1)
 
 
-# In[6]:
+# In[8]:
 
 
 # Add group label
@@ -172,7 +175,7 @@ uncorrected_svcca_err['Group'] = 'uncorrected'
 corrected_svcca_err['Group'] = 'corrected'
 
 
-# In[7]:
+# In[9]:
 
 
 # Concatenate dataframes
@@ -182,7 +185,7 @@ all_svcca
 
 # ## SVCCA panel
 
-# In[8]:
+# In[10]:
 
 
 # Plot
@@ -221,7 +224,8 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
             axis_line=element_line(color="grey"),
             legend_key=element_rect(fill='white', colour='white')
            ) \
-    + scale_color_manual(['#1976d2', '#b3e5fc'])
+    + scale_color_manual(['#1976d2', '#b3e5fc']) \
+    
 
 print(panel_A)
 ggsave(plot=panel_A, filename=svcca_file, device="svg", dpi=300)
@@ -230,10 +234,10 @@ ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
 
 # ## Uncorrected PCA panel
 
-# In[9]:
+# In[11]:
 
 
-lst_num_experiments = [1,2,5,10,3000,6000]
+lst_num_experiments = [lst_num_experiments[i] for i in pca_ind]
 
 all_data_df = pd.DataFrame()
 
@@ -305,7 +309,7 @@ for i in lst_num_experiments:
     all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])     
 
 
-# In[10]:
+# In[12]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -320,13 +324,13 @@ all_data_df = all_data_df.assign(num_experiments_cat = num_experiments_cat)
 all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[11]:
+# In[13]:
 
 
 all_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of experiments', 'Comparison']
 
 
-# In[12]:
+# In[14]:
 
 
 # Plot all comparisons in one figure
@@ -357,10 +361,10 @@ ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=500)
 
 # ## Corrected PCA panel
 
-# In[13]:
+# In[15]:
 
 
-lst_num_experiments = [1,2,5,10,3000,6000]
+lst_num_experiments = [lst_num_experiments[i] for i in pca_ind]
 
 all_corrected_data_df = pd.DataFrame()
 
@@ -440,7 +444,7 @@ for i in lst_num_experiments:
     all_corrected_data_df = pd.concat([all_corrected_data_df, combined_data_PCAencoded_df])
 
 
-# In[14]:
+# In[16]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -455,13 +459,13 @@ all_corrected_data_df = all_corrected_data_df.assign(num_experiments_cat = num_e
 all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[15]:
+# In[17]:
 
 
 all_corrected_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of experiments', 'Comparison']
 
 
-# In[16]:
+# In[18]:
 
 
 # Plot all comparisons in one figure

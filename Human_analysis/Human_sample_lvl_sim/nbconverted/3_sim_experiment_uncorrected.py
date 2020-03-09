@@ -49,6 +49,7 @@ lst_num_experiments = params["lst_num_experiments"]
 use_pca = params["use_pca"]
 num_PCs = params["num_PCs"]
 local_dir = params["local_dir"]
+correction_method = params["correction_method"]
 
 iterations = params["iterations"] 
 num_cores = params["num_cores"]
@@ -86,19 +87,19 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name + "_sample_lvl_sim_similarity_uncorrected_"+correction_method+".pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_ci_uncorrected.pickle")
+    dataset_name + "_sample_lvl_sim_ci_uncorrected_"+correction_method+".pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_sample_lvl_sim_permuted")
+    dataset_name + "_sample_lvl_sim_permuted")
 
 
 # In[5]:

@@ -44,11 +44,12 @@ params = utils.read_config(config_file)
 dataset_name = params["dataset_name"]
 analysis_name = params["analysis_name"]
 NN_architecture = params["NN_architecture"]
-num_simulated_samples = params["num_simulated_samples"]
-lst_num_experiments = params["lst_num_experiments"]
+num_simulated_experiments = params["num_simulated_samples"]
+lst_num_partitions = params["lst_num_experiments"]
 use_pca = params["use_pca"]
 num_PCs = params["num_PCs"]
 local_dir = params["local_dir"]
+correction_method = params["correction_method"]
 
 iterations = params["iterations"] 
 num_cores = params["num_cores"]
@@ -93,13 +94,13 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_uncorrected_"+correction_method+".pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_uncorrected_"+correction_method+".pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,

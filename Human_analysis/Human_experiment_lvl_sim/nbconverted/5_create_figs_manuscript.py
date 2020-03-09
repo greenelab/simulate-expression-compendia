@@ -69,6 +69,9 @@ params = utils.read_config(config_file)
 local_dir = params["local_dir"]
 dataset_name = params["dataset_name"]
 analysis_name = params["analysis_name"]
+correction_method = params["correction_method"]
+lst_num_partitions = params["lst_num_experiments"]
+pca_ind = [0,1,2,-3,-2,-1]
 
 
 # ## Load data
@@ -85,25 +88,25 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_uncorrected_"+correction_method+".pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_ci_uncorrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_uncorrected_"+correction_method+".pickle")
 
 similarity_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_similarity_corrected.pickle")
+    dataset_name +"_experiment_lvl_sim_similarity_corrected_"+correction_method+".pickle")
 
 ci_corrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name +"_experiment_lvl_sim_ci_corrected.pickle")
+    dataset_name +"_experiment_lvl_sim_ci_corrected_"+correction_method+".pickle")
 
 permuted_score_file = os.path.join(
     base_dir,
@@ -113,8 +116,6 @@ permuted_score_file = os.path.join(
 
 compendia_dir = os.path.join(
     local_dir,
-    "Data",
-    "Batch_effects",
     "partition_simulated",
     analysis_name)
 
@@ -126,22 +127,22 @@ compendia_dir = os.path.join(
 svcca_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_experiment_lvl_sim_svcca.svg")
+    dataset_name +"_experiment_lvl_sim_svcca_"+correction_method+".svg")
 
 svcca_png_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_experiment_lvl_sim_svcca.png")
+    dataset_name +"_experiment_lvl_sim_svcca_"+correction_method+".png")
 
 pca_uncorrected_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_experiment_lvl_sim_pca_uncorrected.png")
+    dataset_name +"_experiment_lvl_sim_pca_uncorrected_"+correction_method+".png")
 
 pca_corrected_file = os.path.join(
     base_dir,
     "results",
-    dataset_name +"_experiment_lvl_sim_pca_corrected.png")
+    dataset_name +"_experiment_lvl_sim_pca_corrected_"+correction_method+".png")
 
 
 # In[4]:
@@ -233,8 +234,7 @@ ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
 # In[9]:
 
 
-lst_num_experiments = [1, 2, 3, 5, 10, 20,
-                    30, 50]
+lst_num_experiments = [lst_num_partitions[i] for i in pca_ind]
 
 all_data_df = pd.DataFrame()
 
@@ -361,8 +361,7 @@ ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=500)
 # In[13]:
 
 
-lst_num_experiments = [1, 2, 3, 5, 10, 20,
-                    30, 50]
+lst_num_experiments = [lst_num_partitions[i] for i in pca_ind]
 
 all_corrected_data_df = pd.DataFrame()
 

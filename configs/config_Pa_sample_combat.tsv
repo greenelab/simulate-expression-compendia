@@ -3,9 +3,9 @@ dataset_name	"Pseudomonas_analysis"
 analysis_name	"Pa_sample_lvl_sim"
 NN_architecture	"NN_2500_30"
 num_simulated_samples	6000
-lst_num_experiments	[1, 2, 5, 10, 20, 50, 100, 500, 1000, 2000, 3000, 6000]
+lst_num_experiments	[1, 2, 5, 10, 20, 50, 100, 500, 1000, 2000, 3000, 5000]
 use_pca	True
 num_PCs	10
-correction_method	'limma'
-iterations	range(1)
-num_cores	1
+correction_method	'combat'
+iterations	range(5)
+num_cores	5

@@ -29,15 +29,15 @@ randomState = 123
 seed(randomState)
 
 
-# In[ ]:
+# In[2]:
 
 
 # Read in config variables
-config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_sample.tsv"))
+config_file = os.path.abspath(os.path.join(os.getcwd(),"../../configs", "config_Pa_sample_combat.tsv"))
 params = utils.read_config(config_file)
 
 
-# In[ ]:
+# In[3]:
 
 
 # Load parameters
@@ -49,12 +49,13 @@ lst_num_experiments = params["lst_num_experiments"]
 use_pca = params["use_pca"]
 num_PCs = params["num_PCs"]
 local_dir = params["local_dir"]
+correction_method = params["correction_method"]
 
 iterations = params["iterations"] 
 num_cores = params["num_cores"]
 
 
-# In[ ]:
+# In[4]:
 
 
 # Additional parameters
@@ -62,7 +63,7 @@ file_prefix = "Experiment"
 corrected = False
 
 
-# In[3]:
+# In[5]:
 
 
 # Input file
@@ -78,7 +79,7 @@ normalized_data_file = os.path.join(
     "train_set_normalized.pcl")
 
 
-# In[4]:
+# In[6]:
 
 
 # Output files
@@ -86,13 +87,13 @@ similarity_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name + "_sample_lvl_sim_similarity_uncorrected.pickle")
+    dataset_name + "_sample_lvl_sim_similarity_uncorrected_"+correction_method+".pickle")
 
 ci_uncorrected_file = os.path.join(
     base_dir,
     "results",
     "saved_variables",
-    dataset_name + "_sample_lvl_sim_ci_uncorrected.pickle")
+    dataset_name + "_sample_lvl_sim_ci_uncorrected_"+correction_method+".pickle")
 
 similarity_permuted_file = os.path.join(
     base_dir,
@@ -101,7 +102,7 @@ similarity_permuted_file = os.path.join(
     dataset_name + "_sample_lvl_sim_permuted")
 
 
-# In[5]:
+# In[7]:
 
 
 # Run multiple simulations
@@ -121,14 +122,14 @@ results = Parallel(n_jobs=num_cores, verbose=100)(
                                                        local_dir) for i in iterations)
 
 
-# In[6]:
+# In[8]:
 
 
 # permuted score
 permuted_score = results[0][0]
 
 
-# In[7]:
+# In[9]:
 
 
 # Concatenate output dataframes
@@ -140,7 +141,7 @@ for i in iterations:
 all_svcca_scores
 
 
-# In[8]:
+# In[10]:
 
 
 # Get mean svcca score for each row (number of experiments)
@@ -149,7 +150,7 @@ mean_scores.columns = ['score']
 mean_scores
 
 
-# In[9]:
+# In[11]:
 
 
 # Get standard dev for each row (number of experiments)
@@ -159,7 +160,7 @@ std_scores.columns = ['score']
 std_scores
 
 
-# In[10]:
+# In[12]:
 
 
 # Get confidence interval for each row (number of experiments)
@@ -167,7 +168,7 @@ std_scores
 err = std_scores*1.96
 
 
-# In[11]:
+# In[13]:
 
 
 # Get boundaries of confidence interval
@@ -179,13 +180,13 @@ ci.columns = ['ymin', 'ymax']
 ci
 
 
-# In[12]:
+# In[14]:
 
 
 mean_scores
 
 
-# In[13]:
+# In[15]:
 
 
 # Pickle dataframe of mean scores scores for first run, interval
