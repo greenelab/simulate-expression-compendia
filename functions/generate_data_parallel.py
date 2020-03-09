@@ -593,7 +593,7 @@ def add_experiments_io(
 
             for j in range(i):
                 # Scalar to shift gene expressiond data
-                stretch_factor = np.random.normal(0.0, 0.025, [1, num_genes])
+                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
 
                 # Tile stretch_factor to be able to add to batches
                 num_samples_per_experiment = len(partition[j])
@@ -886,13 +886,19 @@ def apply_correction_io(local_dir,
                 corrected_experiment_data = limma.removeBatchEffect(
                     experiment_data, batch=experiment_map)
 
+                # Convert R object to pandas df
+                corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
+                    corrected_experiment_data)
+
             if correction_method == 'combat':
                 corrected_experiment_data = sva.ComBat(
                     experiment_data, batch=experiment_map)
 
-            # Convert R object to pandas df
-            corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
-                corrected_experiment_data)
+                # Convert R object to pandas df
+                corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
+                    corrected_experiment_data)
+
+                corrected_experiment_data_df.columns = experiment_data.columns
 
         if "sample" in analysis_name:
             # Write out corrected files

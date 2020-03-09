@@ -265,6 +265,7 @@ def sample_level_simulation_corrected(run,
                                       num_simulated_samples,
                                       lst_num_experiments,
                                       corrected,
+                                      correction_method,
                                       use_pca,
                                       num_PCs,
                                       file_prefix,
@@ -305,6 +306,9 @@ def sample_level_simulation_corrected(run,
 
     corrected: bool
         True if correction was applied
+
+    correction_method: str
+      Either limma or COMBAT
 
     use_pca: bool
         True if want to represent expression data in top PCs before
@@ -354,7 +358,8 @@ def sample_level_simulation_corrected(run,
   generate_data_parallel.apply_correction_io(local_dir,
                                              run,
                                              analysis_name,
-                                             lst_num_experiments)
+                                             lst_num_experiments,
+                                             correction_method)
 
   # Calculate similarity between compendium and compendium + noise
   batch_scores, permuted_score = similarity_metric_parallel.sim_svcca_io(simulated_data,
@@ -389,6 +394,7 @@ def experiment_level_simulation_corrected(run,
                                           num_simulated_experiments,
                                           lst_num_partitions,
                                           corrected,
+                                          correction_method,
                                           use_pca,
                                           num_PCs,
                                           file_prefix,
@@ -431,6 +437,9 @@ def experiment_level_simulation_corrected(run,
 
     corrected: bool
         True if correction was applied
+
+    correction_method: str
+      Either limma or COMBAT
 
     use_pca: bool
         True if want to represent expression data in top PCs before
@@ -483,7 +492,8 @@ def experiment_level_simulation_corrected(run,
   generate_data_parallel.apply_correction_io(local_dir,
                                              run,
                                              analysis_name,
-                                             lst_num_partitions)
+                                             lst_num_partitions,
+                                             correction_method)
 
   # Calculate similarity between compendium and compendium + noise
   batch_scores, permuted_score = similarity_metric_parallel.sim_svcca_io(simulated_data,
