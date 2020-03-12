@@ -27,7 +27,8 @@ warnings.filterwarnings(action='ignore')
 
 
 def get_sample_ids(experiment_id,
-                   dataset_name):
+                   dataset_name,
+                   sample_id_colname):
     '''
     Returns sample ids (found in gene expression df) associated with
     a given list of experiment ids (found in the metadata)
@@ -42,9 +43,9 @@ def get_sample_ids(experiment_id,
 
     Returns sample ids for a given experiment id
     '''
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
+    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
 
-    if dataset_name == "Pseudomonas_analysis":
+    if "Pseudomonas" in dataset_name:
         # metadata file
         mapping_file = os.path.join(
             base_dir,
@@ -61,9 +62,9 @@ def get_sample_ids(experiment_id,
             index_col=0)
 
         selected_metadata = metadata.loc[experiment_id]
-        sample_ids = list(selected_metadata['ml_data_source'])
+        sample_ids = list(selected_metadata[sample_id_colname])
 
-    elif dataset_name == "Human_analysis":
+    elif "Human" in dataset_name:
         # metadata file
         mapping_file = os.path.join(
             base_dir,
@@ -80,7 +81,7 @@ def get_sample_ids(experiment_id,
             index_col=0)
 
         selected_metadata = metadata.loc[experiment_id]
-        sample_ids = list(selected_metadata['run'])
+        sample_ids = list(selected_metadata[sample_id_colname])
 
     return sample_ids
 
@@ -92,7 +93,9 @@ def simulate_compendium(
     dataset_name,
     analysis_name,
     experiment_ids_file,
-    local_dir
+    sample_id_colname,
+    local_dir,
+    base_dir
 ):
     '''
     Generate simulated data by randomly sampling some number of experiments
@@ -149,11 +152,6 @@ def simulate_compendium(
         File containing simulated gene expression data
 
     '''
-
-    # Create directory to output simulated data
-    base_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../.."))
 
     #analysis_dir = os.path.join(local_dir, "experiment_simulated", analysis_name)
 
@@ -218,7 +216,8 @@ def simulate_compendium(
             experiment_ids['experiment_id'], size=1)[0]
 
         # Get corresponding sample ids
-        sample_ids = get_sample_ids(selected_experiment_id, dataset_name)
+        sample_ids = get_sample_ids(
+            selected_experiment_id, dataset_name, sample_id_colname)
 
         # Remove any missing sample ids
         sample_ids = list(filter(str.strip, sample_ids))
@@ -313,7 +312,8 @@ def simulate_data(
         dataset_name,
         analysis_name,
         num_simulated_samples,
-        local_dir
+        local_dir,
+        base_dir
 ):
     '''
     Generate simulated data by sampling from VAE latent space.
@@ -362,11 +362,6 @@ def simulate_data(
         File containing simulated gene expression data
 
     '''
-
-    # Create directory to output simulated data
-    base_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../.."))
 
     #new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
 

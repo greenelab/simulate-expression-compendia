@@ -2,7 +2,7 @@
 Author: Alexandra Lee
 Date Created: 11 November 2019
 
-Scripts to run all scripts in one function in order to run the entire pipeline multiple times in parallel
+Scripts to run simulation multiple times in parallel
 '''
 import os
 import sys
@@ -34,7 +34,8 @@ def sample_level_simulation_uncorrected(run,
                                         num_PCs,
                                         file_prefix,
                                         input_file,
-                                        local_dir):
+                                        local_dir,
+                                        base_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, ignorning the sample-experiment relationship
@@ -102,7 +103,8 @@ def sample_level_simulation_uncorrected(run,
                                                         dataset_name,
                                                         analysis_name,
                                                         num_simulated_samples,
-                                                        local_dir)
+                                                        local_dir,
+                                                        base_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -150,7 +152,9 @@ def experiment_level_simulation_uncorrected(run,
                                             file_prefix,
                                             input_file,
                                             experiment_ids_file,
-                                            local_dir):
+                                            sample_id_colname,
+                                            local_dir,
+                                            base_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, keeping track of which sample is associated
@@ -222,7 +226,9 @@ def experiment_level_simulation_uncorrected(run,
                                                               dataset_name,
                                                               analysis_name,
                                                               experiment_ids_file,
-                                                              local_dir)
+                                                              sample_id_colname,
+                                                              local_dir,
+                                                              base_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -270,7 +276,8 @@ def sample_level_simulation_corrected(run,
                                       num_PCs,
                                       file_prefix,
                                       input_file,
-                                      local_dir):
+                                      local_dir,
+                                      base_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, ignoring sample-experiment relationship
@@ -342,7 +349,8 @@ def sample_level_simulation_corrected(run,
                                                         dataset_name,
                                                         analysis_name,
                                                         num_simulated_samples,
-                                                        local_dir)
+                                                        local_dir,
+                                                        base_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -400,7 +408,9 @@ def experiment_level_simulation_corrected(run,
                                           file_prefix,
                                           input_file,
                                           experiment_ids_file,
-                                          local_dir):
+                                          sample_id_colname,
+                                          local_dir,
+                                          base_dir):
   '''
     This function performs runs series of scripts that performs the following steps:
     1. Simulate gene expression data, keeping track of which sample is associated
@@ -476,7 +486,9 @@ def experiment_level_simulation_corrected(run,
                                                               dataset_name,
                                                               analysis_name,
                                                               experiment_ids_file,
-                                                              local_dir)
+                                                              sample_id_colname,
+                                                              local_dir,
+                                                              base_dir)
 
   # Permute simulated data to be used as a negative control
   permuted_data = generate_data_parallel.permute_data(simulated_data)

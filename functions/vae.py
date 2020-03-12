@@ -20,7 +20,7 @@ from keras.models import Model, Sequential
 from keras import metrics, optimizers
 from keras.callbacks import Callback
 
-from functions.helper_ae import sampling_maker, CustomVariationalLayer, WarmUpCallback
+from functions.helper_vae import sampling_maker, CustomVariationalLayer, WarmUpCallback
 
 
 def tybalt_2layer_model(
