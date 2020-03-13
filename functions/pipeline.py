@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 import random
 import math
+import gc
 from sklearn import preprocessing
 
 from joblib import Parallel, delayed
@@ -46,6 +47,7 @@ def setup_dir(config_file):
     params = utils.read_config(config_file)
 
     # Load parameters
+    local_dir = params['local_dir']
     dataset_name = params['dataset_name']
     train_architecture = params['NN_architecture']
 
@@ -66,7 +68,7 @@ def setup_dir(config_file):
             print('creating new directory: {}'.format(new_dir))
             os.makedirs(new_dir, exist_ok=True)
 
-        # Create results directories
+    # Create results directories
     output_dirs = [os.path.join(base_dir, dataset_name, "results")]
 
     # Check if analysis output directory exist otherwise create
@@ -75,13 +77,23 @@ def setup_dir(config_file):
             print('creating new directory: {}'.format(each_dir))
             os.makedirs(each_dir, exist_ok=True)
 
-        # Check if 'saved_variables' directory exist otherwise create
+    # Check if 'saved_variables' directory exist otherwise create
     for each_dir in output_dirs:
         new_dir = os.path.join(each_dir, 'saved_variables')
 
         if os.path.exists(new_dir) == False:
             print('creating new directory: {}'.format(new_dir))
             os.makedirs(new_dir, exist_ok=True)
+
+    # Create local directories to store intermediate files
+    output_dirs = [os.path.join(local_dir, "experiment_simulated"),
+                   os.path.join(local_dir, "partition_simulated")]
+
+    # Check if analysis output directory exist otherwise create
+    for each_dir in output_dirs:
+        if os.path.exists(each_dir) == False:
+            print('creating new directory: {}'.format(each_dir))
+            os.makedirs(each_dir, exist_ok=True)
 
 
 def normalize_expression_data(base_dir,
@@ -123,6 +135,9 @@ def normalize_expression_data(base_dir,
     rnaseq_scaled_df.to_csv(normalized_data_file,
                             sep='\t', compression='xz')
 
+    del rnaseq_scaled_df
+    gc.collect()
+
 
 def create_experiment_id_file(metadata_file,
                               input_data_file,
@@ -150,12 +165,13 @@ def create_experiment_id_file(metadata_file,
 
     # Load parameters
     sample_id_colname = params['metadata_colname']
+    dataset_name = params['dataset_name']
 
     # Get sample id that maps between metadata and expression files
     map_experiment_sample = metadata[[sample_id_colname]]
 
     # Get all unique experiment ids
-    experiment_ids = np.unique(np.array(map_experiment_sample.index))
+    experiment_ids = np.unique(np.array(map_experiment_sample.index)).tolist()
     print("There are {} experiments in the compendium".format(
         len(experiment_ids)))
 
@@ -166,14 +182,22 @@ def create_experiment_id_file(metadata_file,
     experiment_ids_with_gene_expression = []
 
     for experiment_id in experiment_ids:
-        selected_metadata = metadata.loc[experiment_id]
 
-        #print("There are {} samples in experiment {}".format(selected_metadata.shape[0], experiment_id))
+        if "Human" in dataset_name:
+            # Some project id values are descriptions
+            # We will skip these
+            if len(experiment_id) == 9:
+                selected_metadata = metadata.loc[experiment_id]
+                sample_ids = list(selected_metadata[sample_id_colname])
 
-        sample_ids = list(selected_metadata['ml_data_source'])
+                if any(x in sample_ids_with_gene_expression for x in sample_ids):
+                    experiment_ids_with_gene_expression.append(experiment_id)
+        else:
+            selected_metadata = metadata.loc[experiment_id]
+            sample_ids = list(selected_metadata[sample_id_colname])
 
-        if any(x in sample_ids_with_gene_expression for x in sample_ids):
-            experiment_ids_with_gene_expression.append(experiment_id)
+            if any(x in sample_ids_with_gene_expression for x in sample_ids):
+                experiment_ids_with_gene_expression.append(experiment_id)
 
     print('There are {} experiments with gene expression data'.format(
         len(experiment_ids_with_gene_expression)))
@@ -184,6 +208,9 @@ def create_experiment_id_file(metadata_file,
     experiment_ids_with_gene_expression_df.to_csv(output_file, sep='\t')
     print('{} experiment ids saved to file'.format(
         len(experiment_ids_with_gene_expression)))
+
+    del map_experiment_sample, selected_metadata
+    gc.collect()
 
 
 def train_vae(config_file,
@@ -238,10 +265,14 @@ def train_vae(config_file,
                             dataset_name,
                             train_architecture)
 
+    del normalized_data, params
+    gc. collect()
 
-def run_simulation_uncorrected(config_file,
-                               input_data_file,
-                               experiment_ids_file=None):
+
+def run_simulation(config_file,
+                   input_data_file,
+                   corrected,
+                   experiment_ids_file=None):
     '''
     Runs simulation experiment without applying correction method
 
@@ -260,81 +291,108 @@ def run_simulation_uncorrected(config_file,
 
     # Load parameters
     dataset_name = params["dataset_name"]
-    analysis_name = params["simulation_type"]
+    simulation_type = params["simulation_type"]
     NN_architecture = params["NN_architecture"]
-    num_simulated_samples = params["num_simulated_samples"]
-    lst_num_experiments = params["lst_num_experiments"]
     use_pca = params["use_pca"]
     num_PCs = params["num_PCs"]
     local_dir = params["local_dir"]
     correction_method = params["correction_method"]
     sample_id_colname = params['metadata_colname']
-
     iterations = params["iterations"]
     num_cores = params["num_cores"]
-    corrected = False
+
+    if "sample" in simulation_type:
+        num_simulated_samples = params["num_simulated_samples"]
+        lst_num_experiments = params["lst_num_experiments"]
+    else:
+        num_simulated_experiments = params["num_simulated_experiments"]
+        lst_num_partitions = params["lst_num_partitions"]
 
     # Output files
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
-    similarity_uncorrected_file = os.path.join(
-        base_dir,
-        dataset_name,
-        "results",
-        "saved_variables",
-        dataset_name + "_" + analysis_name + "_svcca_uncorrected_" + correction_method + ".pickle")
+    if corrected:
+        similarity_uncorrected_file = os.path.join(
+            base_dir,
+            dataset_name,
+            "results",
+            "saved_variables",
+            dataset_name + "_" + simulation_type + "_svcca_corrected_" + correction_method + ".pickle")
 
-    ci_uncorrected_file = os.path.join(
-        base_dir,
-        dataset_name,
-        "results",
-        "saved_variables",
-        dataset_name + "_" + analysis_name + "_ci_uncorrected_" + correction_method + ".pickle")
+        ci_uncorrected_file = os.path.join(
+            base_dir,
+            dataset_name,
+            "results",
+            "saved_variables",
+            dataset_name + "_" + simulation_type + "_ci_corrected_" + correction_method + ".pickle")
+
+    else:
+        similarity_uncorrected_file = os.path.join(
+            base_dir,
+            dataset_name,
+            "results",
+            "saved_variables",
+            dataset_name + "_" + simulation_type + "_svcca_uncorrected_" + correction_method + ".pickle")
+
+        ci_uncorrected_file = os.path.join(
+            base_dir,
+            dataset_name,
+            "results",
+            "saved_variables",
+            dataset_name + "_" + simulation_type + "_ci_uncorrected_" + correction_method + ".pickle")
 
     similarity_permuted_file = os.path.join(
         base_dir,
         dataset_name,
         "results",
         "saved_variables",
-        dataset_name + "_" + analysis_name + "_permuted")
+        dataset_name + "_" + simulation_type + "_permuted")
 
     # Run multiple simulations
-    if "sample" in analysis_name:
-        file_prefix = "Experiment"
+    if "sample" in simulation_type:
+        if corrected:
+            file_prefix = "Experiment_corrected"
+        else:
+            file_prefix = "Experiment"
         results = Parallel(n_jobs=num_cores, verbose=100)(
             delayed(
-                simulations.sample_level_simulation_uncorrected)(i,
-                                                                 NN_architecture,
-                                                                 dataset_name,
-                                                                 analysis_name,
-                                                                 num_simulated_samples,
-                                                                 lst_num_experiments,
-                                                                 corrected,
-                                                                 use_pca,
-                                                                 num_PCs,
-                                                                 file_prefix,
-                                                                 input_data_file,
-                                                                 local_dir,
-                                                                 base_dir) for i in iterations)
+                simulations.sample_level_simulation)(i,
+                                                     NN_architecture,
+                                                     dataset_name,
+                                                     simulation_type,
+                                                     num_simulated_samples,
+                                                     lst_num_experiments,
+                                                     corrected,
+                                                     correction_method,
+                                                     use_pca,
+                                                     num_PCs,
+                                                     file_prefix,
+                                                     input_data_file,
+                                                     local_dir,
+                                                     base_dir) for i in iterations)
 
     else:
-        file_prefix = "Partition"
+        if corrected:
+            file_prefix = "Partition_corrected"
+        else:
+            file_prefix = "Partition"
         results = Parallel(n_jobs=num_cores, verbose=100)(
             delayed(
-                simulations.experiment_level_simulation_uncorrected)(i,
-                                                                     NN_architecture,
-                                                                     dataset_name,
-                                                                     analysis_name,
-                                                                     num_simulated_samples,
-                                                                     lst_num_experiments,
-                                                                     corrected,
-                                                                     use_pca,
-                                                                     num_PCs,
-                                                                     file_prefix,
-                                                                     input_data_file,
-                                                                     experiment_ids_file,
-                                                                     sample_id_colname,
-                                                                     local_dir,
-                                                                     base_dir) for i in iterations)
+                simulations.experiment_level_simulation)(i,
+                                                         NN_architecture,
+                                                         dataset_name,
+                                                         simulation_type,
+                                                         num_simulated_experiments,
+                                                         lst_num_partitions,
+                                                         corrected,
+                                                         correction_method,
+                                                         use_pca,
+                                                         num_PCs,
+                                                         file_prefix,
+                                                         input_data_file,
+                                                         experiment_ids_file,
+                                                         sample_id_colname,
+                                                         local_dir,
+                                                         base_dir) for i in iterations)
 
     # permuted score
     permuted_score = results[0][0]
@@ -373,138 +431,5 @@ def run_simulation_uncorrected(config_file,
     ci.to_pickle(ci_uncorrected_file)
     np.save(similarity_permuted_file, permuted_score)
 
-
-def run_simulation_corrected(config_file,
-                             input_data_file,
-                             experiment_ids_file=None):
-    '''
-    Runs simulation experiment after applying correction method
-
-    Arguments
-    ----------
-    config_file: str
-        File containing user defined parameters
-
-    input_data_file: str
-        File path corresponding to input dataset to use
-
-    '''
-
-    # Read in config variables
-    params = utils.read_config(config_file)
-
-    # Load parameters
-    dataset_name = params["dataset_name"]
-    analysis_name = params["simulation_type"]
-    NN_architecture = params["NN_architecture"]
-    num_simulated_samples = params["num_simulated_samples"]
-    lst_num_experiments = params["lst_num_experiments"]
-    use_pca = params["use_pca"]
-    num_PCs = params["num_PCs"]
-    local_dir = params["local_dir"]
-    correction_method = params["correction_method"]
-    sample_id_colname = params['metadata_colname']
-
-    iterations = params["iterations"]
-    num_cores = params["num_cores"]
-    corrected = True
-
-    # Output files
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
-    similarity_corrected_file = os.path.join(
-        base_dir,
-        dataset_name,
-        "results",
-        "saved_variables",
-        dataset_name + "_" + analysis_name + "_svcca_corrected_" + correction_method + ".pickle")
-
-    ci_corrected_file = os.path.join(
-        base_dir,
-        dataset_name,
-        "results",
-        "saved_variables",
-        dataset_name + "_" + analysis_name + "_ci_corrected_" + correction_method + ".pickle")
-
-    similarity_permuted_file = os.path.join(
-        base_dir,
-        dataset_name,
-        "results",
-        "saved_variables",
-        dataset_name + "_" + analysis_name + "_permuted")
-
-    # Run multiple simulations
-    if "sample" in analysis_name:
-        file_prefix = "Experiment_corrected"
-        results = Parallel(n_jobs=num_cores, verbose=100)(
-            delayed(
-                simulations.sample_level_simulation_corrected)(i,
-                                                               NN_architecture,
-                                                               dataset_name,
-                                                               analysis_name,
-                                                               num_simulated_samples,
-                                                               lst_num_experiments,
-                                                               corrected,
-                                                               correction_method,
-                                                               use_pca,
-                                                               num_PCs,
-                                                               file_prefix,
-                                                               input_data_file,
-                                                               local_dir,
-                                                               base_dir) for i in iterations)
-    else:
-        file_prefix = "Partition_corrected"
-        results = Parallel(n_jobs=num_cores, verbose=100)(
-            delayed(
-                simulations.experiment_level_simulation_corrected)(i,
-                                                                   NN_architecture,
-                                                                   dataset_name,
-                                                                   analysis_name,
-                                                                   num_simulated_samples,
-                                                                   lst_num_experiments,
-                                                                   corrected,
-                                                                   correction_method,
-                                                                   use_pca,
-                                                                   num_PCs,
-                                                                   file_prefix,
-                                                                   input_data_file,
-                                                                   experiment_ids_file,
-                                                                   sample_id_colname,
-                                                                   local_dir,
-                                                                   base_dir) for i in iterations)
-
-    # permuted score
-    permuted_score = results[0][0]
-
-    # Concatenate output dataframes
-    all_svcca_scores = pd.DataFrame()
-
-    for i in iterations:
-        all_svcca_scores = pd.concat(
-            [all_svcca_scores, results[i][1]], axis=1)
-
-    # Get mean svcca score for each row (number of experiments)
-    mean_scores = all_svcca_scores.mean(axis=1).to_frame()
-    mean_scores.columns = ['score']
-    print(mean_scores)
-
-    # Get standard dev for each row (number of experiments)
-    std_scores = (all_svcca_scores.std(axis=1) / math.sqrt(10)).to_frame()
-    std_scores.columns = ['score']
-    print(std_scores)
-
-    # Get confidence interval for each row (number of experiments)
-    # z-score for 95% confidence interval
-    err = std_scores * 1.96
-
-    # Get boundaries of confidence interval
-    ymax = mean_scores + err
-    ymin = mean_scores - err
-
-    ci = pd.concat([ymin, ymax], axis=1)
-    ci.columns = ['ymin', 'ymax']
-    print(ci)
-
-    # Pickle dataframe of mean scores scores for first run, interval
-    mean_scores.to_pickle(similarity_corrected_file)
-    ci.to_pickle(ci_corrected_file)
-    np.save(similarity_permuted_file, permuted_score)
+    del results
+    gc.collect()

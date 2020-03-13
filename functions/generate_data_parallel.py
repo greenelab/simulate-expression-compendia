@@ -297,8 +297,6 @@ def simulate_compendium(
     # therefore we want to reset the index.
     simulated_data_scaled_df.reset_index(drop=True, inplace=True)
 
-    print(simulated_data_scaled_df.shape)
-
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
         simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
 
@@ -362,18 +360,12 @@ def simulate_data(
         File containing simulated gene expression data
 
     '''
+    # analysis_dir = os.path.join(
+    #    local_dir, "simulated", dataset_name + "_" + analysis_name)
 
-    #new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
-
-    #analysis_dir = os.path.join(new_dir, analysis_name)
-
-    # if os.path.exists(analysis_dir):
-    #    print('Directory already exists: \n {}'.format(analysis_dir))
-    # else:
+    # if os.path.exists(analysis_dir) == False:
     #    print('Creating new directory: \n {}'.format(analysis_dir))
-    #os.makedirs(analysis_dir, exist_ok=True)
-
-    # print('\n')
+    #    os.makedirs(analysis_dir, exist_ok=True)
 
     # Files
     NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
@@ -441,6 +433,13 @@ def simulate_data(
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
         simulated_data.shape[0], simulated_data.shape[1]))
 
+    # Save
+    # simulated_file = os.path.join(
+    #        analysis_dir,
+    #        "Simulated" + str(i) + "_" + str(run) + ".txt.xz")
+    # simulated_data.to_csv(
+    #    experiment_file, float_format='%.3f', sep='\t', compression='xz')
+
     # Output
     return simulated_data
 
@@ -490,6 +489,7 @@ def add_experiments_io(
         num_experiments,
         run,
         local_dir,
+        dataset_name,
         analysis_name):
     '''
     Say we are interested in identifying genes that differentiate between
@@ -535,13 +535,11 @@ def add_experiments_io(
     Each file named as "Experiment_<number of experiments added>"
     '''
     analysis_dir = os.path.join(
-        local_dir, "experiment_simulated", analysis_name)
+        local_dir, "experiment_simulated", dataset_name + "_" + analysis_name)
 
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
+    if os.path.exists(analysis_dir) == False:
         print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
+        os.makedirs(analysis_dir, exist_ok=True)
 
     # Add batch effects
     num_simulated_samples = simulated_data.shape[0]
@@ -622,6 +620,7 @@ def add_experiments_grped_io(
         num_partitions,
         run,
         local_dir,
+        dataset_name,
         analysis_name):
     '''
     Say we are interested in identifying genes that differentiate between
@@ -677,15 +676,11 @@ def add_experiments_grped_io(
     '''
 
     analysis_dir = os.path.join(
-        local_dir, "partition_simulated", analysis_name)
+        local_dir, "partition_simulated", dataset_name + "_" + analysis_name)
 
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
+    if os.path.exists(analysis_dir) == False:
         print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
-
-    print('\n')
+        os.makedirs(analysis_dir, exist_ok=True)
 
     # Add batch effects
     num_genes = simulated_data.shape[1] - 1
@@ -778,6 +773,7 @@ def add_experiments_grped_io(
 
 def apply_correction_io(local_dir,
                         run,
+                        dataset_name,
                         analysis_name,
                         num_experiments,
                         correction_method):
@@ -821,13 +817,13 @@ def apply_correction_io(local_dir,
             experiment_file = os.path.join(
                 local_dir,
                 "experiment_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             experiment_map_file = os.path.join(
                 local_dir,
                 "experiment_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Experiment_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             # Read in data
@@ -849,13 +845,13 @@ def apply_correction_io(local_dir,
             experiment_file = os.path.join(
                 local_dir,
                 "partition_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Partition_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             experiment_map_file = os.path.join(
                 local_dir,
                 "partition_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Partition_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             # Read in data
@@ -900,7 +896,7 @@ def apply_correction_io(local_dir,
             experiment_corrected_file = os.path.join(
                 local_dir,
                 "experiment_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Experiment_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             corrected_experiment_data_df.to_csv(
@@ -911,7 +907,7 @@ def apply_correction_io(local_dir,
             experiment_corrected_file = os.path.join(
                 local_dir,
                 "partition_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Partition_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             corrected_experiment_data_df.to_csv(
