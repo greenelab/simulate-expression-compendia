@@ -1,11 +1,19 @@
 local_dir	"/home/alexandra/Documents/Data/Batch_effects/"
-dataset_name	"Human_analysis"
-analysis_name	"Human_sample_lvl_sim"
+dataset_name	"Human"
+simulation_type	"sample_lvl_sim"
 NN_architecture	"NN_2500_30"
+learning_rate	0.001
+batch_size	10
+epochs	100
+kappa	0.01
+intermediate_dim	2500
+latent_dim	30
+epsilon_std	1.0
 num_simulated_samples	500
 lst_num_experiments	[1, 2, 5, 10, 20, 50, 100, 250, 500]
 use_pca	True
 num_PCs	10
 correction_method	'limma'
+metadata_colname	'run'
 iterations	range(5)
 num_cores	5
