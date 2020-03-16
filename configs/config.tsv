@@ -1,11 +1,3 @@
-local_dir	"home/alexandra/Documents/Batch_effects/"
-dataset_name	"Pseudomonas_analysis"
-analysis_name	"Pa_sample_lvl_sim"
-NN_architecture	"NN_2500_30"
-num_simulated_samples	6000
-lst_num_experiments	[1, 2, 5, 10, 20, 50, 100, 500, 1000, 2000, 3000, 6000]
-use_pca	True
-num_PCs	10
-correction_method	'limma'
-iterations	range(1)
-num_cores	1
+version https://git-lfs.github.com/spec/v1
+oid sha256:13de907bc1a398e341028ac770abd43d12a4974d0120bdd9ed00dbfe283f5e39
+size 335
