@@ -49,13 +49,14 @@ def get_sample_ids(experiment_id, dataset_name):
     return sample_ids
 
 
-def simulate_compendium(
+def simulate_compendium_labeled(
     experiment_ids_file,
     num_simulated_experiments,
     normalized_data_file,
     NN_architecture,
     dataset_name,
-    analysis_name
+    local_dir,
+    base_dir
 ):
     '''
     Generate simulated data by randomly sampling some number of experiments
@@ -89,8 +90,14 @@ def simulate_compendium(
         Name of neural network architecture to use.
         Format 'NN_<intermediate layer>_<latent layer>'
 
-    analysis_name: str
-        Name of analysis. Format 'analysis_<int>'
+    dataset_name:
+        Name of analysis directory. Either "Human" or "Pseudomonas"
+
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+        
+    base_dir: str
+        Root directory containing analysis subdirectories
 
     Returns
     --------
@@ -99,27 +106,6 @@ def simulate_compendium(
 
     '''
     seed(randomState)
-
-    # Create directory to output simulated data
-    base_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../"))
-
-    local_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../../.."))
-
-    new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
-
-    analysis_dir = os.path.join(new_dir, analysis_name)
-
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
-        print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
-
-    print('\n')
 
     # Files
     NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
@@ -267,10 +253,7 @@ def simulate_compendium(
     # Save
     simulated_data_file = os.path.join(
         local_dir,
-        "Data",
-        "Batch_effects",
-        "simulated",
-        analysis_name,
+        "pseudo_experiment",
         "simulated_data_labeled.txt.xz")
 
     simulated_data_scaled_df.to_csv(
