@@ -20,7 +20,7 @@ from keras.models import Model, Sequential
 from keras import metrics, optimizers
 from keras.callbacks import Callback
 
-from functions.helper_ae import sampling_maker, CustomVariationalLayer, WarmUpCallback
+from functions.helper_vae import sampling_maker, CustomVariationalLayer, WarmUpCallback
 
 
 def tybalt_2layer_model(
@@ -65,10 +65,13 @@ def tybalt_2layer_model(
         Gene expression data
 
     base_dir: str
-        Parent directory where data/, scripts/, models/ are subdirectories
+        Root directory containing analysis subdirectories
 
-    analysis_name: str
-        Name that will be used to create a subdirectory where results and models will be stored
+    dataset_name: str
+        Name of analysis directory
+
+    NN_name: str
+        Neural network architecture of VAE. Format NN_<intermediate_dim>_<latent_dim>
 
     Returns
     --------

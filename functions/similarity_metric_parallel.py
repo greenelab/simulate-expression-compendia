@@ -25,6 +25,7 @@ def read_data(simulated_data,
               file_prefix,
               run,
               local_dir,
+              dataset_name,
               analysis_name):
     """
     Script used by all similarity metrics to:
@@ -48,6 +49,9 @@ def read_data(simulated_data,
     local_dir: str
         Root directory where simulated data with experiments/partitionings are be stored
 
+    dataset_name: str
+        Name for analysis directory. Either "Human" or "Pseudomonas"
+
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
         Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
@@ -61,13 +65,13 @@ def read_data(simulated_data,
         compendium_dir = os.path.join(
             local_dir,
             "partition_simulated",
-            analysis_name)
+            dataset_name + "_" + analysis_name)
     else:
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir,
             "experiment_simulated",
-            analysis_name)
+            dataset_name + "_" + analysis_name)
 
     # Get compendium with 1 experiment or partitioning
     compendium_1_file = os.path.join(
@@ -99,6 +103,7 @@ def sim_svcca_io(simulated_data,
                  use_pca,
                  num_PCs,
                  local_dir,
+                 dataset_name,
                  analysis_name):
     '''
     We want to determine if adding multiple simulated experiments is able to capture the
@@ -156,6 +161,9 @@ def sim_svcca_io(simulated_data,
 
     local_dir: str
         Root directory where simulated data with experiments/partitionings are be stored
+    
+    dataset_name: str
+        Name for analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
@@ -176,6 +184,7 @@ def sim_svcca_io(simulated_data,
                                                                file_prefix,
                                                                run,
                                                                local_dir,
+                                                               dataset_name,
                                                                analysis_name)
 
     output_list = []

@@ -27,7 +27,8 @@ warnings.filterwarnings(action='ignore')
 
 
 def get_sample_ids(experiment_id,
-                   dataset_name):
+                   dataset_name,
+                   sample_id_colname):
     '''
     Returns sample ids (found in gene expression df) associated with
     a given list of experiment ids (found in the metadata)
@@ -38,13 +39,16 @@ def get_sample_ids(experiment_id,
         File containing all cleaned experiment ids
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name for analysis directory. Either "Human" or "Pseudomonas"
+
+    sample_id_colname: str
+        Column header that contains sample id that maps expression data and metadata
 
     Returns sample ids for a given experiment id
     '''
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
+    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
 
-    if dataset_name == "Pseudomonas_analysis":
+    if "Pseudomonas" in dataset_name:
         # metadata file
         mapping_file = os.path.join(
             base_dir,
@@ -61,9 +65,9 @@ def get_sample_ids(experiment_id,
             index_col=0)
 
         selected_metadata = metadata.loc[experiment_id]
-        sample_ids = list(selected_metadata['ml_data_source'])
+        sample_ids = list(selected_metadata[sample_id_colname])
 
-    elif dataset_name == "Human_analysis":
+    elif "Human" in dataset_name:
         # metadata file
         mapping_file = os.path.join(
             base_dir,
@@ -80,7 +84,7 @@ def get_sample_ids(experiment_id,
             index_col=0)
 
         selected_metadata = metadata.loc[experiment_id]
-        sample_ids = list(selected_metadata['run'])
+        sample_ids = list(selected_metadata[sample_id_colname])
 
     return sample_ids
 
@@ -92,7 +96,9 @@ def simulate_compendium(
     dataset_name,
     analysis_name,
     experiment_ids_file,
-    local_dir
+    sample_id_colname,
+    local_dir,
+    base_dir
 ):
     '''
     Generate simulated data by randomly sampling some number of experiments
@@ -134,7 +140,7 @@ def simulate_compendium(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name for analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings will be stored.
@@ -143,17 +149,21 @@ def simulate_compendium(
     experiment_ids_file: str
         File containing all cleaned experiment ids
 
+    sample_id_colname: str
+        Column header that contains sample id that maps expression data and metadata
+
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+
+    base_dir: str
+        Root directory containing analysis subdirectories
+
     Returns
     --------
     simulated_data_file: str
         File containing simulated gene expression data
 
     '''
-
-    # Create directory to output simulated data
-    base_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../.."))
 
     #analysis_dir = os.path.join(local_dir, "experiment_simulated", analysis_name)
 
@@ -218,7 +228,8 @@ def simulate_compendium(
             experiment_ids['experiment_id'], size=1)[0]
 
         # Get corresponding sample ids
-        sample_ids = get_sample_ids(selected_experiment_id, dataset_name)
+        sample_ids = get_sample_ids(
+            selected_experiment_id, dataset_name, sample_id_colname)
 
         # Remove any missing sample ids
         sample_ids = list(filter(str.strip, sample_ids))
@@ -298,8 +309,6 @@ def simulate_compendium(
     # therefore we want to reset the index.
     simulated_data_scaled_df.reset_index(drop=True, inplace=True)
 
-    print(simulated_data_scaled_df.shape)
-
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
         simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
 
@@ -313,7 +322,8 @@ def simulate_data(
         dataset_name,
         analysis_name,
         num_simulated_samples,
-        local_dir
+        local_dir,
+        base_dir
 ):
     '''
     Generate simulated data by sampling from VAE latent space.
@@ -347,7 +357,7 @@ def simulate_data(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name of analysis directory, Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings will be stored.
@@ -356,29 +366,24 @@ def simulate_data(
     number_simulated_samples: int
         Number of samples to simulate
 
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+
+    base_dir: str
+        Root directory containing analysis subdirectories
+
     Returns
     --------
     simulated_data_file: str
         File containing simulated gene expression data
 
     '''
+    # analysis_dir = os.path.join(
+    #    local_dir, "simulated", dataset_name + "_" + analysis_name)
 
-    # Create directory to output simulated data
-    base_dir = os.path.abspath(
-        os.path.join(
-            os.getcwd(), "../.."))
-
-    #new_dir = os.path.join(local_dir, "Data", "Batch_effects", "simulated")
-
-    #analysis_dir = os.path.join(new_dir, analysis_name)
-
-    # if os.path.exists(analysis_dir):
-    #    print('Directory already exists: \n {}'.format(analysis_dir))
-    # else:
+    # if os.path.exists(analysis_dir) == False:
     #    print('Creating new directory: \n {}'.format(analysis_dir))
-    #os.makedirs(analysis_dir, exist_ok=True)
-
-    # print('\n')
+    #    os.makedirs(analysis_dir, exist_ok=True)
 
     # Files
     NN_dir = os.path.join(base_dir, dataset_name, "models", NN_architecture)
@@ -446,6 +451,13 @@ def simulate_data(
     print("Return: simulated gene expression data containing {} samples and {} genes".format(
         simulated_data.shape[0], simulated_data.shape[1]))
 
+    # Save
+    # simulated_file = os.path.join(
+    #        analysis_dir,
+    #        "Simulated" + str(i) + "_" + str(run) + ".txt.xz")
+    # simulated_data.to_csv(
+    #    experiment_file, float_format='%.3f', sep='\t', compression='xz')
+
     # Output
     return simulated_data
 
@@ -495,6 +507,7 @@ def add_experiments_io(
         num_experiments,
         run,
         local_dir,
+        dataset_name,
         analysis_name):
     '''
     Say we are interested in identifying genes that differentiate between
@@ -528,7 +541,10 @@ def add_experiments_io(
         Unique core identifier that is used to create unique filenames for intermediate files
 
     local_dir: str
-        Root directory where simulated data with experiments/partitionings are be stored
+        Parent directory on local machine to store intermediate results
+
+    dataset_name: str
+        Name of analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
@@ -540,13 +556,11 @@ def add_experiments_io(
     Each file named as "Experiment_<number of experiments added>"
     '''
     analysis_dir = os.path.join(
-        local_dir, "experiment_simulated", analysis_name)
+        local_dir, "experiment_simulated", dataset_name + "_" + analysis_name)
 
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
+    if os.path.exists(analysis_dir) == False:
         print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
+        os.makedirs(analysis_dir, exist_ok=True)
 
     # Add batch effects
     num_simulated_samples = simulated_data.shape[0]
@@ -593,7 +607,7 @@ def add_experiments_io(
 
             for j in range(i):
                 # Scalar to shift gene expressiond data
-                stretch_factor = np.random.normal(0.0, 0.025, [1, num_genes])
+                stretch_factor = np.random.normal(0.0, 0.2, [1, num_genes])
 
                 # Tile stretch_factor to be able to add to batches
                 num_samples_per_experiment = len(partition[j])
@@ -627,6 +641,7 @@ def add_experiments_grped_io(
         num_partitions,
         run,
         local_dir,
+        dataset_name,
         analysis_name):
     '''
     Say we are interested in identifying genes that differentiate between
@@ -668,7 +683,10 @@ def add_experiments_grped_io(
         Unique core identifier that is used to create unique filenames for intermediate files
 
     local_dir: str
-        Root directory where simulated data with experiments/partitionings are be stored
+        Parent directory on local machine to store intermediate results
+
+    dataset_name: str
+        Name of analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
@@ -682,15 +700,11 @@ def add_experiments_grped_io(
     '''
 
     analysis_dir = os.path.join(
-        local_dir, "partition_simulated", analysis_name)
+        local_dir, "partition_simulated", dataset_name + "_" + analysis_name)
 
-    if os.path.exists(analysis_dir):
-        print('Directory already exists: \n {}'.format(analysis_dir))
-    else:
+    if os.path.exists(analysis_dir) == False:
         print('Creating new directory: \n {}'.format(analysis_dir))
-    os.makedirs(analysis_dir, exist_ok=True)
-
-    print('\n')
+        os.makedirs(analysis_dir, exist_ok=True)
 
     # Add batch effects
     num_genes = simulated_data.shape[1] - 1
@@ -783,6 +797,7 @@ def add_experiments_grped_io(
 
 def apply_correction_io(local_dir,
                         run,
+                        dataset_name,
                         analysis_name,
                         num_experiments,
                         correction_method):
@@ -800,6 +815,9 @@ def apply_correction_io(local_dir,
     run: int
         Unique core identifier that is used to create unique filenames for intermediate files
 
+    dataset_name:
+        Name of analysis directory. Either "Human" or "Pseudomonas"
+
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
         Format of the directory name is <dataset_name>_<sample/experiment>_lvl_sim 
@@ -809,7 +827,7 @@ def apply_correction_io(local_dir,
         technical variations to
 
     correction_method: str
-        Either limma or COMBAT
+        Noise correction method. Either "limma" or "combat"
 
 
     Returns
@@ -826,13 +844,13 @@ def apply_correction_io(local_dir,
             experiment_file = os.path.join(
                 local_dir,
                 "experiment_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             experiment_map_file = os.path.join(
                 local_dir,
                 "experiment_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Experiment_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             # Read in data
@@ -854,13 +872,13 @@ def apply_correction_io(local_dir,
             experiment_file = os.path.join(
                 local_dir,
                 "partition_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Partition_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             experiment_map_file = os.path.join(
                 local_dir,
                 "partition_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Partition_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             # Read in data
@@ -886,20 +904,26 @@ def apply_correction_io(local_dir,
                 corrected_experiment_data = limma.removeBatchEffect(
                     experiment_data, batch=experiment_map)
 
+                # Convert R object to pandas df
+                corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
+                    corrected_experiment_data)
+
             if correction_method == 'combat':
                 corrected_experiment_data = sva.ComBat(
                     experiment_data, batch=experiment_map)
 
-            # Convert R object to pandas df
-            corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
-                corrected_experiment_data)
+                # Convert R object to pandas df
+                corrected_experiment_data_df = pandas2ri.ri2py_dataframe(
+                    corrected_experiment_data)
+
+                corrected_experiment_data_df.columns = experiment_data.columns
 
         if "sample" in analysis_name:
             # Write out corrected files
             experiment_corrected_file = os.path.join(
                 local_dir,
                 "experiment_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Experiment_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             corrected_experiment_data_df.to_csv(
@@ -910,7 +934,7 @@ def apply_correction_io(local_dir,
             experiment_corrected_file = os.path.join(
                 local_dir,
                 "partition_simulated",
-                analysis_name,
+                dataset_name + "_" + analysis_name,
                 "Partition_corrected_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz")
 
             corrected_experiment_data_df.to_csv(

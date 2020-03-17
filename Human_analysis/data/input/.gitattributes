@@ -1,2 +1,0 @@
-recount2_gene_normalized_data.tsv.xz filter=lfs diff=lfs merge=lfs -text
-recount2_gene_RPKM_data.tsv filter=lfs diff=lfs merge=lfs -text
