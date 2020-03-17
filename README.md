@@ -58,7 +58,8 @@ Next we need to modify the code for your analysis:
 2. Update the analysis notebooks to use your config file and input file
 3. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns.
 4. Add your metadata file to ```data/metadata/``` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
-5. Run notebooks
+5. The module ```create_experiment_id_file``` in ```pipeline.py``` will need to be updated based on the format of your metadata file
+6. Run notebooks
 
 ## Additional customization
 

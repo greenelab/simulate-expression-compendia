@@ -101,8 +101,6 @@ def sample_level_simulation(run,
 
     '''
 
-  # Main
-
   # Generate simulated data
   simulated_data = generate_data_parallel.simulate_data(input_file,
                                                         NN_architecture,
@@ -247,8 +245,6 @@ def experiment_level_simulation(run,
     permuted_scre: df
         Similarity score comparing the permuted data to the simulated data per run
     '''
-
-  # Main
 
   # Generate simulated data
   simulated_data = generate_data_parallel.simulate_compendium(num_simulated_experiments,

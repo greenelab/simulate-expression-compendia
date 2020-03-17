@@ -22,7 +22,6 @@ import multiprocessing
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../../")
 from functions import vae, utils, simulations
 
 from numpy.random import seed
@@ -127,7 +126,7 @@ def normalize_expression_data(base_dir,
         sep='\t',
         index_col=0)
 
-    print(rpkm_data.shape)
+    print('raw input dataset contains {} samples and {} genes'.format(rpkm_data.shape[0], rpkm_data.shape[1]))
 
     # 0-1 normalize per gene
     rnaseq_scaled_df = preprocessing.MinMaxScaler().fit_transform(rpkm_data)
@@ -276,7 +275,7 @@ def train_vae(config_file,
         sep='\t',
         index_col=0).T
 
-    print(normalized_data.shape)
+    print('input dataset contains {} samples and {} genes'.format(normalized_data.shape[0], normalized_data.shape[1]))
 
     # Train (VAE)
     vae.tybalt_2layer_model(learning_rate,
@@ -341,7 +340,8 @@ def run_simulation(config_file,
         lst_num_partitions = params["lst_num_partitions"]
 
     # Output files
-    base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
+    #base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
+    base_dir = os.path.abspath(os.pardir)
     if corrected:
         similarity_uncorrected_file = os.path.join(
             base_dir,
