@@ -49,6 +49,9 @@ def read_data(simulated_data,
     local_dir: str
         Root directory where simulated data with experiments/partitionings are be stored
 
+    dataset_name: str
+        Name for analysis directory. Either "Human" or "Pseudomonas"
+
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
         Format of the directory name is <dataset>_<sample/experiment>_lvl_sim 
@@ -158,6 +161,9 @@ def sim_svcca_io(simulated_data,
 
     local_dir: str
         Root directory where simulated data with experiments/partitionings are be stored
+    
+    dataset_name: str
+        Name for analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.

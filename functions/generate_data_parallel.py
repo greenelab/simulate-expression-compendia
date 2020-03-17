@@ -39,7 +39,10 @@ def get_sample_ids(experiment_id,
         File containing all cleaned experiment ids
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name for analysis directory. Either "Human" or "Pseudomonas"
+
+    sample_id_colname: str
+        Column header that contains sample id that maps expression data and metadata
 
     Returns sample ids for a given experiment id
     '''
@@ -137,7 +140,7 @@ def simulate_compendium(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name for analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings will be stored.
@@ -145,6 +148,15 @@ def simulate_compendium(
 
     experiment_ids_file: str
         File containing all cleaned experiment ids
+
+    sample_id_colname: str
+        Column header that contains sample id that maps expression data and metadata
+
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+
+    base_dir: str
+        Root directory containing analysis subdirectories
 
     Returns
     --------
@@ -345,7 +357,7 @@ def simulate_data(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name of analysis directory, Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings will be stored.
@@ -353,6 +365,12 @@ def simulate_data(
 
     number_simulated_samples: int
         Number of samples to simulate
+
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+
+    base_dir: str
+        Root directory containing analysis subdirectories
 
     Returns
     --------
@@ -523,7 +541,10 @@ def add_experiments_io(
         Unique core identifier that is used to create unique filenames for intermediate files
 
     local_dir: str
-        Root directory where simulated data with experiments/partitionings are be stored
+        Parent directory on local machine to store intermediate results
+
+    dataset_name: str
+        Name of analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
@@ -662,7 +683,10 @@ def add_experiments_grped_io(
         Unique core identifier that is used to create unique filenames for intermediate files
 
     local_dir: str
-        Root directory where simulated data with experiments/partitionings are be stored
+        Parent directory on local machine to store intermediate results
+
+    dataset_name: str
+        Name of analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
@@ -791,6 +815,9 @@ def apply_correction_io(local_dir,
     run: int
         Unique core identifier that is used to create unique filenames for intermediate files
 
+    dataset_name:
+        Name of analysis directory. Either "Human" or "Pseudomonas"
+
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings are be stored.
         Format of the directory name is <dataset_name>_<sample/experiment>_lvl_sim 
@@ -800,7 +827,7 @@ def apply_correction_io(local_dir,
         technical variations to
 
     correction_method: str
-        Either limma or COMBAT
+        Noise correction method. Either "limma" or "combat"
 
 
     Returns

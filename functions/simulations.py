@@ -50,7 +50,7 @@ def sample_level_simulation(run,
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name for analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings will be stored.
@@ -68,6 +68,9 @@ def sample_level_simulation(run,
     corrected: bool
         True if correction was applied
 
+    correction_method: str
+        Noise correction method to use. Either 'limma' or 'combat
+
     use_pca: bool
         True if want to represent expression data in top PCs before
         calculating similarity
@@ -81,6 +84,12 @@ def sample_level_simulation(run,
 
     input_file: str
         File name containing normalized gene expressiond data
+
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+        
+    base_dir: str
+        Root directory containing analysis subdirectories
 
     Returns
     --------
@@ -183,7 +192,7 @@ def experiment_level_simulation(run,
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Either "Human_analysis" or "Pseudomonas_analysis"
+        Name for analysis directory. Either "Human" or "Pseudomonas"
 
     analysis_name: str
         Parent directory where simulated data with experiments/partitionings will be stored.
@@ -201,6 +210,9 @@ def experiment_level_simulation(run,
     corrected: bool
         True if correction was applied
 
+    correction_method: str
+        Noise correction method to use. Either 'limma' or 'combat
+
     use_pca: bool
         True if want to represent expression data in top PCs before
         calculating similarity
@@ -217,6 +229,15 @@ def experiment_level_simulation(run,
 
     experiment_ids_file: str
         File containing all cleaned experiment ids
+
+    sample_id_colname: str
+        Column header that contains sample id that maps expression data and metadata
+
+    local_dir: str
+        Parent directory on local machine to store intermediate results
+
+    base_dir: str
+        Root directory containing analysis subdirectories
 
     Returns
     --------

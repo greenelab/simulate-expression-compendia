@@ -100,7 +100,18 @@ def normalize_expression_data(base_dir,
                               config_file,
                               raw_input_data_file):
     '''
+    Normalize the expression data
 
+    Arguments
+    ----------
+    base_dir: str
+        Root directory containing analysis subdirectories
+
+    config_file: str
+        File containing user defined parameters
+
+    raw_input_data_file: str
+        File containing raw expression data
     '''
 
     # Read in config variables
@@ -144,6 +155,21 @@ def create_experiment_id_file(metadata_file,
                               output_file,
                               config_file):
     '''
+    Create file with experiment ids that are associated with expression data
+
+    Arguments
+    ----------
+    metadata_file: str
+        File containing metadata annotations per sample
+
+    input_data_file: str
+        File containing normalized expression data
+
+    output_file: str
+        File containing experiment ids with expression data and sample annotations
+
+    config_file: str
+        File containing user defined parameters
 
     '''
     # Read in metadata
@@ -283,6 +309,12 @@ def run_simulation(config_file,
 
     input_data_file: str
         File path corresponding to input dataset to use
+
+    corrected: bool
+        True if simulation is applying noise correction 
+
+    experiment_ids_file: str
+        File containing experiment ids with expression data associated generated from ```create_experiment_id_file```
 
     '''
 
