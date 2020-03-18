@@ -56,13 +56,13 @@ find_DEGs_run <- function(metadata_file,
   
   # Save summary statistics of DEGs
   if (data_type == "control"){
-    out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_control/DEG_control_data_E-GEOD-51409_", run, ".txt", sep="")
+    out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_control/DE_stats_control_data_E-GEOD-51409_", run, ".txt", sep="")
   } else if (data_type == "simulated"){
-    out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_simulated/DEG_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
+    out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_simulated/DE_stats_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
   } else{
-    out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_original/DEG_original_data_E-GEOD-51409_", run, ".txt", sep="")
+    out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_original/DE_stats_original_data_E-GEOD-51409_", run, ".txt", sep="")
   }  
-  write.table(sign_DEGs, file = out_sim_filename, row.names = T, sep = "\t", quote = F)
+  write.table(all_genes, file = out_sim_filename, row.names = T, sep = "\t", quote = F)
   
   return(nrow(sign_DEGs))
   
