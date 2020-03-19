@@ -1,5 +1,6 @@
 # Setup 
 # Run 1 time
+# Using R 3.6
 
 #if (!requireNamespace("BiocManager", quietly = TRUE))
 #  install.packages("BiocManager")
