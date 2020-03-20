@@ -9,7 +9,7 @@
 
 library(clusterProfiler)
 
-find_over_representation <- function(DE_stats_file){
+find_over_represented_pathways <- function(DE_stats_file){
 
   # Read in data
   DE_stats_data <- as.matrix(read.table(DE_stats_file, sep="\t", header=TRUE, row.names=1))
@@ -18,8 +18,8 @@ find_over_representation <- function(DE_stats_file){
   print(length((all_genes)))
   
   # Get the number of genes that p-value < 0.05/5549
-  adj_threshold = 0.05/5549
-  sign_DEG_data <- DE_stats_data[DE_stats_data[,'P.Value']<adj_threshold,]
+  # These p-values are FDR adjusted
+  sign_DEG_data <- DE_stats_data[DE_stats_data[,'adj.P.Val']<0.05,]
   
   DEG_genes <- row.names(sign_DEG_data)
   print(length((DEG_genes)))
@@ -46,27 +46,26 @@ find_over_representation <- function(DE_stats_file){
   return(num_kegg_pathways)
 }
 
-num_over_pathways <- c()
-
+## Paths based on laptop directory
+num_over_pathways_simulated <- c()
 for (i in 0:99){
   DE_stats_simulated_data_file <- paste("~/UPenn/CGreene/Remote/pathway_analysis/output_simulated/DE_stats_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
   cat(paste("running file: ", DE_stats_simulated_data_file, "...\n", sep=""))
   
-  run_output <- find_over_representation(DE_stats_simulated_data_file)
+  run_output <- find_over_represented_pathways(DE_stats_simulated_data_file)
   
-  num_over_pathways <- c(num_over_pathways, run_output)
+  num_over_pathways_simulated <- c(num_over_pathways_simulated, run_output)
 }
+hist(num_over_pathways_simulated)
 
-hist(num_over_pathways)
 
-num_over_pathways <- c()
+num_over_pathways_control <- c()
 for (i in 0:99){
   DE_stats_control_data_file <- paste("~/UPenn/CGreene/Remote/pathway_analysis/output_control/DE_stats_control_data_E-GEOD-51409_", i, ".txt", sep="")
   cat(paste("running file: ", DE_stats_control_data_file, "...\n", sep=""))
   
-  run_output <- find_over_representation(DE_stats_control_data_file)
+  run_output <- find_over_represented_pathways(DE_stats_control_data_file)
   
-  num_over_pathways <- c(num_over_pathways, run_output)
+  num_over_pathways_control <- c(num_over_pathways_control, run_output)
 }
-
-hist(num_over_pathways)
+hist(num_over_pathways_control)

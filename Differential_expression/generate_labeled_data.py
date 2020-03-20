@@ -419,8 +419,8 @@ def shift_template_experiment(
                                             columns=simulated_data_decoded_df.columns,
                                             index=simulated_data_decoded_df.index)
 
-    print("Return: simulated gene expression data containing {} samples and {} genes".format(
-        simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
+    #print("Return: simulated gene expression data containing {} samples and {} genes".format(
+    #    simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
 
     # Save
     out_file = os.path.join(local_dir,
