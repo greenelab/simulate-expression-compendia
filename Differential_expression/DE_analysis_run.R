@@ -62,29 +62,38 @@ get_DE_stats <- function(metadata_file,
     out_sim_filename = paste("~/UPenn/CGreene/Remote/pathway_analysis/output_original/DE_stats_original_data_E-GEOD-51409_", run, ".txt", sep="")
     
   }  
-  write.table(sign_DEGs, file = out_sim_filename, row.names = T, sep = "\t", quote = F)
+  write.table(all_genes, file = out_sim_filename, row.names = T, sep = "\t", quote = F)
   
   return(nrow(sign_DEGs))
   
 }
 
 #-------------------------------------------------
-# Get DE stats for heatmap
+# Get DE stats for representative example to generate heatmap
 ## Paths based on laptop directory
 metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
+selected_simulated_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_example.txt"
 selected_simulated_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_simulated/selected_simulated_data_E-GEOD-51409_example.txt"
 selected_original_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_original/selected_original_data_E-GEOD-51409_example.txt"
 experiment_id <- "E-GEOD-51409"
+
+cat(paste("running file: ", selected_control_data_file, "...\n", sep=""))
+run_output <- get_DE_stats(metadata_file,
+                           experiment_id, 
+                           selected_control_data_file,
+                           "control",
+                           "example")
+cat(run_output)
+
 cat(paste("running file: ", selected_simulated_data_file, "...\n", sep=""))
-  
 run_output <- get_DE_stats(metadata_file,
                            experiment_id, 
                            selected_simulated_data_file,
                            "simulated",
                            "example")
 cat(run_output)
-cat(paste("running file: ", selected_original_data_file, "...\n", sep=""))
 
+cat(paste("running file: ", selected_original_data_file, "...\n", sep=""))
 run_output <- get_DE_stats(metadata_file,
                            experiment_id, 
                            selected_original_data_file,
@@ -96,7 +105,7 @@ cat(run_output)
 
 # Get DE statistics for multiple simulated and control datasets
 ## Paths based on laptop directory
-num_sign_DEGs <- c()
+num_sign_DEGs_control <- c()
 for (i in 0:99){
   metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
   selected_control_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_", i, ".txt", sep="")
@@ -131,3 +140,25 @@ for (i in 0:99){
   num_sign_DEGs_sim <- c(num_sign_DEGs_sim, run_output)
 }
 median(num_sign_DEGs_sim)
+
+# Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
+library(ggplot2)
+
+name_control <- rep("random sample", 100)
+name_sim <- rep("experiment-preserving", 100)
+names <- append(name_control, name_sim)
+num_DEGs <- append(num_sign_DEGs_control, num_sign_DEGs_sim)
+
+df <- data.frame(num_DEGs, names)
+
+p <- ggplot(df, aes(x=names, y=num_DEGs, color=names)) + 
+  geom_boxplot() +
+  labs(title="Differential expression across multiple simulated experiments",
+       x="Simulation type",
+       y = "Number of differentially expressed genes",
+       color = "simulation type")+
+  scale_color_brewer(palette="Dark2")
+p
+
+# Save 
+ggsave("~/UPenn/CGreene/Remote/DE_analysis/boxplot_simulated_control.png", plot = p, dpi=500)
