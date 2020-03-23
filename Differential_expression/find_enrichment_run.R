@@ -1,7 +1,11 @@
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
+# Setup 
+# Run 1 time
+# Using R 3.6
 
-BiocManager::install("fgsea")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#  install.packages("BiocManager")
+
+#BiocManager::install("fgsea")
 
 library("fgsea")
 
@@ -33,6 +37,7 @@ find_enriched_pathways <- function(annotation_file,
   
   # Pathways: dictionary {pathway name: list of genes}
   # stats: array with gene_id - numeric score
+  # minsize, maxsize: size of a gene set to test
   fgseaRes <- fgsea(pathways = pathway_parsed, 
                     stats = gene_ranks,
                     minSize=15,
@@ -49,9 +54,9 @@ find_enriched_pathways <- function(annotation_file,
   return(enrich_terms_pathways)
 }
 
-## Paths based on laptop directory
-#pathway_file <- "~/UPenn/CGreene/Remote/pathway_analysis/Pa_KEGG_pathways_ADAGE.txt"
-pathway_file <- "~/UPenn/CGreene/Remote/pathway_analysis/Pa_GO_terms_ADAGE.txt"
+#------------------------------------------------------------------------------
+# Enriched pathways in example experiment-preserving simulated experiment
+pathway_file <- "~/UPenn/CGreene/Remote/pathway_analysis/Pa_KEGG_pathways_ADAGE.txt"
 num_enrich_pathways_simulated <- c()
 for (i in 0:99){
   DE_stats_simulated_data_file <- paste("~/UPenn/CGreene/Remote/pathway_analysis/output_simulated/DE_stats_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
@@ -59,13 +64,11 @@ for (i in 0:99){
   
   run_output <- find_enriched_pathways(pathway_file,
                                        DE_stats_simulated_data_file)
-  
   num_enrich_pathways_simulated <- c(num_enrich_pathways_simulated, run_output)
 }
 
-hist(num_enrich_pathways_simulated)
 
-
+# Enriched pathways in example random-sampling simulated experiment
 num_enrich_pathways_control <- c()
 for (i in 0:99){
   DE_stats_control_data_file <- paste("~/UPenn/CGreene/Remote/pathway_analysis/output_control/DE_stats_control_data_E-GEOD-51409_", i, ".txt", sep="")
@@ -77,4 +80,20 @@ for (i in 0:99){
   num_enrich_pathways_control <- c(num_enrich_pathways_control, run_output)
 }
 
-hist(num_enrich_pathways_control)
+
+# Plot density
+library(ggplot2)
+df <- data.frame(
+  dens = c(num_enrich_pathways_simulated, num_enrich_pathways_control),
+  simulation_type = rep(c("experiment-preserving", "random"),each = 100))
+
+f <- ggplot(df, aes(x = dens, fill = simulation_type))+
+  geom_density(alpha = 0.3)+
+  labs(title="Number of enriched pathways",
+       x="Number of enriched pathways",
+       y="Count",
+       fill="simulation type")
+f
+
+# Save 
+ggsave("~/UPenn/CGreene/Remote/pathway_analysis/density_enriched_pathways.png", plot = f, dpi=500)

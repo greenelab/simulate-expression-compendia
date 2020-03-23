@@ -68,9 +68,8 @@ get_DE_stats <- function(metadata_file,
   
 }
 
-#-------------------------------------------------
+#-------------------------------------------------------------------------
 # Get DE stats for representative example to generate heatmap
-## Paths based on laptop directory
 metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
 selected_simulated_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_example.txt"
 selected_simulated_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_simulated/selected_simulated_data_E-GEOD-51409_example.txt"
@@ -101,46 +100,6 @@ run_output <- get_DE_stats(metadata_file,
                            "example")
 cat(run_output)
 
-#---------------------------------------------------
-
-# Get DE statistics for multiple simulated and control datasets
-## Paths based on laptop directory
-num_sign_DEGs_control <- c()
-for (i in 0:99){
-  metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
-  selected_control_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_", i, ".txt", sep="")
-  experiment_id <- "E-GEOD-51409"
-  cat(paste("running file: ", selected_control_data_file, "...\n", sep=""))
-  
-  run_output <- get_DE_stats(metadata_file,
-                              experiment_id, 
-                              selected_control_data_file,
-                              "control",
-                              i)
-  
-  num_sign_DEGs_control <- c(num_sign_DEGs_control, run_output)
-}
-median(num_sign_DEGs_control)
-sum(num_sign_DEGs_control)
-
-num_sign_DEGs_sim <- c()
-## Paths based on laptop directory
-for (i in 0:99){
-  metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
-  selected_simulated_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_simulated/selected_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
-  experiment_id <- "E-GEOD-51409"
-  cat(paste("running file: ", selected_simulated_data_file, "...\n", sep=""))
-  
-  run_output <- get_DE_stats(metadata_file,
-                             experiment_id, 
-                             selected_simulated_data_file,
-                             "control",
-                             i)
-  
-  num_sign_DEGs_sim <- c(num_sign_DEGs_sim, run_output)
-}
-median(num_sign_DEGs_sim)
-
 # Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
 library(ggplot2)
 
@@ -161,4 +120,41 @@ p <- ggplot(df, aes(x=names, y=num_DEGs, color=names)) +
 p
 
 # Save 
-ggsave("~/UPenn/CGreene/Remote/DE_analysis/boxplot_simulated_control.png", plot = p, dpi=500)
+ggsave("~/UPenn/CGreene/Remote/DE_analysis/boxplot_num_DEGs.png", plot = p, dpi=500)
+
+#------------------------------------------------------------------
+# Get DE statistics for multiple simulated and control datasets
+num_sign_DEGs_control <- c()
+for (i in 0:99){
+  metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
+  selected_control_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_", i, ".txt", sep="")
+  experiment_id <- "E-GEOD-51409"
+  cat(paste("running file: ", selected_control_data_file, "...\n", sep=""))
+  
+  run_output <- get_DE_stats(metadata_file,
+                              experiment_id, 
+                              selected_control_data_file,
+                              "control",
+                              i)
+  
+  num_sign_DEGs_control <- c(num_sign_DEGs_control, run_output)
+}
+median(num_sign_DEGs_control)
+sum(num_sign_DEGs_control)
+
+num_sign_DEGs_sim <- c()
+for (i in 0:99){
+  metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
+  selected_simulated_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_simulated/selected_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
+  experiment_id <- "E-GEOD-51409"
+  cat(paste("running file: ", selected_simulated_data_file, "...\n", sep=""))
+  
+  run_output <- get_DE_stats(metadata_file,
+                             experiment_id, 
+                             selected_simulated_data_file,
+                             "simulated",
+                             i)
+  
+  num_sign_DEGs_sim <- c(num_sign_DEGs_sim, run_output)
+}
+median(num_sign_DEGs_sim)
