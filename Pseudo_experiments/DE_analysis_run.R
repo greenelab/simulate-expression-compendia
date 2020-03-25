@@ -26,13 +26,16 @@ get_DE_stats <- function(metadata_file,
   mm <- model.matrix(~0 + group)
   
   ## DEGs of simulated data
+  # lmFit expects input array to have structure: gene x sample
   # lmFit fits a linear model using weighted least squares for each gene:
   fit <- lmFit(expression_data, mm)
   
   # Comparisons between groups (log fold-changes) are obtained as contrasts of these fitted linear models:
-  # Specify which groups to compare:
-  
+  # Samples are grouped based on experimental condition
+  # The variability of gene expression is compared between these groups
   if (grep("metadata_deg_temp", metadata_file)){
+    # For experiment E-GEOD-51409, we are comparing the expression profile
+    # of samples grown in 37 degrees versus those grown in 22 degrees
     contr <- makeContrasts(group37 - group22, levels = colnames(coef(fit)))
   }
   # Estimate contrast for each gene
@@ -51,15 +54,16 @@ get_DE_stats <- function(metadata_file,
   sign_DEGs <- all_genes[all_genes[,'adj.P.Val']<0.05,]
   
   # Save summary statistics of DEGs
+  main_out_dir="~/UPenn/CGreene/Remote/pathway_analysis/"
   if (data_type == "control"){
     #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_control/DEG_control_data_E-GEOD-51409_", run, ".txt", sep="")
-    out_sim_filename = paste("~/UPenn/CGreene/Remote/pathway_analysis/output_control/DE_stats_control_data_E-GEOD-51409_", run, ".txt", sep="")
+    out_sim_filename = paste(main_out_dir, "output_control/DE_stats_control_data_E-GEOD-51409_", run, ".txt", sep="")
   } else if (data_type == "simulated"){
     #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_simulated/DEG_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
-    out_sim_filename = paste("~/UPenn/CGreene/Remote/pathway_analysis/output_simulated/DE_stats_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
+    out_sim_filename = paste(main_out_dir, "output_simulated/DE_stats_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
   } else {
     #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_original/DEG_original_data_E-GEOD-51409_", run, ".txt", sep="")
-    out_sim_filename = paste("~/UPenn/CGreene/Remote/pathway_analysis/output_original/DE_stats_original_data_E-GEOD-51409_", run, ".txt", sep="")
+    out_sim_filename = paste(main_out_dir, "output_original/DE_stats_original_data_E-GEOD-51409_", run, ".txt", sep="")
     
   }  
   write.table(all_genes, file = out_sim_filename, row.names = T, sep = "\t", quote = F)
@@ -70,10 +74,11 @@ get_DE_stats <- function(metadata_file,
 
 #-------------------------------------------------------------------------
 # Get DE stats for representative example to generate heatmap
-metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
-selected_simulated_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_example.txt"
-selected_simulated_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_simulated/selected_simulated_data_E-GEOD-51409_example.txt"
-selected_original_data_file <- "~/UPenn/CGreene/Remote/DE_analysis/selected_original/selected_original_data_E-GEOD-51409_example.txt"
+main_input_dir="~/UPenn/CGreene/Remote/DE_analysis/"
+metadata_file <- paste(main_input_dir, "metadata_deg_temp.txt", sep="")
+selected_simulated_data_file <- paste(main_input_dir, "selected_control/selected_control_data_E-GEOD-51409_example.txt", sep="")
+selected_simulated_data_file <- paste(main_input_dir, "selected_simulated/selected_simulated_data_E-GEOD-51409_example.txt", sep="")
+selected_original_data_file <- paste(main_input_dir, "selected_original/selected_original_data_E-GEOD-51409_example.txt", sep="")
 experiment_id <- "E-GEOD-51409"
 
 cat(paste("running file: ", selected_control_data_file, "...\n", sep=""))
@@ -103,8 +108,8 @@ cat(run_output)
 # Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
 library(ggplot2)
 
-name_control <- rep("random sample", 100)
-name_sim <- rep("experiment-preserving", 100)
+name_control <- rep("sample-lvl", 100)
+name_sim <- rep("experiment-lvl", 100)
 names <- append(name_control, name_sim)
 num_DEGs <- append(num_sign_DEGs_control, num_sign_DEGs_sim)
 
@@ -116,18 +121,18 @@ p <- ggplot(df, aes(x=names, y=num_DEGs, color=names)) +
        x="Simulation type",
        y = "Number of differentially expressed genes",
        color = "simulation type")+
-  scale_color_brewer(palette="Dark2")
+  scale_color_manual(values=c("#E69F00", "#56B4E9"))
 p
 
 # Save 
-ggsave("~/UPenn/CGreene/Remote/DE_analysis/boxplot_num_DEGs.png", plot = p, dpi=500)
+ggsave(main_input_dir,"boxplot_num_DEGs.png", plot = p, dpi=500)
 
 #------------------------------------------------------------------
 # Get DE statistics for multiple simulated and control datasets
 num_sign_DEGs_control <- c()
 for (i in 0:99){
-  metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
-  selected_control_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_control/selected_control_data_E-GEOD-51409_", i, ".txt", sep="")
+  metadata_file <- paste(main_input_dir, "metadata_deg_temp.txt", sep="")
+  selected_control_data_file <- paste(main_input_dir, "selected_control/selected_control_data_E-GEOD-51409_", i, ".txt", sep="")
   experiment_id <- "E-GEOD-51409"
   cat(paste("running file: ", selected_control_data_file, "...\n", sep=""))
   
@@ -144,8 +149,8 @@ sum(num_sign_DEGs_control)
 
 num_sign_DEGs_sim <- c()
 for (i in 0:99){
-  metadata_file <- "~/UPenn/CGreene/Remote/DE_analysis/metadata_deg_temp.txt"
-  selected_simulated_data_file <- paste("~/UPenn/CGreene/Remote/DE_analysis/selected_simulated/selected_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
+  metadata_file <- paste(main_input_dir, "metadata_deg_temp.txt", sep="")
+  selected_simulated_data_file <- paste(main_input_dir, "selected_simulated/selected_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
   experiment_id <- "E-GEOD-51409"
   cat(paste("running file: ", selected_simulated_data_file, "...\n", sep=""))
   

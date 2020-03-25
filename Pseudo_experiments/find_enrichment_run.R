@@ -56,10 +56,11 @@ find_enriched_pathways <- function(annotation_file,
 
 #------------------------------------------------------------------------------
 # Enriched pathways in example experiment-preserving simulated experiment
-pathway_file <- "~/UPenn/CGreene/Remote/pathway_analysis/Pa_KEGG_pathways_ADAGE.txt"
+main_input_dir="~/UPenn/CGreene/Remote/pathway_analysis/"
+pathway_file <- paste(main_input_dir, "Pa_KEGG_pathways_ADAGE.txt", sep="")
 num_enrich_pathways_simulated <- c()
 for (i in 0:99){
-  DE_stats_simulated_data_file <- paste("~/UPenn/CGreene/Remote/pathway_analysis/output_simulated/DE_stats_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
+  DE_stats_simulated_data_file <- paste(main_input_dir, "output_simulated/DE_stats_simulated_data_E-GEOD-51409_", i, ".txt", sep="")
   cat(paste("running file: ", DE_stats_simulated_data_file, "...\n", sep=""))
   
   run_output <- find_enriched_pathways(pathway_file,
@@ -71,7 +72,7 @@ for (i in 0:99){
 # Enriched pathways in example random-sampling simulated experiment
 num_enrich_pathways_control <- c()
 for (i in 0:99){
-  DE_stats_control_data_file <- paste("~/UPenn/CGreene/Remote/pathway_analysis/output_control/DE_stats_control_data_E-GEOD-51409_", i, ".txt", sep="")
+  DE_stats_control_data_file <- paste(main_input_dir, "output_control/DE_stats_control_data_E-GEOD-51409_", i, ".txt", sep="")
   cat(paste("running file: ", DE_stats_control_data_file, "...\n", sep=""))
   
   run_output <- find_enriched_pathways(pathway_file,
@@ -85,15 +86,16 @@ for (i in 0:99){
 library(ggplot2)
 df <- data.frame(
   dens = c(num_enrich_pathways_simulated, num_enrich_pathways_control),
-  simulation_type = rep(c("experiment-preserving", "random"),each = 100))
+  simulation_type = rep(c("experiment-lvl", "sample-lvl"),each = 100))
 
 f <- ggplot(df, aes(x = dens, fill = simulation_type))+
   geom_density(alpha = 0.3)+
   labs(title="Number of enriched pathways",
        x="Number of enriched pathways",
        y="Count",
-       fill="simulation type")
+       fill="simulation type")+
+  scale_fill_manual(values=c("#E69F00", "#56B4E9"))
 f
 
 # Save 
-ggsave("~/UPenn/CGreene/Remote/pathway_analysis/density_enriched_pathways.png", plot = f, dpi=500)
+ggsave(main_input_dir, "density_enriched_pathways.png", plot = f, dpi=500)
