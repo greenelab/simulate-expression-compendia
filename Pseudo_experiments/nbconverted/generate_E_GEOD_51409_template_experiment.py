@@ -1,9 +1,11 @@
 
 # coding: utf-8
 
-# # Create pseudo experiments using simulated compendia
+# # Simulate pseudo experiments using template experiment
 # 
-# This notebook generates new pseudo-experiments using the experiment-preserving approach in the experiment level simulation. In this simulation we are preserving the experiment type but not the actual experiment so the relationship between samples within an experiment are preserved but the genes that are expressed will be different (module ```simulate_compendium``` in ```functions/generate_data_parallel.py```).
+# This notebook generates new pseudo-experiments using the experiment-preserving approach in the [experiment level simulation](../Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb). In this simulation we are preserving the experiment type but not the actual experiment so the relationship between samples within an experiment are preserved but the genes that are expressed will be different (module [simulate_compendium](../functions/generate_data_parallel.py)).
+# 
+# The expression patterns in these new experiments are compared against the patterns in the experiments generated in [generate_random_sampled_experiment.ipynb](generate_random_sampled_experiment.ipynb) using [differential expression analysis](DE_analysis_run.R) and [pathway enrichment analysis](find_enrichment_run.R)
 
 # In[1]:
 
@@ -130,6 +132,8 @@ if not Path(simulated_labeled_data_file).exists():
 
 
 # ## Process data
+# 
+# Notice: Originally the expression data was 0-1 normalized for use in training the VAE, however when we performed differential expression analyses we found that the normalized data had reduced variance that resulted in an inconsistency between the number of DEGs found compared to the publication. Therefore, we are re-scaling our normalized data to be in the original range of data.
 
 # In[7]:
 
