@@ -76,7 +76,7 @@ get_DE_stats <- function(metadata_file,
 # Get DE stats for representative example to generate heatmap
 main_input_dir="~/UPenn/CGreene/Remote/DE_analysis/"
 metadata_file <- paste(main_input_dir, "metadata_deg_temp.txt", sep="")
-selected_simulated_data_file <- paste(main_input_dir, "selected_control/selected_control_data_E-GEOD-51409_example.txt", sep="")
+selected_control_data_file <- paste(main_input_dir, "selected_control/selected_control_data_E-GEOD-51409_example.txt", sep="")
 selected_simulated_data_file <- paste(main_input_dir, "selected_simulated/selected_simulated_data_E-GEOD-51409_example.txt", sep="")
 selected_original_data_file <- paste(main_input_dir, "selected_original/selected_original_data_E-GEOD-51409_example.txt", sep="")
 experiment_id <- "E-GEOD-51409"
@@ -104,28 +104,6 @@ run_output <- get_DE_stats(metadata_file,
                            "original",
                            "example")
 cat(run_output)
-
-# Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
-library(ggplot2)
-
-name_control <- rep("sample-lvl", 100)
-name_sim <- rep("experiment-lvl", 100)
-names <- append(name_control, name_sim)
-num_DEGs <- append(num_sign_DEGs_control, num_sign_DEGs_sim)
-
-df <- data.frame(num_DEGs, names)
-
-p <- ggplot(df, aes(x=names, y=num_DEGs, color=names)) + 
-  geom_boxplot() +
-  labs(title="Differential expression across multiple simulated experiments",
-       x="Simulation type",
-       y = "Number of differentially expressed genes",
-       color = "simulation type")+
-  scale_color_manual(values=c("#E69F00", "#56B4E9"))
-p
-
-# Save 
-ggsave(main_input_dir,"boxplot_num_DEGs.png", plot = p, dpi=500)
 
 #------------------------------------------------------------------
 # Get DE statistics for multiple simulated and control datasets
@@ -163,3 +141,25 @@ for (i in 0:99){
   num_sign_DEGs_sim <- c(num_sign_DEGs_sim, run_output)
 }
 median(num_sign_DEGs_sim)
+
+# Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
+library(ggplot2)
+
+name_control <- rep("sample-lvl", 100)
+name_sim <- rep("experiment-lvl", 100)
+names <- append(name_control, name_sim)
+num_DEGs <- append(num_sign_DEGs_control, num_sign_DEGs_sim)
+
+df <- data.frame(num_DEGs, names)
+
+p <- ggplot(df, aes(x=names, y=num_DEGs, color=names)) + 
+  geom_boxplot() +
+  labs(title="Differential expression across multiple simulated experiments",
+       x="Simulation type",
+       y = "Number of differentially expressed genes",
+       color = "simulation type")+
+  scale_color_manual(values=c("#E69F00", "#56B4E9"))
+p
+
+# Save 
+ggsave(paste(main_input_dir,"boxplot_num_DEGs.png", sep=""), plot = p, dpi=500)

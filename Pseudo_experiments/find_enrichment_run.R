@@ -98,4 +98,4 @@ f <- ggplot(df, aes(x = dens, fill = simulation_type))+
 f
 
 # Save 
-ggsave(main_input_dir, "density_enriched_pathways.png", plot = f, dpi=500)
+ggsave(paste(main_input_dir, "density_enriched_pathways.png", sep=""), plot = f, dpi=500)
