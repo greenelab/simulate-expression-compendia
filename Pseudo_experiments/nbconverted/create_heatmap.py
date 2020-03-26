@@ -267,7 +267,7 @@ sim_gene_ids = list(sign_DEG_simulated.index)
 control_gene_ids = list(sign_DEG_control.index)
 
 
-# In[13]:
+# In[24]:
 
 
 # Plot original data
@@ -277,7 +277,7 @@ f = sns.clustermap(selected_original_DEG_data.T, cmap="viridis")
 f.savefig(heatmap_original_file, dpi=500)
 
 
-# In[14]:
+# In[20]:
 
 
 # Plot simulated
@@ -286,7 +286,7 @@ f = sns.clustermap(selected_simulated_DEG_data.T, cmap="viridis")
 f.savefig(heatmap_simulated_file, dpi=500)
 
 
-# In[15]:
+# In[19]:
 
 
 # Plot control

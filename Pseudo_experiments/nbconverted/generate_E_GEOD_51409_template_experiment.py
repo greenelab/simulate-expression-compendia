@@ -15,6 +15,7 @@ get_ipython().run_line_magic('autoreload', '2')
 
 import os
 import sys
+from pathlib import Path
 import ast
 import pandas as pd
 import numpy as np
@@ -308,6 +309,7 @@ for i in range(num_runs):
         experiment_id,
         NN_architecture,
         dataset_name,
+        scaler,
         local_dir,
         base_dir,
         i)

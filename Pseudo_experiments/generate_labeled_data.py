@@ -264,6 +264,7 @@ def shift_template_experiment(
     selected_experiment_id,
     NN_architecture,
     dataset_name,
+    scaler,
     local_dir,
     base_dir,
     run):
@@ -308,6 +309,9 @@ def shift_template_experiment(
 
     dataset_name: str
         Name for analysis directory. Either "Human" or "Pseudomonas"
+
+    scaler: minmax model
+        Model used to transform data into a different range
 
     local_dir: str
         Parent directory on local machine to store intermediate results
@@ -411,9 +415,8 @@ def shift_template_experiment(
     simulated_data_decoded_df = pd.DataFrame(simulated_data_decoded,
                                                 index=simulated_data_encoded_df.index,
                                                 columns=selected_data_df.columns)
-
-    simulated_data_scaled = preprocessing.MinMaxScaler(
-    ).fit_transform(simulated_data_decoded_df)
+    
+    simulated_data_scaled = scaler.inverse_transform(simulated_data_decoded_df)
 
     simulated_data_scaled_df = pd.DataFrame(simulated_data_scaled,
                                             columns=simulated_data_decoded_df.columns,
