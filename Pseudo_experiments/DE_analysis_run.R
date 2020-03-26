@@ -19,7 +19,7 @@ get_DE_stats <- function(metadata_file,
   expression_data <- t(as.matrix(read.table(expression_file, sep="\t", header=TRUE, row.names=1)))
   metadata <- as.matrix(read.table(metadata_file, sep="\t", header=TRUE, row.names=1))
   
-  # NOTE: It is very,very,very important that you make sure the metadata is in the same order 
+  # NOTE: It make sure the metadata is in the same order 
   # as the column names of the expression matrix.
   group <- interaction(metadata[,1])
   
@@ -49,34 +49,34 @@ get_DE_stats <- function(metadata_file,
   top.table <- topTable(tmp, sort.by = "P", n = Inf)
   all_genes <-  as.data.frame(top.table)
   
-  # Find all DEGs based on adjusted p-value cutoff
-  # These p-values are FDR adjusted
-  sign_DEGs <- all_genes[all_genes[,'adj.P.Val']<0.05,]
+  # Find all DEGs based on Bonferroni corrected p-value cutoff
+  threshold = 0.05/5549
+  num_sign_DEGs <- all_genes[all_genes[,'P.Value']<threshold,]
   
   # Save summary statistics of DEGs
   main_out_dir="~/UPenn/CGreene/Remote/pathway_analysis/"
   if (data_type == "control"){
-    #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_control/DEG_control_data_E-GEOD-51409_", run, ".txt", sep="")
+    #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_control/DE_stats_control_data_E-GEOD-51409_", run, ".txt", sep="")
     out_sim_filename = paste(main_out_dir, "output_control/DE_stats_control_data_E-GEOD-51409_", run, ".txt", sep="")
   } else if (data_type == "simulated"){
-    #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_simulated/DEG_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
+    #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_simulated/DE_stats_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
     out_sim_filename = paste(main_out_dir, "output_simulated/DE_stats_simulated_data_E-GEOD-51409_", run, ".txt", sep="")
   } else {
-    #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_original/DEG_original_data_E-GEOD-51409_", run, ".txt", sep="")
+    #out_sim_filename = paste("/home/alexandra/Documents/Data/Batch_effects/pseudo_experiment/output_original/DE_stats_original_data_E-GEOD-51409_", run, ".txt", sep="")
     out_sim_filename = paste(main_out_dir, "output_original/DE_stats_original_data_E-GEOD-51409_", run, ".txt", sep="")
     
   }  
   write.table(all_genes, file = out_sim_filename, row.names = T, sep = "\t", quote = F)
   
-  return(nrow(sign_DEGs))
+  return(nrow(num_sign_DEGs))
   
 }
 
-#-------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------------
 # Get DE stats for representative example to generate heatmap
 main_input_dir="~/UPenn/CGreene/Remote/DE_analysis/"
 metadata_file <- paste(main_input_dir, "metadata_deg_temp.txt", sep="")
-selected_control_data_file <- paste(main_input_dir, "selected_control/selected_control_data_E-GEOD-51409_example.txt", sep="")
+selected_simulated_data_file <- paste(main_input_dir, "selected_control/selected_control_data_E-GEOD-51409_example.txt", sep="")
 selected_simulated_data_file <- paste(main_input_dir, "selected_simulated/selected_simulated_data_E-GEOD-51409_example.txt", sep="")
 selected_original_data_file <- paste(main_input_dir, "selected_original/selected_original_data_E-GEOD-51409_example.txt", sep="")
 experiment_id <- "E-GEOD-51409"
@@ -105,8 +105,9 @@ run_output <- get_DE_stats(metadata_file,
                            "example")
 cat(run_output)
 
-#------------------------------------------------------------------
-# Get DE statistics for multiple simulated and control datasets
+#------------------------------------------------------------------------------------------------------------------------------------
+# Get number of DEGs for multiple simulated experiments using experiment-level approach ("simulated")
+# and using sample-level approach ("control")
 num_sign_DEGs_control <- c()
 for (i in 0:99){
   metadata_file <- paste(main_input_dir, "metadata_deg_temp.txt", sep="")
