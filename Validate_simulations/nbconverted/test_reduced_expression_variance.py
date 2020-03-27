@@ -7,7 +7,13 @@
 # 
 # **Question:** What is causing the reduced variance in the simulated data? Is this reduced variance 1) a property of the variational autoencoder (VAE) algorithm or 2) the result of the latent space shifting (see [simulate_compendium module](../functions/generate_data_parallel.py)?
 # 
-# This notebook aims to answer this question by performing 3 short experiments. In the first experiment, we test the effect of the VAE. In the second experiment, we test the effect of sampling from the latent space to simulate gene expression data (i.e. [sample-level-simulation](../Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb) approach). In the third experiment, we test the effect of the latent space shifting (i.e. [experiment-level simulation](../Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb) approach).
+# **Approach:**
+# This notebook aims to answer this question by performing 3 short experiments, each building off of the next. 
+# 1. In the first experiment, we test the effect of applying the VAE. 
+# 2. In the second experiment, we test the effect of sampling from the VAE latent space to simulate gene expression data (i.e. [sample-level-simulation](../Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb) approach). 
+# 3. In the third experiment, we test the effect of the latent space shifting (i.e. [experiment-level simulation](../Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb) approach).
+# 
+# **Conclusion:** The VAE is minimally contributes the the reduced variance. Most of the reduced variance is due to the sampling of the latent space due to the Normal constraint of the latent space.
 
 # In[1]:
 
@@ -62,7 +68,7 @@ NN_architecture = params['NN_architecture']
 # 
 # In this experiment we want to test the effect of the VAE on the gene expression variance. 
 # 
-# To do this we will compare the distribution of the gene variance in the [original dataset](../Pseudomonas/data/input/train_set_normalized.pcl), which does not use the VAE, versus the original data after it has been encoded and decoded by the VAE. The only variable we are testing is the application of the VAE.
+# To do this we will compare the distribution of the gene variance in the [original dataset](../Pseudomonas/data/input/train_set_normalized.pcl), which does not use the VAE, versus the original data after it has been encoded and decoded by the VAE. The only variable we are varying is the application of the VAE.
 
 # In[4]:
 
@@ -97,7 +103,6 @@ weights_decoder_file = glob.glob(os.path.join(
     NN_dir,
     "*_decoder_weights.h5"))[0]
 
-# Load saved models
 loaded_model = load_model(model_encoder_file)
 loaded_decode_model = load_model(model_decoder_file)
 
@@ -163,14 +168,14 @@ df_vae.head()
 boxplot = df_vae.boxplot(column=['original', 'original after VAE'])
 
 
-# **Conclusions:** The VAE model (encoder + decoder) does not appear to have an effect on the variance. This is expected, given that the model was trained to reconstruct the 
+# **Observations:** The VAE model (encoder + decoder) does not appear to have much of an effect on the variance. This is expected, given that the model was trained to reconstruct the input data
 
 # ## Experiment 2
 # ### Testing the effect of sampling from the latent space to simulate data
 # 
 # In this experiment we want to test the effect of sampling from the VAE latent space on the gene expression variance. 
 # 
-# To do this we will compare the distribution of the gene variance in the [original dataset](../Pseudomonas/data/input/train_set_normalized.pcl), which does not use the VAE, versus simulated dataset generated using the [sample-level simulation](../Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb), which uses the learned latent space of the VAE to simulate new data. Building off of the results from experiment 1, we add sampling from the latent space as a factor in this experiment.
+# To do this we will compare the distribution of the gene variance in the [original dataset](../Pseudomonas/data/input/train_set_normalized.pcl) versus a simulated dataset generated using the [sample-level simulation](../Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb), which uses the learned latent space of the VAE to simulate new data. Building off of the results from experiment 1, we add sampling from the latent space as a factor in this experiment.
 
 # In[10]:
 
@@ -240,7 +245,7 @@ df_sampling.head()
 boxplot = df_sampling.boxplot(column=['original', 'sample simulated'])
 
 
-# **Conclusions**:
+# **Observations**:
 # Based on the results it looks like there is some shrinkage of the variance using the VAE latent space to sample from. This is expected given the assumption that the VAE is making for latent space features to draw from a standard Normal distribution. Without this constraint, there are sparse regions in the latent space (i.e. the space is not continuous) that make generating relalistic 
 # data from these regions difficult because there is no information about this space. Therefore, this constraint was added ontop of the generic autoencoder (AE) in order to reduce the variance in the latent space to ensure a continuous latent space. Thus we would expect the VAE to squish the variance of the original data.
 # 
@@ -252,7 +257,7 @@ boxplot = df_sampling.boxplot(column=['original', 'sample simulated'])
 # ## Experiment 3
 # ### Testing the effect of the latent space shift to simulate data
 # 
-# In this experiment we want to test the effect of the linear shift on the gene expression variance. 
+# In this experiment we want to test the effect of the linear shift in the latent space on the gene expression variance. 
 # 
 # To do this we will compare the distribution of the gene variance in the simulated dataset generated using the [sample-level simulation](../Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb), which does *not* perform a linear shift, versus the simulated dataset generated using the [experiment-level simulation](../Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb), which does perform a linear shift. Both simulations use the VAE, so this factor is held constant and the variable we are testing is the latent space shift.
 # 
