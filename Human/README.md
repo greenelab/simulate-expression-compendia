@@ -50,4 +50,4 @@ Given a compendium of gene expression partitions, how will increasing the number
 **Conclusions:**
 We observed the same trend as before.  
 
-![Similarity_Human_experiment](https://github.com/greenelab/simulate-expression-compendia/blob/master/Human/results/Human_experiment_lvl_sim_svcca.png)
+![Similarity_Human_experiment](https://github.com/greenelab/simulate-expression-compendia/blob/master/Human/results/Human_experiment_lvl_sim_svcca_limma.png)

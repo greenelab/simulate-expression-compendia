@@ -9,7 +9,7 @@
 # 
 # This figure can be found in the supplemental material of the manuscript.
 
-# In[17]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -153,7 +153,7 @@ simulated_data_UMAPencoded_df = pd.DataFrame(data=simulated_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[24]:
+# In[11]:
 
 
 # Overlay original input vs simulated data
