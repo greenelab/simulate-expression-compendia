@@ -34,7 +34,13 @@ sys.path.append("../")
 from functions import utils
 
 import warnings
-warnings.filterwarnings(action='ignore')
+
+def fxn():
+    warnings.warn("deprecated", DeprecationWarning)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fxn()
 
 from numpy.random import seed
 randomState = 123
@@ -161,11 +167,13 @@ df_vae = pd.DataFrame(list(zip(var_no_vae, var_vae)),
 df_vae.head()
 
 
-# In[22]:
+# In[24]:
 
 
 # Plot distribution of variances using original data and original data passed through the VAE
 boxplot = df_vae.boxplot(column=['original', 'original after VAE'])
+_ = boxplot.set_title("Distribution of per-gene expression variances")
+_ = boxplot.set_ylabel("variances per gene")
 
 
 # **Observations:** The VAE model (encoder + decoder) does not appear to have much of an effect on the variance. This is expected, given that the model was trained to reconstruct the input data
@@ -243,6 +251,8 @@ df_sampling.head()
 
 # Plot distribution of variances using original and sample-simulated data
 boxplot = df_sampling.boxplot(column=['original', 'sample simulated'])
+_ = boxplot.set_title("Distribution of per-gene expression variances")
+_ = boxplot.set_ylabel("variances per gene")
 
 
 # **Observations**:
@@ -326,7 +336,34 @@ df_shift.head()
 
 
 # Plot distribution of variances using no shifted data and shifted data
-boxplot = df_shift.boxplot(column=['sample simulated(not shifted)', 'experiment simulated (shifted)'])
+boxplot = df_shift.boxplot(column=['sample simulated(not shifted)', 
+                                   'experiment simulated (shifted)'])
+_ = boxplot.set_title("Distribution of per-gene expression variances")
+_ = boxplot.set_ylabel("variances per gene")
 
 
 # **Observations:** We can see that compared to the not shifted compendium, the shifted compendium has a slightly larger variance. This makes sense given that we are shifting our samples in the latent space. The samples were shifted randomly to a new location in the latent space. Theoretically, we could get a smaller variance using the shifted approach *if* all the shifts happen to compress the samples together, however the likelihood of this happening is very rare.
+
+# ## Summary
+# 
+# Plotting the distribution of variances per-gene for all cases (original data, sampling from VAE space, sampling and shifting in VAE space), we can see that the largest reduction in variance is due to the sampling of the VAE space.
+
+# In[22]:
+
+
+df_shift = pd.DataFrame(list(zip(var_no_shift, var_shift, var_no_sampling)), 
+               columns =['sample simulated(not shifted)', 'experiment simulated (shifted)', 'original']) 
+df_shift.head()
+
+
+# In[23]:
+
+
+# Plot distribution of variances using no shifted data and shifted data
+boxplot = df_shift.boxplot(column=['sample simulated(not shifted)', 
+                                   'experiment simulated (shifted)', 
+                                   'original'],
+                          rot=45)
+_ = boxplot.set_title("Distribution of per-gene expression variances")
+_ = boxplot.set_ylabel("variances per gene")
+
