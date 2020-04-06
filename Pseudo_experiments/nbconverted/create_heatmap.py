@@ -26,7 +26,11 @@ from functions import utils
 import generate_labeled_data
 
 import warnings
-warnings.filterwarnings(action='ignore')
+def fxn():
+    warnings.warn("deprecated", DeprecationWarning)
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fxn()
 
 from numpy.random import seed
 randomState = 123
@@ -47,6 +51,10 @@ params = utils.read_config(config_file)
 # Load parameters
 local_dir = params["local_dir"]
 experiment_id = 'E-GEOD-51409'
+
+base_dir = os.path.abspath(
+  os.path.join(
+      os.getcwd(), "../"))
 
 
 # In[4]:
@@ -88,15 +96,17 @@ DE_stats_control_file = os.path.join(
     "output_control",
     "DE_stats_control_data_"+experiment_id+"_example.txt")
 
+# Gene number to gene name file
+gene_name_file = os.path.join(
+    base_dir,
+    "Pseudo_experiments",
+    "Pseudomonas_aeruginosa_PAO1_107.csv")
+
 
 # In[5]:
 
 
 # Output files
-base_dir = os.path.abspath(
-  os.path.join(
-      os.getcwd(), "../")) 
-
 heatmap_original_file = os.path.join(
     base_dir,
     "Pseudomonas",
@@ -267,21 +277,78 @@ sim_gene_ids = list(sign_DEG_simulated.index)
 control_gene_ids = list(sign_DEG_control.index)
 
 
-# In[24]:
+# In[13]:
+
+
+# Read gene number to name mapping
+gene_name_mapping = pd.read_table(
+    gene_name_file,
+    header=0,
+    sep=',',
+    index_col=0)
+
+gene_name_mapping = gene_name_mapping[["Locus Tag", "Name"]]
+
+gene_name_mapping.set_index("Locus Tag", inplace=True)
+gene_name_mapping.head()
+
+
+# In[14]:
+
+
+# Format gene numbers to remove extraneous quotes
+gene_number = gene_name_mapping.index
+gene_name_mapping.index = gene_number.str.strip("\"")
+
+gene_name_mapping.head()
+
+
+# In[15]:
+
+
+# Map gene numbers to names
+def get_gene_names(gene_id_list):    
+    gene_names = []
+    for gene_id in gene_id_list:
+        gene_name = gene_name_mapping.loc[gene_id]
+        if gene_name.isnull()[0]:
+            # If gene name does not exist
+            # Use gene number
+            gene_names.append(gene_id)
+        else:
+            gene_names.append(gene_name[0])
+    return gene_names
+
+
+# In[16]:
+
+
+original_gene_names = get_gene_names(original_gene_ids)
+control_gene_names = get_gene_names(control_gene_ids)
+sim_gene_names = get_gene_names(sim_gene_ids)
+
+print(original_gene_names)
+print(control_gene_names)
+print(sim_gene_ids)
+
+
+# In[17]:
 
 
 # Plot original data
 selected_original_DEG_data = selected_original_data[original_gene_ids]
+selected_original_DEG_data.columns = original_gene_names
 sns.set(style="ticks", context="talk")
 f = sns.clustermap(selected_original_DEG_data.T, cmap="viridis")
 f.savefig(heatmap_original_file, dpi=500)
 
 
-# In[20]:
+# In[18]:
 
 
 # Plot simulated
 selected_simulated_DEG_data = selected_simulated_data[sim_gene_ids]
+selected_simulated_DEG_data.columns = sim_gene_names
 f = sns.clustermap(selected_simulated_DEG_data.T, cmap="viridis")
 f.savefig(heatmap_simulated_file, dpi=500)
 
@@ -291,6 +358,7 @@ f.savefig(heatmap_simulated_file, dpi=500)
 
 # Plot control
 selected_control_DEG_data = selected_control_data[control_gene_ids]
+selected_control_DEG_data.columns = control_gene_names
 f = sns.clustermap(selected_control_DEG_data.T, cmap="viridis")
 f.savefig(heatmap_control_file, dpi=500)
 
