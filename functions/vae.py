@@ -141,7 +141,7 @@ def tybalt_2layer_model(
         dataset_name,
         "logs",
         NN_name,
-        "tybalt_2layer_{}latent_hist.png".format(latent_dim))
+        "tybalt_2layer_{}latent_hist.svg".format(latent_dim))
 
     model_encoder_file = os.path.join(
         base_dir,
@@ -282,8 +282,9 @@ def tybalt_2layer_model(
     # Visualize training performance
     history_df = pd.DataFrame(hist.history)
     ax = history_df.plot()
-    ax.set_xlabel('Epochs')
-    ax.set_ylabel('VAE Loss')
+    ax.set_xlabel('Epochs', fontsize='xx-large', family='sans-serif')
+    ax.set_ylabel('Loss', fontsize='xx-large', family='sans-serif')
+    ax.legend(['Training Loss', 'Validation Loss'], prop={'family':'sans-serif', 'size':12})
     fig = ax.get_figure()
     fig.savefig(hist_plot_file, dpi=300)
 
