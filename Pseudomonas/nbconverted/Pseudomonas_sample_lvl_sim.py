@@ -5,7 +5,7 @@
 # 
 # Main notebook to run sample-level simulation experiment using *P. aeruginosa* gene expression data.
 
-# In[1]:
+# In[3]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -49,7 +49,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[2]:
+# In[40]:
 
 
 # Read in config variables
@@ -60,7 +60,7 @@ config_file = os.path.abspath(os.path.join(base_dir,
 params = utils.read_config(config_file)
 
 
-# In[3]:
+# In[41]:
 
 
 # Load parameters
@@ -72,7 +72,7 @@ lst_num_experiments = params["lst_num_experiments"]
 train_architecture = params['NN_architecture']
 
 
-# In[4]:
+# In[9]:
 
 
 # Input files
@@ -86,7 +86,7 @@ normalized_data_file = os.path.join(
 
 # ## Setup directories
 
-# In[5]:
+# In[10]:
 
 
 pipeline.setup_dir(config_file)
@@ -94,7 +94,7 @@ pipeline.setup_dir(config_file)
 
 # ## Train VAE
 
-# In[6]:
+# In[11]:
 
 
 # Directory containing log information from VAE training
@@ -105,7 +105,7 @@ vae_log_dir = os.path.join(
     train_architecture)
 
 
-# In[7]:
+# In[17]:
 
 
 # Train VAE
@@ -139,13 +139,13 @@ pipeline.run_simulation(config_file,
 
 # ## Make figures
 
-# In[10]:
+# In[90]:
 
 
 pca_ind = [0,1,2,-3,-2,-1]
 
 
-# In[11]:
+# In[91]:
 
 
 # File directories
@@ -190,7 +190,7 @@ compendia_dir = os.path.join(
     dataset_name + "_" + analysis_name)
 
 
-# In[12]:
+# In[108]:
 
 
 # Output files
@@ -210,16 +210,16 @@ pca_uncorrected_file = os.path.join(
     base_dir,
     dataset_name,
     "results",
-    dataset_name +"_"+analysis_name+"_pca_uncorrected_"+correction_method+".png")
+    dataset_name +"_"+analysis_name+"_pca_uncorrected_"+correction_method+".svg")
 
 pca_corrected_file = os.path.join(
     base_dir,
     dataset_name,
     "results",
-    dataset_name +"_"+analysis_name+"_pca_corrected_"+correction_method+".png")
+    dataset_name +"_"+analysis_name+"_pca_corrected_"+correction_method+".svg")
 
 
-# In[13]:
+# In[93]:
 
 
 # Load pickled files
@@ -231,7 +231,7 @@ err_corrected_svcca = pd.read_pickle(ci_corrected_file)
 permuted_score = np.load(permuted_score_file)
 
 
-# In[14]:
+# In[94]:
 
 
 # Concatenate error bars
@@ -239,7 +239,7 @@ uncorrected_svcca_err = pd.concat([uncorrected_svcca, err_uncorrected_svcca], ax
 corrected_svcca_err = pd.concat([corrected_svcca, err_corrected_svcca], axis=1)
 
 
-# In[15]:
+# In[95]:
 
 
 # Add group label
@@ -247,7 +247,7 @@ uncorrected_svcca_err['Group'] = 'uncorrected'
 corrected_svcca_err['Group'] = 'corrected'
 
 
-# In[16]:
+# In[96]:
 
 
 # Concatenate dataframes
@@ -257,7 +257,7 @@ all_svcca
 
 # ### SVCCA 
 
-# In[17]:
+# In[97]:
 
 
 # Plot
@@ -288,13 +288,18 @@ panel_A = ggplot(all_svcca)     + geom_line(all_svcca,
     + labs(x = "Number of Partitions", 
            y = "Similarity score (SVCCA)", 
            title = "Similarity across varying numbers of partitions") \
-    + theme(plot_title=element_text(weight='bold'),
+    + theme(
             plot_background=element_rect(fill="white"),
             panel_background=element_rect(fill="white"),
             panel_grid_major_x=element_line(color="lightgrey"),
             panel_grid_major_y=element_line(color="lightgrey"),
             axis_line=element_line(color="grey"),
-            legend_key=element_rect(fill='white', colour='white')
+            legend_key=element_rect(fill='white', colour='white'),
+            legend_title=element_text(family='sans-serif', size=15),
+            legend_text=element_text(family='sans-serif', size=12),
+            plot_title=element_text(family='sans-serif', size=15),
+            axis_text=element_text(family='sans-serif', size=12),
+            axis_title=element_text(family='sans-serif', size=15)
            ) \
     + scale_color_manual(['#1976d2', '#b3e5fc']) \
 
@@ -305,7 +310,7 @@ ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
 
 # ### Uncorrected PCA
 
-# In[18]:
+# In[117]:
 
 
 lst_num_experiments = [lst_num_experiments[i] for i in pca_ind]
@@ -333,6 +338,9 @@ for i in lst_num_experiments:
     # Add grouping column for plotting
     original_data_df['num_experiments'] = '1'
     
+    # downsample
+    original_data_df = original_data_df.sample(n=500)
+    
     # Get data with additional batch effects added
     experiment_other_file = os.path.join(
         compendia_dir,
@@ -349,6 +357,9 @@ for i in lst_num_experiments:
     
     # Add grouping column for plotting
     experiment_data_df['num_experiments'] = 'multiple'
+    
+    # downsample
+    experiment_data_df = experiment_data_df.sample(n=500)
     
     # Concatenate datasets together
     combined_data_df = pd.concat([original_data_df, experiment_data_df])
@@ -380,7 +391,7 @@ for i in lst_num_experiments:
     all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])   
 
 
-# In[19]:
+# In[118]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -395,20 +406,20 @@ all_data_df = all_data_df.assign(num_experiments_cat = num_experiments_cat)
 all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[20]:
+# In[119]:
 
 
 all_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of experiments', 'Comparison']
 
 
-# In[21]:
+# In[120]:
 
 
 # Plot all comparisons in one figure
 panel_B = ggplot(all_data_df[all_data_df['Comparison'] != '1'],
                  aes(x='PC1', y='PC2')) \
     + geom_point(aes(color='No. of experiments'), 
-                 alpha=0.1) \
+                 alpha=0.2) \
     + facet_wrap('~Comparison') \
     + labs(x = "PC 1", 
            y = "PC 2", 
@@ -418,7 +429,11 @@ panel_B = ggplot(all_data_df[all_data_df['Comparison'] != '1'],
         legend_title_align = "center",
         plot_background=element_rect(fill='white'),
         legend_key=element_rect(fill='white', colour='white'), 
-        plot_title=element_text(weight='bold')
+        legend_title=element_text(family='sans-serif', size=15),
+        legend_text=element_text(family='sans-serif', size=12),
+        plot_title=element_text(family='sans-serif', size=15),
+        axis_text=element_text(family='sans-serif', size=12),
+        axis_title=element_text(family='sans-serif', size=15)
     ) \
     + guides(colour=guide_legend(override_aes={'alpha': 1})) \
     + scale_color_manual(['#bdbdbd', '#b3e5fc']) \
@@ -427,12 +442,12 @@ panel_B = ggplot(all_data_df[all_data_df['Comparison'] != '1'],
                  color='#bdbdbd')
 
 print(panel_B)
-ggsave(plot=panel_B, filename=pca_uncorrected_file, dpi=500)
+ggsave(plot=panel_B, filename=pca_uncorrected_file)
 
 
 # ### Corrected PCA
 
-# In[22]:
+# In[121]:
 
 
 lst_num_experiments = [lst_num_experiments[i] for i in pca_ind]
@@ -465,6 +480,9 @@ for i in lst_num_experiments:
     # Add grouping column for plotting
     original_data_df['num_experiments'] = '1'
     
+    # downsample
+    original_data_df = original_data_df.sample(n=500)
+    
     # Get data with additional batch effects added and corrected
     experiment_other_file = os.path.join(
         compendia_dir,
@@ -487,6 +505,9 @@ for i in lst_num_experiments:
     
     # Add grouping column for plotting
     experiment_data_df['num_experiments'] = 'multiple'
+    
+    # downsample
+    experiment_data_df = experiment_data_df.sample(n=500)
         
     # Concatenate datasets together
     combined_data_df = pd.concat([original_data_df, experiment_data_df])
@@ -515,7 +536,7 @@ for i in lst_num_experiments:
     all_corrected_data_df = pd.concat([all_corrected_data_df, combined_data_PCAencoded_df])
 
 
-# In[23]:
+# In[122]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -530,20 +551,20 @@ all_corrected_data_df = all_corrected_data_df.assign(num_experiments_cat = num_e
 all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[24]:
+# In[123]:
 
 
 all_corrected_data_df.columns = ['PC1', 'PC2', 'num_experiments', 'comparison', 'No. of experiments', 'Comparison']
 
 
-# In[25]:
+# In[124]:
 
 
 # Plot all comparisons in one figure
 panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1'],
                  aes(x='PC1', y='PC2')) \
     + geom_point(aes(color='No. of experiments'), 
-                 alpha=0.1) \
+                 alpha=0.2) \
     + facet_wrap('~Comparison') \
     + labs(x = "PC 1",
            y = "PC 2", 
@@ -553,7 +574,11 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
         legend_title_align = "center",
         plot_background=element_rect(fill='white'),
         legend_key=element_rect(fill='white', colour='white'), 
-        plot_title=element_text(weight='bold')
+        legend_title=element_text(family='sans-serif', size=15),
+        legend_text=element_text(family='sans-serif', size=12),
+        plot_title=element_text(family='sans-serif', size=15),
+        axis_text=element_text(family='sans-serif', size=12),
+        axis_title=element_text(family='sans-serif', size=15)
     )\
     + guides(colour=guide_legend(override_aes={'alpha': 1})) \
     + scale_color_manual(['#bdbdbd', '#1976d2']) \
@@ -562,5 +587,5 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
                  color='#bdbdbd')
 
 print(panel_C)
-ggsave(plot=panel_C, filename=pca_corrected_file, dpi=500)
+ggsave(plot=panel_C, filename=pca_corrected_file)
 
