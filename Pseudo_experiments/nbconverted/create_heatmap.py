@@ -22,8 +22,7 @@ import glob
 from sklearn import preprocessing
 
 sys.path.append("../")
-from functions import utils
-import generate_labeled_data
+from functions import utils, generate_labeled_data
 
 import warnings
 def fxn():
@@ -111,19 +110,19 @@ heatmap_original_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_original_"+experiment_id+"_example.png")
+    "DE_heatmap_original_"+experiment_id+"_example.svg")
 
 heatmap_simulated_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_simulated_"+experiment_id+"_example.png")
+    "DE_heatmap_simulated_"+experiment_id+"_example.svg")
 
 heatmap_control_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_control_"+experiment_id+"_example.png")
+    "DE_heatmap_control_"+experiment_id+"_example.svg")
 
 original_sign_DEG_file = os.path.join(
     base_dir,
@@ -339,8 +338,10 @@ print(sim_gene_ids)
 selected_original_DEG_data = selected_original_data[original_gene_ids]
 selected_original_DEG_data.columns = original_gene_names
 sns.set(style="ticks", context="talk")
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_original_DEG_data.T, cmap="viridis")
-f.savefig(heatmap_original_file, dpi=500)
+f.fig.suptitle('Original experiment') 
+f.savefig(heatmap_original_file)
 
 
 # In[18]:
@@ -349,8 +350,10 @@ f.savefig(heatmap_original_file, dpi=500)
 # Plot simulated
 selected_simulated_DEG_data = selected_simulated_data[sim_gene_ids]
 selected_simulated_DEG_data.columns = sim_gene_names
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_simulated_DEG_data.T, cmap="viridis")
-f.savefig(heatmap_simulated_file, dpi=500)
+f.fig.suptitle('Experiment-level simulated experiment') 
+f.savefig(heatmap_simulated_file)
 
 
 # In[19]:
@@ -359,8 +362,10 @@ f.savefig(heatmap_simulated_file, dpi=500)
 # Plot control
 selected_control_DEG_data = selected_control_data[control_gene_ids]
 selected_control_DEG_data.columns = control_gene_names
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_control_DEG_data.T, cmap="viridis")
-f.savefig(heatmap_control_file, dpi=500)
+f.fig.suptitle('Sample-level simulated experiment') 
+f.savefig(heatmap_control_file)
 
 
 # **Summary**

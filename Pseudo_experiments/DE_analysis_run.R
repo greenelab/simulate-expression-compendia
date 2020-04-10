@@ -144,6 +144,8 @@ for (i in 0:99){
 median(num_sign_DEGs_sim)
 
 # Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
+install.packages("svglite")
+library(svglite)
 library(ggplot2)
 
 name_control <- rep("sample-lvl", 100)
@@ -159,8 +161,15 @@ p <- ggplot(df, aes(x=names, y=num_DEGs, color=names)) +
        x="Simulation type",
        y = "Number of differentially expressed genes",
        color = "simulation type")+
-  scale_color_manual(values=c("#E69F00", "#56B4E9"))
+  scale_color_manual(values=c("#E69F00", "#56B4E9")) +
+  theme(
+    legend.title=element_text(family='sans-serif', size=15),
+    legend.text=element_text(family='sans-serif', size=12),
+    plot.title=element_text(family='sans-serif', size=15),
+    axis.text=element_text(family='sans-serif', size=12),
+    axis.title=element_text(family='sans-serif', size=15)
+  )
 p
 
 # Save 
-ggsave(paste(main_input_dir,"boxplot_num_DEGs.png", sep=""), plot = p, dpi=500)
+ggsave(paste(main_input_dir,"boxplot_num_DEGs.svg", sep=""), plot = p, device="svg")

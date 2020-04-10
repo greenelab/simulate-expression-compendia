@@ -23,8 +23,7 @@ import glob
 from sklearn import preprocessing
 
 sys.path.append("../")
-from functions import utils
-import generate_labeled_data
+from functions import utils, generate_labeled_data
 
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -252,13 +251,13 @@ heatmap_original_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_original_"+experiment_id+"_example.png")
+    "DE_heatmap_original_"+experiment_id+"_example.svg")
 
 heatmap_simulated_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_simulated_"+experiment_id+"_example.png")
+    "DE_heatmap_simulated_"+experiment_id+"_example.svg")
 
 
 # In[18]:
@@ -274,7 +273,11 @@ selected_original_data = original_data.loc[original_selected_sample_ids]
 desc_id = list(map_sample_description.loc[list(selected_original_data.index)]['description'])
 selected_original_data.index = desc_id
 
-selected_original_data.head(10)
+# downsample columns 
+random_subset_genes = random.sample(selected_original_data.columns.tolist(), 50)
+
+selected_original_data = selected_original_data.loc[:,random_subset_genes]
+selected_original_data.head(5)
 
 
 # In[19]:
@@ -299,6 +302,8 @@ selected_simulated_data.index = original_selected_sample_ids
 selected_simulated_data = selected_simulated_data.drop(columns=['experiment_id'])
 
 selected_simulated_data.index = desc_id
+
+selected_simulated_data = selected_simulated_data.loc[:,random_subset_genes]
 selected_simulated_data.head(5)
 
 
@@ -307,8 +312,10 @@ selected_simulated_data.head(5)
 
 # Plot original data
 sns.set(style="ticks", context="talk")
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_original_data.T, cmap="viridis")
-f.savefig(heatmap_original_file, dpi=500)
+f.fig.suptitle('Original experiment') 
+f.savefig(heatmap_original_file)
 
 
 # In[22]:
@@ -316,8 +323,10 @@ f.savefig(heatmap_original_file, dpi=500)
 
 # Plot simulated data
 sns.set(style="ticks", context="talk")
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_simulated_data.T, cmap="viridis")
-f.savefig(heatmap_simulated_file, dpi=500)
+f.fig.suptitle('Experiment-level simulated experiment')
+f.savefig(heatmap_simulated_file)
 
 
 # # Template experiment E-GEOD-10030
@@ -343,13 +352,13 @@ heatmap_original_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_original_"+experiment_id+"_example.png")
+    "DE_heatmap_original_"+experiment_id+"_example.svg")
 
 heatmap_simulated_file = os.path.join(
     base_dir,
     "Pseudomonas",
     "results",
-    "DE_heatmap_simulated_"+experiment_id+"_example.png")
+    "DE_heatmap_simulated_"+experiment_id+"_example.svg")
 
 
 # In[25]:
@@ -366,7 +375,11 @@ uniq_desc = map_sample_description.loc[list(selected_original_data.index)].drop_
 desc_id = list(uniq_desc['description'])
 selected_original_data.index = desc_id
 
-selected_original_data.head(10)
+# downsample columns 
+random_subset_genes = random.sample(selected_original_data.columns.tolist(), 50)
+
+selected_original_data = selected_original_data.loc[:,random_subset_genes]
+selected_original_data.head(5)
 
 
 # In[26]:
@@ -391,6 +404,8 @@ selected_simulated_data.index = original_selected_sample_ids
 selected_simulated_data = selected_simulated_data.drop(columns=['experiment_id'])
 
 selected_simulated_data.index = desc_id
+
+selected_simulated_data = selected_simulated_data.loc[:,random_subset_genes]
 selected_simulated_data.head(5)
 
 
@@ -399,8 +414,10 @@ selected_simulated_data.head(5)
 
 # Plot original data
 sns.set(style="ticks", context="talk")
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_original_data.T, cmap="viridis")
-f.savefig(heatmap_original_file, dpi=500)
+f.fig.suptitle('Original experiment')
+f.savefig(heatmap_original_file)
 
 
 # In[29]:
@@ -408,6 +425,8 @@ f.savefig(heatmap_original_file, dpi=500)
 
 # Plot simulated data
 sns.set(style="ticks", context="talk")
+sns.set(font='sans-serif', font_scale=1.5)
 f = sns.clustermap(selected_simulated_data.T, cmap="viridis")
-f.savefig(heatmap_simulated_file, dpi=500)
+f.fig.suptitle('Experiment-level simulated experiment')
+f.savefig(heatmap_simulated_file)
 
