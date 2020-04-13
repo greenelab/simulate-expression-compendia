@@ -52,9 +52,7 @@ seed(randomState)
 
 
 # User parameters
-dataset_name = "Human_analysis"
-analysis_name = 'Human_sample_lvl_sim'
-NN_architecture = 'NN_2500_30'
+dataset_name = "Human"
 
 
 # In[3]:
@@ -63,9 +61,6 @@ NN_architecture = 'NN_2500_30'
 # Load data
 base_dir = os.path.abspath(os.path.join(os.getcwd(),"../"))    # base dir on repo
 local_dir = "/home/alexandra/Documents"                          # base dir on local machine for data storage
-
-NN_dir = base_dir + "/" + dataset_name + "/models/" + NN_architecture
-latent_dim = NN_architecture.split('_')[-1]
 
 normalized_data_file = os.path.join(
     base_dir,
@@ -79,27 +74,22 @@ simulated_data_file = os.path.join(
     "Data",
     "Batch_effects",
     "experiment_simulated",
-    analysis_name,
+    "Human_sample_lvl_sim",
     "Experiment_1_0.txt.xz")
 
 
 # In[4]:
 
 
-NN_dir
-
-
-# In[5]:
-
-
 # Output files
 umap_overlay_file = os.path.join(
     base_dir,
+    "Human",
     "results",
-    "Human_umap_overlay.png")
+    "Human_umap_overlay.svg")
 
 
-# In[6]:
+# In[5]:
 
 
 # Read data
@@ -119,19 +109,19 @@ print(normalized_data.shape)
 print(simulated_data.shape)
 
 
-# In[7]:
+# In[6]:
 
 
 normalized_data.head(10)
 
 
-# In[8]:
+# In[7]:
 
 
 simulated_data.head(10)
 
 
-# In[9]:
+# In[8]:
 
 
 # Get and save model
@@ -143,7 +133,7 @@ input_data_UMAPencoded_df = pd.DataFrame(data=input_data_UMAPencoded,
                                          columns=['1','2'])
 
 
-# In[10]:
+# In[9]:
 
 
 # UMAP embedding of simulated data
@@ -174,13 +164,15 @@ g_input_sim += geom_point(color='#d5a6bd',
                           alpha=0.1)
 g_input_sim += labs(x = "UMAP 1", 
                     y = "UMAP 2", 
-                    title = "UMAP of original and simulated data")
+                    title = "Original and simulated data")
 g_input_sim += theme_bw()
 g_input_sim += theme(
     legend_title_align = "center",
     plot_background=element_rect(fill='white'),
     legend_key=element_rect(fill='white', colour='white'), 
-    plot_title=element_text(weight='bold')
+    plot_title=element_text(family='sans-serif', size=15),
+    axis_text=element_text(family='sans-serif', size=12),
+    axis_title=element_text(family='sans-serif', size=15)
 )
 #g_input_sim += guides(colour=guide_legend(override_aes={'alpha': 1}))
 #g_input_sim += scale_color_manual(['#d5a6bd', '#cccccc'])
@@ -189,5 +181,5 @@ g_input_sim += geom_point(combined_data_df[combined_data_df['dataset'] == 'simul
                           color='#cccccc')
 
 print(g_input_sim)
-ggsave(plot = g_input_sim, filename = umap_overlay_file, dpi=500)
+ggsave(plot = g_input_sim, filename = umap_overlay_file, dpi=300)
 

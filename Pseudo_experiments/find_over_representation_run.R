@@ -75,6 +75,8 @@ for (i in 0:99){
 }
 
 # Create boxplot for the number of DEGs (based on adj p-value<0.05 only)
+install.packages("svglite")
+library(svglite)
 library(ggplot2)
 
 name_control <- rep("sample-lvl", 100)
@@ -90,8 +92,16 @@ p <- ggplot(df, aes(x=names, y=num_over_pathways, color=names)) +
        x="Simulation type",
        y = "Number of over-represented pathways",
        color = "simulation type")+
-  scale_color_manual(values=c("#E69F00", "#56B4E9"))
+  scale_color_manual(values=c("#E69F00", "#56B4E9")) +
+  theme(
+    legend.title=element_text(family='sans-serif', size=15),
+    legend.text=element_text(family='sans-serif', size=12),
+    plot.title=element_text(family='sans-serif', size=15),
+    axis.text=element_text(family='sans-serif', size=12),
+    axis.title=element_text(family='sans-serif', size=15)
+  )
 p
 
+
 # Save 
-ggsave(paste(main_input_dir,"boxplot_num_over_represented_pathways.png", sep=""), plot = p, dpi=500)
+ggsave(paste(main_input_dir,"boxplot_num_over_represented_pathways.svg", sep=""), plot = p, device="svg")
