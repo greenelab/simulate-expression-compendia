@@ -1,8 +1,6 @@
 name: simulate_expression_compendia
 channels:
-- anaconda
 - conda-forge
-- defaults
 dependencies:
 - conda-forge::python=3.5.5
 - conda-forge::keras=2.1.6
@@ -28,6 +26,7 @@ dependencies:
 - conda-forge::rpy2=2.8
 - conda-forge::libiconv=1.15
 - conda-forge::joblib=0.13.2
+- pip=9.0
 - pip:
   - torch>=0.4.0
   - matplotlib==3.0.0
