@@ -1,10 +1,12 @@
-# The impact of undesired technical variability on large-scale data compendia
+# Correcting for experiment-specific variability in expression compendia can remove underlying signals
 
 **Alexandra J Lee, YoSon Park, Georgia Doing, Deborah A Hogan and Casey S Greene**
 
 **January 2020**
 
 **University of Pennsylvania**
+
+[![DOI:10.1101/2020.05.03.066597v1](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://www.biorxiv.org/content/10.1101/2020.05.03.066597v1)
 
 This repository stores data and analysis modules to simulate compendia of gene expression data and measure the effect of technical sources of variation on our ability to extract an underlying biological signal.  
 
