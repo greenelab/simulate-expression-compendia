@@ -6,7 +6,7 @@
 
 **University of Pennsylvania**
 
-[![DOI](https://zenodo.org/badge/126377943.svg)](https://www.biorxiv.org/content/10.1101/2020.05.03.066597v1)
+[![DOI]()](https://www.biorxiv.org/content/10.1101/2020.05.03.066597v1)
 
 This repository stores data and analysis modules to simulate compendia of gene expression data and measure the effect of technical sources of variation on our ability to extract an underlying biological signal.  
 
