@@ -29,23 +29,44 @@ def get_sample_ids(experiment_id, dataset_name):
     '''
     base_dir = os.path.abspath(os.path.join(os.getcwd(), "../"))
 
-    # metadata file
-    mapping_file = os.path.join(
-        base_dir,
-        dataset_name,
-        "data",
-        "metadata",
-        "sample_annotations.tsv")
+    if dataset_name == "Pseudomonas":
+        # metadata file
+        mapping_file = os.path.join(
+            base_dir,
+            dataset_name,
+            "data",
+            "metadata",
+            "sample_annotations.tsv")
 
-    # Read in metadata
-    metadata = pd.read_table(
-        mapping_file,
-        header=0,
-        sep='\t',
-        index_col=0)
+        # Read in metadata
+        metadata = pd.read_table(
+            mapping_file,
+            header=0,
+            sep='\t',
+            index_col=0)
 
-    selected_metadata = metadata.loc[experiment_id]
-    sample_ids = list(selected_metadata['ml_data_source'])
+        selected_metadata = metadata.loc[experiment_id]
+        sample_ids = list(selected_metadata['ml_data_source'])
+    
+    else:
+        # metadata file
+        mapping_file = os.path.join(
+            base_dir,
+            dataset_name,
+            "data",
+            "metadata",
+            "recount2_metadata.tsv")
+
+        # Read in metadata
+        metadata = pd.read_table(
+            mapping_file,
+            header=0,
+            sep='\t',
+            index_col=0)
+
+        selected_metadata = metadata.loc[experiment_id]
+        sample_ids = list(selected_metadata['run'])
+    
     return sample_ids
 
 
@@ -357,11 +378,21 @@ def shift_template_experiment(
     loaded_decode_model.load_weights(weights_decoder_file)
 
     # Read data
-    normalized_data = pd.read_table(
-        normalized_data_file,
-        header=0,
-        sep='\t',
-        index_col=0).T
+
+    if dataset_name == "Pseudomonas":
+        # Pseudomonas data is gene x sample
+        normalized_data = pd.read_table(
+            normalized_data_file,
+            header=0,
+            sep='\t',
+            index_col=0).T
+    else:
+        # recount2 data is already sample x gene
+        normalized_data = pd.read_table(
+            normalized_data_file,
+            header=0,
+            sep='\t',
+            index_col=0)
 
     #print("Normalized gene expression data contains {} samples and {} genes".format(
     #    normalized_data.shape[0], normalized_data.shape[1]))
@@ -403,7 +434,6 @@ def shift_template_experiment(
             encoded_means[j], encoded_stds[j])
 
     shift_vec_df = new_centroid - centroid
-    #print(shift_vec_df)
 
     simulated_data_encoded_df = data_encoded_df.apply(
         lambda x: x + shift_vec_df, axis=1)
