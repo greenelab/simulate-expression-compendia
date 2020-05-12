@@ -269,11 +269,18 @@ def train_vae(config_file,
     train_architecture = params['NN_architecture']
 
     # Read data
-    normalized_data = pd.read_table(
-        input_data_file,
-        header=0,
-        sep='\t',
-        index_col=0).T
+    if dataset_name == "Rank_pathways":
+        normalized_data = pd.read_table(
+            input_data_file,
+            header=0,
+            sep='\t',
+            index_col=0)
+    else:
+        normalized_data = pd.read_table(
+            input_data_file,
+            header=0,
+            sep='\t',
+            index_col=0).T
 
     print('input dataset contains {} samples and {} genes'.format(normalized_data.shape[0], normalized_data.shape[1]))
 
