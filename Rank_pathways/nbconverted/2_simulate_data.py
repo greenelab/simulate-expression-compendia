@@ -111,19 +111,19 @@ scaler = pickle.load(open(scaler_transform_file, "rb" ) )
 
 
 # Read data
-compendium = pd.read_table(
+compendium = pd.read_csv(
     compendium_file,
     header=0,
     sep='\t',
     index_col=0)
 
-normalized_compendium = pd.read_table(
+normalized_compendium = pd.read_csv(
     normalized_compendium_file,
     header=0,
     sep='\t',
     index_col=0)
 
-template_data = pd.read_table(
+template_data = pd.read_csv(
     template_data_file,
     header=0,
     sep='\t',
@@ -194,7 +194,7 @@ simulated_file_1 = os.path.join(
     "selected_simulated_data_SRP000762_0.txt")
 
 # Read data
-simulated_test_1 = pd.read_table(
+simulated_test_1 = pd.read_csv(
     simulated_file_1,
     header=0,
     sep='\t',
@@ -220,7 +220,7 @@ simulated_file_2 = os.path.join(
     "selected_simulated_data_SRP000762_10.txt")
 
 # Read data
-simulated_test_2 = pd.read_table(
+simulated_test_2 = pd.read_csv(
     simulated_file_2,
     header=0,
     sep='\t',
