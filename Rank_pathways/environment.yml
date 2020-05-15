@@ -13,7 +13,7 @@ dependencies:
 - conda-forge::tensorboard
 - conda-forge::tensorflow
 - conda-forge::scikit-learn
-- conda-forge::pandas=0.24.2
+- conda-forge::pandas=0.23.4
 - conda-forge::seaborn=0.10
 - conda-forge::umap-learn
 - conda-forge::scipy=1.1.0
