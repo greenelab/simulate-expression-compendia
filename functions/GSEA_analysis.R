@@ -11,10 +11,15 @@ find_enriched_pathways <- function(DE_stats_file){
     # Read in data
     DE_stats_data <- read.table(DE_stats_file, sep="\t", header=TRUE, row.names=NULL)
    
-    # Sort genes by log FC
+    # Sort genes by feature 1
     
-    # feature 1: numeric vector of adjusted p-values
-    rank_genes = DE_stats_data[,5]
+    # feature 1: numeric vector
+    # 5: p-values
+    # 6: adjusted p-values
+    # 2: logFC
+    rank_genes = as.numeric(as.character(DE_stats_data[,5]))
+    
+    #print(head(rank_genes))
 
     # feature 2: named vector of gene ids
     # Remove version from gene id
@@ -22,7 +27,7 @@ find_enriched_pathways <- function(DE_stats_file){
 
     names(rank_genes) = as.character(DE_stats_data[,1])
 
-    ## feature 3: decreasing orde
+    ## feature 3: decreasing order
     rank_genes = sort(rank_genes, decreasing = TRUE)
   
     enrich_pathways <- gseGO(
@@ -32,6 +37,8 @@ find_enriched_pathways <- function(DE_stats_file){
         keyType = "ENSEMBL", 
         verbose=F
         )
+
+    dotplot(enrich_pathways)
   
     return(as.data.frame(enrich_pathways@result))
 }
