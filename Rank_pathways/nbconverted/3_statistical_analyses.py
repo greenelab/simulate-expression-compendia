@@ -3,6 +3,8 @@
 
 # # Statistical analysis
 # This notebook performs differential expression analysis using the real template experiment and simulated experiments, as a null set. Then the set of differentially expressed genes (DEGs) obtained from this analysis are used to perform gene set enrichment analysis (GSEA) to identify pathways enriched in these set of DEGs.
+# 
+# *Note:* To run datatables, need to refresh the window and then run all cells (DO NOT restart and run all, only run all works).
 
 # In[1]:
 
@@ -23,6 +25,16 @@ from rpy2.robjects import pandas2ri
 pandas2ri.activate()
 import matplotlib.pyplot as plt
 import seaborn as sns
+import warnings
+from jupyter_datatables import init_datatables_mode
+
+
+def fxn():
+    warnings.warn("deprecated", DeprecationWarning)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fxn()
 
 sys.path.append("../")
 from functions import utils
@@ -98,7 +110,7 @@ get_ipython().run_cell_magic('R', '', "library('limma')")
 # In[8]:
 
 
-get_ipython().run_cell_magic('R', '-i metadata_file -i project_id -i template_data_file -i local_dir', '\nsource(\'../functions/DE_analysis.R\')\n\nget_DE_stats(metadata_file,\n             project_id, \n             template_data_file,\n             "template",\n             local_dir,\n             "real")')
+get_ipython().run_cell_magic('R', '-i metadata_file -i project_id -i template_data_file -i local_dir', '\nsource(\'../functions/DE_analysis.R\')\n\nout_file <- paste(local_dir,\n                  "DE_stats/DE_stats_template_data_",\n                  project_id,\n                  "_real.txt",\n                  sep="")\n\nif (file.exists(out_file) == FALSE){\n    get_DE_stats(metadata_file,\n                 project_id, \n                 template_data_file,\n                 "template",\n                 local_dir,\n                 "real")\n    }')
 
 
 # **Get differentially expressed genes from each simulated experiment**
@@ -106,7 +118,7 @@ get_ipython().run_cell_magic('R', '-i metadata_file -i project_id -i template_da
 # In[9]:
 
 
-get_ipython().run_cell_magic('R', '-i metadata_file -i project_id -i base_dir -i local_dir -i num_runs -o num_sign_DEGs_simulated', '\nsource(\'../functions/DE_analysis.R\')\n\nnum_sign_DEGs_simulated <- c()\n\nfor (i in 0:(num_runs-1)){\n  simulated_data_file <- paste(local_dir, "pseudo_experiment/selected_simulated_data_", project_id, "_", i, ".txt", sep="")\n  cat(paste("running file: ", simulated_data_file, "...\\n", sep=""))\n  \n  run_output <- get_DE_stats(metadata_file,\n                             project_id, \n                             simulated_data_file,\n                             "simulated",\n                             local_dir,\n                             i)\n  \n  num_sign_DEGs_simulated <- c(num_sign_DEGs_simulated, run_output)\n}\nmedian(num_sign_DEGs_simulated)')
+get_ipython().run_cell_magic('R', '-i metadata_file -i project_id -i base_dir -i local_dir -i num_runs -o num_sign_DEGs_simulated', '\nsource(\'../functions/DE_analysis.R\')\n\nnum_sign_DEGs_simulated <- c()\n\nfor (i in 0:(num_runs-1)){\n    simulated_data_file <- paste(local_dir, \n                                 "pseudo_experiment/selected_simulated_data_",\n                                 project_id,\n                                 "_", \n                                 i,\n                                 ".txt",\n                                 sep="")\n    out_file <- paste(local_dir, \n                      "DE_stats/DE_stats_simulated_data_",\n                      project_id,\n                      "_",\n                      i,\n                      ".txt", \n                      sep="")\n    \n    if (file.exists(out_file) == FALSE){\n        run_output <- get_DE_stats(metadata_file,\n                                   project_id, \n                                   simulated_data_file,\n                                   "simulated",\n                                   local_dir,\n                                   i)\n        num_sign_DEGs_simulated <- c(num_sign_DEGs_simulated, run_output)\n    } else {\n        # Read in DE stats data\n        DE_stats_data <- as.data.frame(read.table(out_file, sep="\\t", header=TRUE, row.names=1))\n        \n        # Get number of genes that exceed threshold\n        threshold <- 0.05\n        sign_DEGs <- DE_stats_data[DE_stats_data[,\'adj.P.Val\']<threshold,]\n        \n        num_sign_DEGs <- nrow(sign_DEGs)\n        \n        num_sign_DEGs_simulated <- c(num_sign_DEGs_simulated, num_sign_DEGs)\n    }\n}')
 
 
 # In[10]:
@@ -187,7 +199,7 @@ template_DEGs.head()
 # In[15]:
 
 
-get_ipython().run_cell_magic('R', '', 'library(clusterProfiler)\nlibrary(org.Hs.eg.db)\nlibrary(DOSE)')
+get_ipython().run_cell_magic('R', '', 'suppressWarnings(library(clusterProfiler))\nsuppressWarnings(library(org.Hs.eg.db))\nsuppressWarnings(library(DOSE))')
 
 
 # **Get pathway enrichment for template experiment**
@@ -195,14 +207,14 @@ get_ipython().run_cell_magic('R', '', 'library(clusterProfiler)\nlibrary(org.Hs.
 # In[16]:
 
 
-get_ipython().run_cell_magic('R', '-i template_DE_stats_file  -o enriched_pathways', "\nsource('../functions/GSEA_analysis.R')\n\nenriched_pathways <- find_enriched_pathways(template_DE_stats_file)")
+get_ipython().run_cell_magic('R', '-i template_DE_stats_file  -o template_enriched_pathways', "\nsource('../functions/GSEA_analysis.R')\n\ntemplate_enriched_pathways <- find_enriched_pathways(template_DE_stats_file)")
 
 
 # In[17]:
 
 
-print(enriched_pathways.shape)
-enriched_pathways.head()
+print(template_enriched_pathways.shape)
+template_enriched_pathways.head()
 
 
 # **Get pathway enrichment for simulated experiments**
@@ -210,7 +222,7 @@ enriched_pathways.head()
 # In[18]:
 
 
-get_ipython().run_cell_magic('R', '-i project_id -i local_dir -i num_runs ', '\nsource(\'../functions/GSEA_analysis.R\')\n\nfor (i in 0:(num_runs-1)){\n    simulated_DE_stats_file <- paste(local_dir, \n                                 "DE_stats/DE_stats_simulated_data_", \n                                 project_id,\n                                 "_", \n                                 i,\n                                 ".txt",\n                                 sep="")\n    cat(paste("running file: ", simulated_DE_stats_file, "...\\n", sep=""))\n    \n    enriched_pathways <- find_enriched_pathways(simulated_DE_stats_file)\n    \n    out_file = paste(local_dir, "GSEA_stats/GSEA_simulated_data_", project_id,"_", i, ".txt", sep="")\n    write.table(enriched_pathways, file = out_file, row.names = T, sep = "\\t", quote = F)\n    }')
+get_ipython().run_cell_magic('R', '-i project_id -i local_dir -i num_runs ', '\nsource(\'../functions/GSEA_analysis.R\')\n\nfor (i in 0:(num_runs-1)){\n    simulated_DE_stats_file <- paste(local_dir, \n                                 "DE_stats/DE_stats_simulated_data_", \n                                 project_id,\n                                 "_", \n                                 i,\n                                 ".txt",\n                                 sep="")\n    \n    out_file = paste(local_dir, \n                     "GSEA_stats/GSEA_simulated_data_",\n                     project_id,\n                     "_",\n                     i,\n                     ".txt", \n                     sep="")\n    \n    if (file.exists(out_file) == FALSE){\n        enriched_pathways <- find_enriched_pathways(simulated_DE_stats_file) \n    \n        write.table(enriched_pathways, file = out_file, row.names = T, sep = "\\t", quote = F)\n        }\n    }')
 
 
 # ## Statistics
@@ -226,28 +238,22 @@ col_to_rank = 'enrichmentScore'
 # In[20]:
 
 
-# zip GO ID and description to get unique key
-enriched_pathways["ID_description"] = enriched_pathways["ID"] +"-"+enriched_pathways["Description"]
+# Get ranks of template experiment
+# Rank pathways by highest enrichment score
+template_enriched_pathways['ranking'] = template_enriched_pathways[col_to_rank].rank(ascending = 0) 
+template_enriched_pathways = template_enriched_pathways.sort_values(by=col_to_rank, ascending=False)
+
+# Set index to GO ID
+template_enriched_pathways.set_index("ID", inplace=True)
+print(template_enriched_pathways.shape)
+template_enriched_pathways.head()
 
 
 # In[21]:
 
 
-# Get ranks of template experiment
-# Rank pathways by highest enrichment score
-enriched_pathways['ranking'] = enriched_pathways[col_to_rank].rank(ascending = 0) 
-enriched_pathways = enriched_pathways.sort_values(by=col_to_rank, ascending=False)
-enriched_pathways
-
-
-# In[22]:
-
-
-# Make dictionary {GO ID-description:rank}
-template_rank_dict = dict(zip(enriched_pathways["ID_description"], 
-                              enriched_pathways["ranking"]
-                             ))
-template_rank_dict
+# Check that GO IDs are unique
+template_enriched_pathways.index.nunique() == len(template_enriched_pathways)
 
 
 # **Check**
@@ -260,31 +266,11 @@ template_rank_dict
 
 # **Simulated experiments**
 
-# In[23]:
+# In[22]:
 
 
-def FullMergeDict(D1, D2):
-    for key, value in D1.items():
-        if key in D2:
-            if type(value) is dict:
-                FullMergeDict(D1[key], D2[key])
-            else:
-                if type(value) in (int, float, str):
-                    D1[key] = [value]
-                if type(D2[key]) is list:
-                    D1[key].extend(D2[key])
-                else:
-                    D1[key].append(D2[key])
-    for key, value in D2.items():
-        if key not in D1:
-            D1[key] = value
-    return(D1)
-
-
-# In[24]:
-
-
-# Get distribution of ranks for simulated experiments
+# Concatenate simulated experiments
+simulated_enriched_pathways_all = pd.DataFrame()
 for i in range(num_runs):
     simulated_GSEA_file = os.path.join(
         local_dir, 
@@ -298,65 +284,91 @@ for i in range(num_runs):
         sep='\t',
         index_col=0)
     
-    # zip GO ID and description to get unique key
-    simulated_enriched_pathways["ID_description"] = simulated_enriched_pathways["ID"]+"-"+simulated_enriched_pathways["Description"]
-    
-    # Get ranks of simulated experiment
+    # Add ranks of simulated experiment
     simulated_enriched_pathways['ranking'] = simulated_enriched_pathways[col_to_rank].rank(ascending = 0) 
     simulated_enriched_pathways = simulated_enriched_pathways.sort_values(by=col_to_rank, ascending=False)
     
-    if i == 0:
-        # Initiate dictionary {GO ID-description:rank}
-        simulated_rank_dict = dict(zip(simulated_enriched_pathways["ID_description"], 
-                                      simulated_enriched_pathways["ranking"]
-                                     ))
-    else:
-        tmp_simulated_rank_dict = dict(zip(simulated_enriched_pathways["ID_description"], 
-                                      simulated_enriched_pathways["ranking"]
-                                     ))
-        
-        simulated_rank_dict = FullMergeDict(simulated_rank_dict, tmp_simulated_rank_dict)
+    # Concatenate df
+    simulated_enriched_pathways_all = pd.concat([simulated_enriched_pathways_all,
+                                       simulated_enriched_pathways])
+    
+print(simulated_enriched_pathways_all.shape)
+simulated_enriched_pathways_all.head()
+
+
+# In[23]:
+
+
+simulated_enriched_pathways_stats = simulated_enriched_pathways_all.groupby(['ID'])[['enrichmentScore', 'pvalue', 'ranking']].agg({
+    col_to_rank:['mean', 'std','count'],
+    'pvalue':['median'],
+    'ranking':['median']
+})
+
+simulated_enriched_pathways_stats.head()
+
+
+# In[24]:
+
+
+# Merge template statistics with simulated statistics
+template_simulated_enriched_pathways_stats = template_enriched_pathways.merge(simulated_enriched_pathways_stats, 
+                                                                              how='outer',
+                                                                              left_index=True,
+                                                                              right_index=True)
+template_simulated_enriched_pathways_stats.head()
 
 
 # In[25]:
 
 
-simulated_rank_dict
+# Parse columns
+median_pval_simulated = template_simulated_enriched_pathways_stats[('pvalue','median')]
+median_rank_simulated = template_simulated_enriched_pathways_stats[('ranking','median')]
+mean_test_simulated = template_simulated_enriched_pathways_stats[(col_to_rank,'mean')]
+std_test_simulated = template_simulated_enriched_pathways_stats[(col_to_rank,'std')]
 
 
-# ## Manually examine enriched pathways
+# ## Examine enriched pathways
 # Examine the enriched pathways identified from template experiment -- How are these enriched pathways ranked in the simulated experiments?
 # 
 # Recall that there were 25 simulated experiments
 
-# In[26]:
-
-
-# Compare template rank vs median simulated rank 
-# Print those pathways where template rank < simulated rank (template is higher ranked than simulated)
-# Some of these are pathways that are potentially template-specific
-
-for key, val in template_rank_dict.items():
-    if key in simulated_rank_dict.keys():
-        diff_rank = val - np.median(simulated_rank_dict[key])
-        if diff_rank < 10:
-            print(key)
-            print("Template rank: ", val)
-            print("Median simulated rank: ", np.median(simulated_rank_dict[key]))
-
+# ### Calculations for summary table
 
 # In[27]:
 
 
-# Compare template rank vs median simulated rank 
-# Print those pathways that ranked high in template experiment AND have similar ranks in simulated experiment
-for key, val in template_rank_dict.items():
-    if key in simulated_rank_dict.keys():
-        diff_rank = val - np.median(simulated_rank_dict[key])
-        if (val < 50) and (abs(diff_rank) < 10):
-            print(key)
-            print("Template rank: ", val)
-            print("Median simulated rank: ", np.median(simulated_rank_dict[key]))
+init_datatables_mode()
+
+
+# In[30]:
+
+
+summary = pd.DataFrame(data={'GO ID': template_simulated_enriched_pathways_stats.index,
+                             'Pathway': template_simulated_enriched_pathways_stats['Description'],
+                             'P-value (Real)': template_simulated_enriched_pathways_stats['pvalue'],
+                             'Rank (Real)': template_simulated_enriched_pathways_stats['ranking'],
+                             'Test statistic (Real)': template_enriched_pathways[col_to_rank],
+                             'Median p-value (simulated)': median_pval_simulated ,
+                             'Median rank (simulated)': median_rank_simulated ,
+                             'Mean test statistic (simulated)': mean_test_simulated ,
+                             'Std deviation (simulated)': std_test_simulated
+                            }
+                      )
+summary['Z score'] = (summary['Test statistic (Real)'] - summary['Mean test statistic (simulated)'])/summary['Std deviation (simulated)']
+summary
+
+
+# In[29]:
+
+
+# Save file
+summary_file = os.path.join(
+        local_dir, 
+        "summary_table.tsv")
+
+summary.to_csv(summary_file, float_format='%.5f', sep='\t')
 
 
 # There are a few immune pathways that are template-enriched but there are others that look to be involved in cellular maintenancem, which I wouldn't expect to be specific to these experiment.
