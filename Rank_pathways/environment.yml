@@ -26,3 +26,5 @@ dependencies:
 - pip=19.2.1
 - pip:
   - matplotlib==3.0.0
+  - jupyter-datatables
+  - jupyter-require
