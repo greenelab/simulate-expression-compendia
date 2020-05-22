@@ -7,7 +7,28 @@
 
 #library(clusterProfiler)
 
-find_enriched_pathways <- function(DE_stats_file){
+convertEnsembl2Symbol <- function(ensembl.genes) {
+  #require(biomaRt)
+  ensembl = useMart("ensembl",dataset="hsapiens_gene_ensembl")
+  getBM(values = ensembl.genes, attributes = c('ensembl_gene_id','hgnc_symbol'), 
+        filters = 'ensembl_gene_id', mart = ensembl, bmHeader=FALSE )
+}
+
+get_ensembl_symbol_mapping <- function(DE_stats_file){
+    # Read in data
+    DE_stats_data <- read.table(DE_stats_file, sep="\t", header=TRUE, row.names=NULL)
+    
+    # Remove version from gene id
+    DE_stats_data[,1] <- gsub("\\..*","", DE_stats_data[,1])
+    
+    # Get mapping from ensembl - gene symbol
+    gene_id_mapping <- convertEnsembl2Symbol(as.character(DE_stats_data[,1]))
+    
+    return(gene_id_mapping)
+    }
+
+find_enriched_pathways <- function(DE_stats_file,
+                                  pathway_DB){
     # Read in data
     DE_stats_data <- read.table(DE_stats_file, sep="\t", header=TRUE, row.names=NULL)
    
@@ -17,7 +38,7 @@ find_enriched_pathways <- function(DE_stats_file){
     # 5: p-values
     # 6: adjusted p-values
     # 2: logFC
-    rank_genes = as.numeric(as.character(DE_stats_data[,5]))
+    rank_genes <- as.numeric(as.character(DE_stats_data[,5]))
     
     #print(head(rank_genes))
 
@@ -25,22 +46,27 @@ find_enriched_pathways <- function(DE_stats_file){
     # Remove version from gene id
     DE_stats_data[,1] <- gsub("\\..*","", DE_stats_data[,1])
 
-    names(rank_genes) = as.character(DE_stats_data[,1])
+    names(rank_genes) <- as.character(DE_stats_data[,1])
 
     ## feature 3: decreasing order
     rank_genes = sort(rank_genes, decreasing = TRUE)
   
-    enrich_pathways <- gseGO(
-        geneList=rank_genes, 
-        ont="ALL", 
-        OrgDb=org.Hs.eg.db,
-        keyType = "ENSEMBL", 
-        verbose=F
-        )
+    #enrich_pathways <- gseGO(
+    #    geneList=rank_genes, 
+    #    ont="ALL", 
+    #    OrgDb=org.Hs.eg.db,
+    #    keyType = "ENSEMBL", 
+    #    verbose=F
+    #    )
+    pathway_DB_data <- read.gmt(pathway_DB)
+    enrich_pathways <- GSEA(rank_genes, 
+                            TERM2GENE=pathway_DB_data,
+                            minGSSize = 10,
+                            nPerm = 1000, 
+                            pvalueCutoff = 0.05,
+                            verbose=FALSE)
 
-    dotplot(enrich_pathways)
-  
-    return(as.data.frame(enrich_pathways@result))
+    return(as.data.frame(enrich_pathways))
 }
 
 find_over_represented_pathways <- function(DE_stats_file){
