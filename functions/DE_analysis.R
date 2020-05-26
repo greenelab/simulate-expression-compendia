@@ -32,11 +32,14 @@ get_DE_stats <- function(metadata_file,
   # Comparisons between groups (log fold-changes) are obtained as contrasts of these fitted linear models:
   # Samples are grouped based on experimental condition
   # The variability of gene expression is compared between these groups
-  if (grep("SRP000762_groups", metadata_file)){
-    # For experiment E-GEOD-51409, we are comparing the expression profile
-    # of samples grown in 37 degrees versus those grown in 22 degrees
+  if (grepl("SRP000762_groups", metadata_file)){
     contr <- makeContrasts(groupDEX_treated - groupcontrol, levels = colnames(coef(fit)))
+  }else if (grepl("SRP057087_groups", metadata_file)){
+    contr <- makeContrasts(grouplesion - groupnot_lesion, levels = colnames(coef(fit)))
+  }else if (grepl("SRP012656_groups", metadata_file)){
+    contr <- makeContrasts(groupTumor - groupNormal, levels = colnames(coef(fit)))
   }
+  
   # Estimate contrast for each gene
   tmp <- contrasts.fit(fit, contr)
   
@@ -49,8 +52,8 @@ get_DE_stats <- function(metadata_file,
   all_genes <-  as.data.frame(top.table)
   
   # Find all DEGs based on adjusted p-value cutoff
-  threshold = 0.05
-  num_sign_DEGs <- all_genes[all_genes[,'adj.P.Val']<threshold,]
+  threshold = 0.001
+  num_sign_DEGs <- all_genes[all_genes[,'adj.P.Val']<threshold & abs(all_genes[,'logFC'])>1,]
   
   # Save summary statistics of DEGs
   if (data_type == "template"){
