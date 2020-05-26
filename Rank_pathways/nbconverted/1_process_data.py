@@ -8,7 +8,7 @@
 # 2. Downloads subset of recount2 data, including the template experiment (50 random experiments + 1 template experiment)
 # 3. Train VAE on subset of recount2 data
 
-# In[11]:
+# In[1]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -33,7 +33,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[12]:
+# In[2]:
 
 
 # Read in config variables
@@ -58,20 +58,14 @@ params = utils.read_config(config_file)
 # 
 # For this analysis we will treat each run as a *sample*
 
-# In[3]:
-
-
-# User selected experiment id
-project_id = "SRP000762"
-
-
-# In[13]:
+# In[4]:
 
 
 # Load params
 local_dir = params["local_dir"]
 dataset_name = params['dataset_name']
 NN_architecture = params['NN_architecture']
+project_id = params['project_id']
 
 
 # ### Download subset of recount2 to use as a compendium
@@ -97,7 +91,7 @@ get_ipython().run_cell_magic('R', '-i project_id -i base_dir -i local_dir', "\ns
 
 # ### Download expression data for selected project id
 
-# In[8]:
+# In[12]:
 
 
 get_ipython().run_cell_magic('R', '-i project_id -i local_dir', "\nsource('../functions/download_recount2_data.R')\n\nget_recount2_template_experiment(project_id, local_dir)")

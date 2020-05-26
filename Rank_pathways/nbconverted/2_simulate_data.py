@@ -70,16 +70,14 @@ params = utils.read_config(config_file)
 local_dir = params["local_dir"]
 dataset_name = params['dataset_name']
 NN_architecture = params['NN_architecture']
-num_runs = 25
+num_runs = params['num_simulated']
+project_id = params['project_id']
 
 NN_dir = os.path.join(
     base_dir, 
     dataset_name, 
     "models", 
     NN_architecture)
-
-# User selected experiment id
-project_id = "SRP000762"
 
 
 # In[4]:
@@ -132,22 +130,22 @@ template_data = pd.read_csv(
 
 # ### Simulate experiments using selected template experiment
 
-# In[6]:
+# In[8]:
 
 
 # Simulate experiments
 # Make sure range is correct
 # Generate multiple simulated datasets
-#for i in range(num_runs):
-#    generate_labeled_data.shift_template_experiment(
-#        normalized_compendium_file,
-#        project_id,
-#        NN_architecture,
-#        dataset_name,
-#        scaler,
-#        local_dir,
-#        base_dir,
-#        i)
+for i in range(num_runs):
+    generate_labeled_data.shift_template_experiment(
+        normalized_compendium_file,
+        project_id,
+        NN_architecture,
+        dataset_name,
+        scaler,
+        local_dir,
+        base_dir,
+        i)
 
 
 # ### Quick validation of simulated experiments
@@ -156,7 +154,7 @@ template_data = pd.read_csv(
 # 1. Values are different between different simulated data files (meaning it was a different simulated dataset), and different from the template experiment
 # 2. Range of values is scaled the same as the compendium
 
-# In[7]:
+# In[9]:
 
 
 # Compendium
@@ -164,13 +162,13 @@ print(compendium.shape)
 compendium.head()
 
 
-# In[8]:
+# In[10]:
 
 
 sns.distplot(compendium['ENSG00000000003.14'])
 
 
-# In[9]:
+# In[11]:
 
 
 # Template experiment
@@ -178,20 +176,20 @@ print(template_data.shape)
 template_data.head()
 
 
-# In[10]:
+# In[12]:
 
 
 sns.distplot(template_data['ENSG00000000003.14'])
 
 
-# In[11]:
+# In[13]:
 
 
 # Manual select one simulated experiment
 simulated_file_1 = os.path.join(
     local_dir,
     "pseudo_experiment",
-    "selected_simulated_data_SRP000762_0.txt")
+    "selected_simulated_data_"+project_id+"_0.txt")
 
 # Read data
 simulated_test_1 = pd.read_csv(
@@ -204,20 +202,20 @@ print(simulated_test_1.shape)
 simulated_test_1.head()
 
 
-# In[12]:
+# In[14]:
 
 
 sns.distplot(simulated_test_1['ENSG00000000003.14'])
 
 
-# In[55]:
+# In[15]:
 
 
 # Manual select another simulated experiment
 simulated_file_2 = os.path.join(
     local_dir,
     "pseudo_experiment",
-    "selected_simulated_data_SRP000762_10.txt")
+    "selected_simulated_data_"+project_id+"_10.txt")
 
 # Read data
 simulated_test_2 = pd.read_csv(
@@ -230,7 +228,7 @@ print(simulated_test_2.shape)
 simulated_test_2.head()
 
 
-# In[56]:
+# In[16]:
 
 
 sns.distplot(simulated_test_2['ENSG00000000003.14'])
@@ -242,7 +240,7 @@ sns.distplot(simulated_test_2['ENSG00000000003.14'])
 
 # **Visualization in latent space**
 
-# In[57]:
+# In[17]:
 
 
 # Load VAE models
@@ -270,13 +268,13 @@ loaded_model.load_weights(weights_encoder_file)
 loaded_decode_model.load_weights(weights_decoder_file)
 
 
-# In[58]:
+# In[18]:
 
 
 pca = PCA(n_components=2)
 
 
-# In[59]:
+# In[19]:
 
 
 # Embedding of real compendium (encoded)
@@ -307,7 +305,7 @@ compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[60]:
+# In[20]:
 
 
 # Embedding of real template experiment (encoded)
@@ -333,7 +331,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[61]:
+# In[21]:
 
 
 # Embedding of simulated experiment (encoded)
@@ -359,7 +357,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[62]:
+# In[22]:
 
 
 # Concatenate dataframes
@@ -370,7 +368,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[63]:
+# In[23]:
 
 
 # Plot
@@ -396,7 +394,7 @@ fig += geom_point(data=combined_UMAPencoded_df[combined_UMAPencoded_df['experime
                   alpha=0.2, 
                   color='blue')
 fig += geom_point(data=combined_UMAPencoded_df[combined_UMAPencoded_df['experiment_id'] == 'simulated_experiment'],
-                  alpha=0.2, 
+                  alpha=0.1, 
                   color='red')
 
 print(fig)
@@ -404,7 +402,7 @@ print(fig)
 
 # **Visualization in gene space**
 
-# In[64]:
+# In[24]:
 
 
 # Embedding of real compendium
@@ -421,7 +419,7 @@ compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[65]:
+# In[25]:
 
 
 # Embedding of real template experiment
@@ -436,7 +434,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[66]:
+# In[26]:
 
 
 # Embedding of simulated template experiment
@@ -451,7 +449,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[67]:
+# In[27]:
 
 
 # Concatenate dataframes
@@ -462,7 +460,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[68]:
+# In[28]:
 
 
 # Plot
