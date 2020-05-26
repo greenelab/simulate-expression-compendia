@@ -82,13 +82,13 @@ get_ipython().run_cell_magic('R', '-i project_id -i base_dir -i local_dir', "\ns
 
 # ### Download expression data for selected project id
 
-# In[13]:
+# In[20]:
 
 
 get_ipython().run_cell_magic('R', '-i project_id -i local_dir', "\nsource('../functions/download_recount2_data.R')\n\nget_recount2_template_experiment(project_id, local_dir)")
 
 
-# In[5]:
+# In[21]:
 
 
 # Load real template experiment
@@ -97,18 +97,7 @@ template_data_file = os.path.join(
     "recount2_template_data.tsv")
 
 
-# In[6]:
-
-
-# Read data
-template_data = pd.read_csv(
-    template_data_file,
-    header=0,
-    sep='\t',
-    index_col=0)
-
-
-# In[7]:
+# In[22]:
 
 
 # This experiment contains both RNA-seq and smRNA-seq samples.
@@ -125,15 +114,14 @@ smRNA_samples = ["SRR493961",
                  "SRR493970",
                  "SRR493971",
                  "SRR493972"]
-#template_data = template_data.loc[smRNA_samples]
-template_data = template_data.drop(smRNA_samples)
 
 
-# In[8]:
+# In[23]:
 
 
-# Save 
-template_data.to_csv(template_data_file, float_format='%.5f', sep='\t')
+# Drop samples
+utils.subsample_data(template_data_file,
+                    smRNA_samples)
 
 
 # ### Normalize compendium 

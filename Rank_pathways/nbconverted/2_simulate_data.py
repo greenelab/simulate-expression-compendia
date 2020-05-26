@@ -130,22 +130,49 @@ template_data = pd.read_csv(
 
 # ### Simulate experiments using selected template experiment
 
-# In[8]:
+# In[6]:
 
 
 # Simulate experiments
 # Make sure range is correct
 # Generate multiple simulated datasets
+#for i in range(num_runs):
+#    generate_labeled_data.shift_template_experiment(
+#        normalized_compendium_file,
+#        project_id,
+#        NN_architecture,
+#        dataset_name,
+#        scaler,
+#        local_dir,
+#        base_dir,
+#        i)
+
+
+# In[7]:
+
+
+# Truncate simulated experiments
+smRNA_samples = ["SRR493961",
+                 "SRR493962",
+                 "SRR493963",
+                 "SRR493964",
+                 "SRR493965",
+                 "SRR493966",
+                 "SRR493967",
+                 "SRR493968",
+                 "SRR493969",
+                 "SRR493970",
+                 "SRR493971",
+                 "SRR493972"]
+
 for i in range(num_runs):
-    generate_labeled_data.shift_template_experiment(
-        normalized_compendium_file,
-        project_id,
-        NN_architecture,
-        dataset_name,
-        scaler,
-        local_dir,
-        base_dir,
-        i)
+    simulated_data_file = os.path.join(
+        local_dir, 
+        "pseudo_experiment",
+        "selected_simulated_data_"+project_id+"_"+str(i)+".txt")
+    
+    utils.subsample_data(simulated_data_file,
+                        smRNA_samples)
 
 
 # ### Quick validation of simulated experiments
@@ -154,7 +181,7 @@ for i in range(num_runs):
 # 1. Values are different between different simulated data files (meaning it was a different simulated dataset), and different from the template experiment
 # 2. Range of values is scaled the same as the compendium
 
-# In[9]:
+# In[8]:
 
 
 # Compendium
@@ -162,13 +189,13 @@ print(compendium.shape)
 compendium.head()
 
 
-# In[10]:
+# In[9]:
 
 
 sns.distplot(compendium['ENSG00000000003.14'])
 
 
-# In[11]:
+# In[10]:
 
 
 # Template experiment
@@ -176,13 +203,13 @@ print(template_data.shape)
 template_data.head()
 
 
-# In[12]:
+# In[11]:
 
 
 sns.distplot(template_data['ENSG00000000003.14'])
 
 
-# In[13]:
+# In[12]:
 
 
 # Manual select one simulated experiment
@@ -202,13 +229,13 @@ print(simulated_test_1.shape)
 simulated_test_1.head()
 
 
-# In[14]:
+# In[13]:
 
 
 sns.distplot(simulated_test_1['ENSG00000000003.14'])
 
 
-# In[15]:
+# In[14]:
 
 
 # Manual select another simulated experiment
@@ -228,7 +255,7 @@ print(simulated_test_2.shape)
 simulated_test_2.head()
 
 
-# In[16]:
+# In[15]:
 
 
 sns.distplot(simulated_test_2['ENSG00000000003.14'])
@@ -240,7 +267,7 @@ sns.distplot(simulated_test_2['ENSG00000000003.14'])
 
 # **Visualization in latent space**
 
-# In[17]:
+# In[16]:
 
 
 # Load VAE models
@@ -268,13 +295,13 @@ loaded_model.load_weights(weights_encoder_file)
 loaded_decode_model.load_weights(weights_decoder_file)
 
 
-# In[18]:
+# In[17]:
 
 
 pca = PCA(n_components=2)
 
 
-# In[19]:
+# In[18]:
 
 
 # Embedding of real compendium (encoded)
@@ -305,7 +332,7 @@ compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[20]:
+# In[19]:
 
 
 # Embedding of real template experiment (encoded)
@@ -331,7 +358,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[21]:
+# In[20]:
 
 
 # Embedding of simulated experiment (encoded)
@@ -357,7 +384,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[22]:
+# In[21]:
 
 
 # Concatenate dataframes
@@ -368,7 +395,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[23]:
+# In[22]:
 
 
 # Plot
@@ -402,7 +429,7 @@ print(fig)
 
 # **Visualization in gene space**
 
-# In[24]:
+# In[23]:
 
 
 # Embedding of real compendium
@@ -419,7 +446,7 @@ compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[25]:
+# In[24]:
 
 
 # Embedding of real template experiment
@@ -434,7 +461,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[26]:
+# In[25]:
 
 
 # Embedding of simulated template experiment
@@ -449,7 +476,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[27]:
+# In[26]:
 
 
 # Concatenate dataframes
@@ -460,7 +487,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[28]:
+# In[27]:
 
 
 # Plot
