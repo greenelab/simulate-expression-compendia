@@ -8,7 +8,7 @@
 # 2. Downloads subset of recount2 data, including the template experiment (50 random experiments + 1 template experiment)
 # 3. Train VAE on subset of recount2 data
 
-# In[1]:
+# In[2]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -33,7 +33,7 @@ randomState = 123
 seed(randomState)
 
 
-# In[2]:
+# In[3]:
 
 
 # Read in config variables
@@ -47,16 +47,7 @@ params = utils.read_config(config_file)
 
 # ### Select template experiment
 # 
-# We manually selected bioproject [SRP000762](https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP000762), which contains 4 A549 sample replicates - 2 were treated with 100nM Dexamethasone (DEX) and 2 were treated with 0.01% ethanol (control).
-# 
-# For each sample replicate there were 5-6 sequencing runs.
-# 
-# * [DEX treated replicate 1](https://www.ncbi.nlm.nih.gov/sra/SRX006804[accn])
-# * [DEX treated replicate 2](https://www.ncbi.nlm.nih.gov/sra/SRX006806[accn])
-# * [Ethanol treated replicate 1](https://www.ncbi.nlm.nih.gov/sra/SRX006805[accn])
-# * [Ethanol treated replicate 2](https://www.ncbi.nlm.nih.gov/sra/SRX006807[accn])
-# 
-# For this analysis we will treat each run as a *sample*
+# We manually selected bioproject [SRP012656](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE37764), which contains primary non-small cell lung adenocarcinoma tumors and adjacent normal tissues of 6 never-smoker Korean female patients with 2 replicates each.
 
 # In[4]:
 
@@ -77,7 +68,7 @@ project_id = params['project_id']
 get_ipython().run_cell_magic('R', '', '# Select 59\n# Run one time\nif (!requireNamespace("BiocManager", quietly = TRUE))\n    install.packages("BiocManager")\nBiocManager::install("recount")')
 
 
-# In[6]:
+# In[11]:
 
 
 get_ipython().run_cell_magic('R', '', "library('recount')")
@@ -91,10 +82,58 @@ get_ipython().run_cell_magic('R', '-i project_id -i base_dir -i local_dir', "\ns
 
 # ### Download expression data for selected project id
 
-# In[12]:
+# In[13]:
 
 
 get_ipython().run_cell_magic('R', '-i project_id -i local_dir', "\nsource('../functions/download_recount2_data.R')\n\nget_recount2_template_experiment(project_id, local_dir)")
+
+
+# In[5]:
+
+
+# Load real template experiment
+template_data_file = os.path.join(
+    local_dir,
+    "recount2_template_data.tsv")
+
+
+# In[6]:
+
+
+# Read data
+template_data = pd.read_csv(
+    template_data_file,
+    header=0,
+    sep='\t',
+    index_col=0)
+
+
+# In[7]:
+
+
+# This experiment contains both RNA-seq and smRNA-seq samples.
+# We will drop smRNA samples so that samples are within the same range
+smRNA_samples = ["SRR493961",
+                 "SRR493962",
+                 "SRR493963",
+                 "SRR493964",
+                 "SRR493965",
+                 "SRR493966",
+                 "SRR493967",
+                 "SRR493968",
+                 "SRR493969",
+                 "SRR493970",
+                 "SRR493971",
+                 "SRR493972"]
+#template_data = template_data.loc[smRNA_samples]
+template_data = template_data.drop(smRNA_samples)
+
+
+# In[8]:
+
+
+# Save 
+template_data.to_csv(template_data_file, float_format='%.5f', sep='\t')
 
 
 # ### Normalize compendium 
