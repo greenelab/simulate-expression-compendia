@@ -88,6 +88,8 @@ get_ipython().run_cell_magic('R', '-i project_id -i base_dir -i local_dir', "\ns
 get_ipython().run_cell_magic('R', '-i project_id -i local_dir', "\nsource('../functions/download_recount2_data.R')\n\nget_recount2_template_experiment(project_id, local_dir)")
 
 
+# Processing is required for this project id. This experiment contains both RNA-seq and smRNA-seq samples which are in different ranges so we will drop smRNA samples so that samples are within the same range. The analysis identifying these two subsets of samples can be found in this [notebook](0_explore_input_data.ipynb)
+
 # In[21]:
 
 
@@ -100,8 +102,7 @@ template_data_file = os.path.join(
 # In[22]:
 
 
-# This experiment contains both RNA-seq and smRNA-seq samples.
-# We will drop smRNA samples so that samples are within the same range
+# Drop smRNA samples so that samples are within the same range
 smRNA_samples = ["SRR493961",
                  "SRR493962",
                  "SRR493963",
