@@ -14,6 +14,13 @@ convertEnsembl2Symbol <- function(ensembl.genes) {
         filters = 'ensembl_gene_id', mart = ensembl, bmHeader=FALSE )
 }
 
+convertEnsembl2Entrez <- function(ensembl.genes) {
+  #require(biomaRt)
+  ensembl = useMart("ensembl",dataset="hsapiens_gene_ensembl")
+  getBM(values = ensembl.genes, attributes = c('ensembl_gene_id','entrezgene_id'), 
+        filters = 'ensembl_gene_id', mart = ensembl, bmHeader=FALSE )
+}
+
 get_ensembl_symbol_mapping <- function(DE_stats_file){
     # Read in data
     DE_stats_data <- read.table(DE_stats_file, sep="\t", header=TRUE, row.names=NULL)
@@ -38,7 +45,7 @@ find_enriched_pathways <- function(DE_stats_file,
     # 5: p-values
     # 6: adjusted p-values
     # 2: logFC
-    rank_genes <- as.numeric(as.character(DE_stats_data[,5]))
+    rank_genes <- as.numeric(as.character(DE_stats_data[,2]))
     
     #print(head(rank_genes))
 
@@ -48,8 +55,12 @@ find_enriched_pathways <- function(DE_stats_file,
 
     names(rank_genes) <- as.character(DE_stats_data[,1])
 
+    #print(head(rank_genes))
+
     ## feature 3: decreasing order
-    rank_genes = sort(rank_genes, decreasing = TRUE)
+    #rank_genes = sort(rank_genes, decreasing = TRUE)
+
+    #barplot(sort(rank_genes, decreasing = T))
   
     #enrich_pathways <- gseGO(
     #    geneList=rank_genes, 
@@ -58,13 +69,23 @@ find_enriched_pathways <- function(DE_stats_file,
     #    keyType = "ENSEMBL", 
     #    verbose=F
     #    )
-    pathway_DB_data <- read.gmt(pathway_DB)
-    enrich_pathways <- GSEA(rank_genes, 
-                            TERM2GENE=pathway_DB_data,
-                            minGSSize = 10,
-                            nPerm = 1000, 
-                            pvalueCutoff = 0.05,
-                            verbose=FALSE)
+    #pathway_DB_data <- read.gmt(pathway_DB)
+    pathway_DB_data <- GSA.read.gmt(hallmark_DB_file)
+    pathway_parsed <- {}
+    for (i in 1:length(pathway_DB_data$genesets)){
+    pathway_parsed[pathway_DB_data$geneset.name[i]] <- as.list(pathway_DB_data$genesets[i])
+    }
+
+    #print(head(pathway_DB_data))
+    #enrich_pathways <- GSEA(geneList=rank_genes, 
+    #                        TERM2GENE=pathway_DB_data,
+    #                        nPerm=1000,
+    #                        verbose=T)
+    enrich_pathways <- fgsea(pathways=pathway_parsed,
+                              stats=rank_genes,
+                              nperm=1000)
+
+    #plotEnrichment(pathway_parsed[["HALLMARK_ADIPOGENESIS"]], stats=rank_genes, gseaParam = 1, ticksSize = 0.2)
 
     return(as.data.frame(enrich_pathways))
 }
