@@ -97,7 +97,7 @@ hallmark_DB_file = os.path.join(
     "hallmark_DB.gmt")
 
 
-# In[10]:
+# In[7]:
 
 
 template_DE_stats_file = os.path.join(
@@ -106,13 +106,13 @@ template_DE_stats_file = os.path.join(
     "DE_stats_template_data_"+project_id+"_real.txt")
 
 
-# In[11]:
+# In[8]:
 
 
 get_ipython().run_cell_magic('R', '-i template_DE_stats_file -o gene_id_mapping', "\nsource('../functions/GSEA_analysis.R')\n\ngene_id_mapping <- get_ensembl_symbol_mapping(template_DE_stats_file)")
 
 
-# In[12]:
+# In[9]:
 
 
 # Set ensembl id as index
@@ -121,7 +121,7 @@ print(gene_id_mapping.shape)
 gene_id_mapping.head()
 
 
-# In[13]:
+# In[10]:
 
 
 # Replace ensembl ids with gene symbols
@@ -129,7 +129,7 @@ utils.replace_ensembl_ids(template_DE_stats_file,
                           gene_id_mapping)
 
 
-# In[33]:
+# In[11]:
 
 
 # Shuffle ranking
@@ -153,7 +153,7 @@ for r in range(5):
     shuffled_template_DE_stats.to_csv(shuffled_template_DE_stats_file, float_format='%.5f', sep='\t')
 
 
-# In[77]:
+# In[12]:
 
 
 # Test shuffled files
@@ -164,7 +164,7 @@ shuffled_template_DE_stats_file = os.path.join(
     "DE_stats_template_data_"+project_id+"_shuffled_"+str(r)+".txt")
 
 
-# In[101]:
+# In[13]:
 
 
 #%%R
@@ -174,10 +174,10 @@ shuffled_template_DE_stats_file = os.path.join(
 #wp2gene
 
 
-# In[103]:
+# In[24]:
 
 
-get_ipython().run_cell_magic('R', '-i template_DE_stats_file -i hallmark_DB_file', '# Read in data\nDE_stats_data <- read.table(template_DE_stats_file, sep="\\t", header=TRUE, row.names=NULL)\n\n# Sort genes by feature 1\n\n# feature 1: numeric vector\n# 5: p-values\n# 6: adjusted p-values\n# 2: logFC\nrank_genes <- as.numeric(as.character(DE_stats_data[,4]))\n\n#print(head(rank_genes))\n\n# feature 2: named vector of gene ids\n# Remove version from gene id\nDE_stats_data[,1] <- gsub("\\\\..*","", DE_stats_data[,1])\n\nnames(rank_genes) <- as.character(DE_stats_data[,1])\n\nprint(head(rank_genes))\n\n## feature 3: decreasing order\nrank_genes = sort(rank_genes, decreasing = TRUE)\n\n#pathway_DB_data <- read.gmt(hallmark_DB_file)\n#pathway_DB_data <- GSA.read.gmt(hallmark_DB_file)\n#pathway_parsed <- {}\n#for (i in 1:length(pathway_DB_data$genesets)){\n#pathway_parsed[pathway_DB_data$geneset.name[i]] <- as.list(pathway_DB_data$genesets[i])\n#}\n#print(head(pathway_DB_data))\n# GSEA is a generic gene set enrichment function\n# Different backend methods can be applied depending on the \n# type of annotations\n# Here we will use fgsea\n#enrich_pathways <- GSEA(geneList=rank_genes, \n#                        TERM2GENE=pathway_DB_data,\n#                        nPerm=100000,\n#                        by=\'fgsea\',\n#                        verbose=T)\n#enrich_pathways <- fgsea(pathways=pathway_parsed,\n#                         stats=rank_genes,\n#                         nperm=100000)\nprint(enrich_pathways)\n#plotEnrichment(pathway_parsed[["HALLMARK_P53_PATHWAY"]], stats=rank_genes, gseaParam = 1, ticksSize = 0.2)\n#barplot(sort(rank_genes, decreasing = T))')
+get_ipython().run_cell_magic('R', '-i template_DE_stats_file -i hallmark_DB_file', '# Read in data\nDE_stats_data <- read.table(template_DE_stats_file, sep="\\t", header=TRUE, row.names=NULL)\n\n# Sort genes by feature 1\n\n# feature 1: numeric vector\n# 5: p-values\n# 6: adjusted p-values\n# 2: logFC\nrank_genes <- as.numeric(as.character(DE_stats_data[,4]))\n\n#print(head(rank_genes))\n\n# feature 2: named vector of gene ids\n# Remove version from gene id\nDE_stats_data[,1] <- gsub("\\\\..*","", DE_stats_data[,1])\n\nnames(rank_genes) <- as.character(DE_stats_data[,1])\n\nprint(head(rank_genes))\n\n## feature 3: decreasing order\nrank_genes = sort(rank_genes, decreasing = TRUE)\n\n#pathway_DB_data <- read.gmt(hallmark_DB_file)\npathway_DB_data <- GSA.read.gmt(hallmark_DB_file)\npathway_parsed <- {}\nfor (i in 1:length(pathway_DB_data$genesets)){\npathway_parsed[pathway_DB_data$geneset.name[i]] <- as.list(pathway_DB_data$genesets[i])\n}\n#print(head(pathway_DB_data))\n# GSEA is a generic gene set enrichment function\n# Different backend methods can be applied depending on the \n# type of annotations\n# Here we will use fgsea\n#enrich_pathways <- GSEA(geneList=rank_genes, \n#                        TERM2GENE=pathway_DB_data,\n#                        nPerm=100000,\n#                        by=\'fgsea\',\n#                        verbose=T)\nenrich_pathways <- fgsea(pathways=pathway_parsed,\n                         stats=rank_genes,\n                         nperm=20000)\nprint(enrich_pathways)\n#plotEnrichment(pathway_parsed[["HALLMARK_P53_PATHWAY"]], stats=rank_genes, gseaParam = 1, ticksSize = 0.2)\n#barplot(sort(rank_genes, decreasing = T))')
 
 
 # *fgsea* 
@@ -192,13 +192,13 @@ get_ipython().run_cell_magic('R', '-i template_DE_stats_file -i hallmark_DB_file
 # Source code for *fgsea* is available [here](https://rdrr.io/bioc/fgsea/src/R/fgsea.R). This package was based on the method published by [Korotkevich et. al.](https://www.biorxiv.org/content/10.1101/060012v2.full.pdf).
 # Blog about calulcation is [here](https://www.pathwaycommons.org/guide/primers/data_analysis/gsea/).
 
-# In[ ]:
+# In[15]:
 
 
 get_ipython().run_cell_magic('R', '-i template_DE_stats_file -i hallmark_DB_file -o template_enriched_pathways', "\nsource('../functions/GSEA_analysis.R')\n\ntemplate_enriched_pathways <- find_enriched_pathways(template_DE_stats_file, hallmark_DB_file)")
 
 
-# In[ ]:
+# In[16]:
 
 
 print(template_enriched_pathways.shape)
@@ -207,7 +207,7 @@ template_enriched_pathways.head()
 
 # ### Get pathway enrichment for simulated experiments
 
-# In[ ]:
+# In[17]:
 
 
 # Replace ensembl ids with gene symbols
@@ -222,7 +222,7 @@ if rerun_simulated:
                                   gene_id_mapping)
 
 
-# In[ ]:
+# In[18]:
 
 
 get_ipython().run_cell_magic('R', '-i project_id -i local_dir -i hallmark_DB_file -i num_runs -i rerun_simulated', '\nsource(\'../functions/GSEA_analysis.R\')\n\nfor (i in 0:(num_runs-1)){\n    simulated_DE_stats_file <- paste(local_dir, \n                                 "DE_stats/DE_stats_simulated_data_", \n                                 project_id,\n                                 "_", \n                                 i,\n                                 ".txt",\n                                 sep="")\n    \n    out_file = paste(local_dir, \n                     "GSEA_stats/GSEA_simulated_data_",\n                     project_id,\n                     "_",\n                     i,\n                     ".txt", \n                     sep="")\n    \n    if (rerun_simulated){\n        enriched_pathways <- find_enriched_pathways(simulated_DE_stats_file, hallmark_DB_file) \n        #print(head(enriched_pathways))\n    \n        write.table(enriched_pathways, file = out_file, row.names = T, sep = "\\t")\n        }\n    }')
@@ -237,13 +237,13 @@ get_ipython().run_cell_magic('R', '-i project_id -i local_dir -i hallmark_DB_fil
 
 # ### Template experiment
 
-# In[ ]:
+# In[19]:
 
 
 col_to_rank = 'enrichmentScore'
 
 
-# In[ ]:
+# In[20]:
 
 
 # Get ranks of template experiment

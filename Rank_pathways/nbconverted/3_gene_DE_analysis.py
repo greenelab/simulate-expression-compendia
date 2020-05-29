@@ -61,7 +61,7 @@ dataset_name = params['dataset_name']
 num_runs = params['num_simulated']
 project_id = params['project_id']
 
-rerun_template = False
+rerun_template = True
 rerun_simulated = False
 
 
@@ -178,7 +178,7 @@ sns.distplot(num_sign_DEGs_simulated,
 # In[14]:
 
 
-col_to_rank = 't'
+col_to_rank = 'logFC'
 
 
 # In[15]:
@@ -204,7 +204,7 @@ else:
 template_DE_stats.head()
 
 
-# In[17]:
+# In[16]:
 
 
 # Concatenate simulated experiments
@@ -224,22 +224,6 @@ for i in range(num_runs):
     
     simulated_DE_stats.reset_index(inplace=True)
     
-    # Add ranks of simulated experiment
-    # If ranking by p-value or adjusted p-value then high rank = low value
-    if col_to_rank in ['P.Value', 'adj.P.Val']:
-        simulated_DE_stats['ranking'] = simulated_DE_stats[col_to_rank].rank(ascending = False)
-        simulated_DE_stats = simulated_DE_stats.sort_values(by=col_to_rank, ascending=True)
-
-    # If ranking by logFC then high rank = high abs(value)
-    elif col_to_rank in ['logFC','t']:
-        simulated_DE_stats['ranking'] = simulated_DE_stats[col_to_rank].abs().rank(ascending = True)
-        simulated_DE_stats = simulated_DE_stats.sort_values(by=col_to_rank, ascending=False)
-
-    # If ranking by Z-score then high rank = high value
-    else:
-        simulated_DE_stats['ranking'] = simulated_DE_stats[col_to_rank].rank(ascending = True)
-        simulated_DE_stats = simulated_DE_stats.sort_values(by=col_to_rank, ascending=False)
-    
     # Concatenate df
     simulated_DE_stats_all = pd.concat([simulated_DE_stats_all,
                                        simulated_DE_stats])
@@ -248,24 +232,52 @@ print(simulated_DE_stats_all.shape)
 simulated_DE_stats_all.head()
 
 
-# In[21]:
+# In[17]:
 
 
+# Aggregate statistics across all simulated experiments
 if col_to_rank == "adj.P.Val":
-    simulated_DE_summary_stats = simulated_DE_stats_all.groupby(['index'])[[col_to_rank, 'adj.P.Val', 'ranking']].agg({
-        col_to_rank:['mean', 'std','count', 'median'],
-        'ranking':['median']
-    })
+    simulated_DE_summary_stats = simulated_DE_stats_all.groupby(['index'])[[col_to_rank]].agg(
+        ['median','mean', 'std','count']
+    )
 else:
-    simulated_DE_summary_stats = simulated_DE_stats_all.groupby(['index'])[[col_to_rank, 'adj.P.Val', 'ranking']].agg({
-        col_to_rank:['mean', 'std','count'],
-        'adj.P.Val':['median'],
-        'ranking':['median']
+    simulated_DE_summary_stats = simulated_DE_stats_all.groupby(['index'])[[col_to_rank, 'adj.P.Val']].agg({
+        col_to_rank:['median','mean', 'std','count'],
+        'adj.P.Val':['median']
     })
 simulated_DE_summary_stats.head()
 
 
-# In[22]:
+# In[18]:
+
+
+# Rank gene by median value of col_to_rank
+
+# If ranking by p-value or adjusted p-value then high rank = low value
+if col_to_rank in ['P.Value', 'adj.P.Val']:
+    simulated_DE_summary_stats['ranking'] = simulated_DE_summary_stats[(col_to_rank,'median')].rank(ascending = False)
+    simulated_DE_summary_stats = simulated_DE_summary_stats.sort_values(by=(col_to_rank,'median'), ascending=True)
+
+# If ranking by logFC then high rank = high abs(value)
+elif col_to_rank in ['logFC','t']:
+    simulated_DE_summary_stats['ranking'] = simulated_DE_summary_stats[(col_to_rank,'median')].abs().rank(ascending = True)
+    simulated_DE_summary_stats = simulated_DE_summary_stats.sort_values(by=(col_to_rank,'median'), ascending=False)
+
+# If ranking by Z-score then high rank = high value
+else:
+    simulated_DE_summary_stats['ranking'] = simulated_DE_summary_stats[(col_to_rank,'median')].rank(ascending = True)
+    simulated_DE_summary_stats = simulated_DE_summary_stats.sort_values(by=(col_to_rank,'median'), ascending=False)
+
+simulated_DE_summary_stats.head()
+
+
+# In[19]:
+
+
+simulated_DE_summary_stats.tail()
+
+
+# In[20]:
 
 
 # Merge template statistics with simulated statistics
@@ -276,24 +288,24 @@ print(template_simulated_DE_stats.shape)
 template_simulated_DE_stats.head()
 
 
-# In[29]:
+# In[21]:
 
 
-sns.distplot(template_simulated_DE_stats[('ranking','median')].values, kde=False)
+sns.distplot(template_simulated_DE_stats[('ranking',"")].values, kde=False)
 
 
-# In[24]:
+# In[22]:
 
 
 # Parse columns
 median_pval_simulated = template_simulated_DE_stats[('adj.P.Val','median')]
-median_rank_simulated = template_simulated_DE_stats[('ranking','median')]
 mean_test_simulated = template_simulated_DE_stats[(col_to_rank,'mean')]
 std_test_simulated = template_simulated_DE_stats[(col_to_rank,'std')]
 count_simulated = template_simulated_DE_stats[(col_to_rank,'count')]
+rank_simulated = template_simulated_DE_stats[('ranking','')]
 
 
-# In[25]:
+# In[23]:
 
 
 summary = pd.DataFrame(data={'Gene ID': template_simulated_DE_stats.index,
@@ -301,7 +313,7 @@ summary = pd.DataFrame(data={'Gene ID': template_simulated_DE_stats.index,
                              'Rank (Real)': template_simulated_DE_stats['ranking'],
                              'Test statistic (Real)': template_simulated_DE_stats[col_to_rank],
                              'Median adj p-value (simulated)': median_pval_simulated ,
-                             'Median rank (simulated)': median_rank_simulated ,
+                             'Rank (simulated)': rank_simulated ,
                              'Mean test statistic (simulated)': mean_test_simulated ,
                              'Std deviation (simulated)': std_test_simulated,
                              'Number of experiments (simulated)': count_simulated
@@ -311,19 +323,13 @@ summary['Z score'] = (summary['Test statistic (Real)'] - summary['Mean test stat
 summary.head()
 
 
-# In[26]:
-
-
-summary.sort_values(by="Z score", ascending=False)
-
-
-# In[27]:
+# In[24]:
 
 
 # Save file
 summary_file = os.path.join(
         local_dir, 
-        "gene_summary_table.tsv")
+        "gene_summary_table_"+col_to_rank+".tsv")
 
 summary.to_csv(summary_file, float_format='%.5f', sep='\t')
 

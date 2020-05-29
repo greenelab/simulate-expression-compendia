@@ -56,18 +56,3 @@ gene_id_mapping):
 
     # Save
     DE_stats.to_csv(DE_stats_file, float_format='%.5f', sep='\t')
-
-def subsample_data(input_file,
-list_samples_to_drop):
-
-    # Read data
-    input_data = pd.read_csv(
-        input_file,
-        header=0,
-        sep='\t',
-        index_col=0)
-
-    input_data = input_data.drop(list_samples_to_drop)
-
-    # Save 
-    input_data.to_csv(input_file, float_format='%.5f', sep='\t')

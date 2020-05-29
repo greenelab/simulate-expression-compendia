@@ -74,6 +74,7 @@ params = utils.read_config(config_file)
 
 # Load params
 local_dir = params["local_dir"]
+col_to_rank = 'logFC'
 
 
 # In[4]:
@@ -82,11 +83,11 @@ local_dir = params["local_dir"]
 # Input files
 gene_summary_file = os.path.join(
     local_dir, 
-    "gene_summary_table.tsv")
+    "gene_summary_table_"+col_to_rank+".tsv")
 
 pathway_summary_file = os.path.join(
     local_dir, 
-    "pathway_summary_table.tsv")
+    "pathway_summary_table_"+col_to_rank+".tsv")
 
 
 # ## Generic genes
@@ -97,25 +98,56 @@ pathway_summary_file = os.path.join(
 # In[5]:
 
 
-get_ipython().run_cell_magic('R', '', 'suppressWarnings(library("biomaRt"))')
+#%%R
+#suppressWarnings(library("biomaRt"))
 
 
 # In[6]:
 
 
-get_ipython().run_cell_magic('R', '-i gene_summary_file -o gene_id_mapping', "# Convert gene ids from ensembl (ours) to entrez (DE_prior)\n\nsource('../functions/GSEA_analysis.R')\n\ngene_id_mapping <- get_ensembl_symbol_mapping(gene_summary_file)")
+#%%R -i gene_summary_file -o gene_id_mapping
+# Convert gene ids from ensembl (ours) to entrez (DE_prior)
+
+#source('../functions/GSEA_analysis.R')
+
+#gene_id_mapping <- get_ensembl_symbol_mapping(gene_summary_file)
 
 
 # In[7]:
 
 
 # Set ensembl id as index
-gene_id_mapping.set_index("ensembl_gene_id", inplace=True)
-print(gene_id_mapping.shape)
-gene_id_mapping.head()
+#gene_id_mapping.set_index("ensembl_gene_id", inplace=True)
+#print(gene_id_mapping.shape)
+#gene_id_mapping.head()
 
 
 # In[8]:
+
+
+# Save 
+#gene_id_file = os.path.join(
+#    local_dir,
+#    "ensembl_hgnc_mapping.tsv")
+#gene_id_mapping.to_csv(gene_id_file, float_format='%.5f', sep='\t')
+
+
+# In[9]:
+
+
+# Read file mapping ensembl ids to hgnc symbols
+gene_id_file = os.path.join(
+    local_dir,
+    "ensembl_hgnc_mapping.tsv")
+
+gene_id_mapping = pd.read_csv(
+    gene_id_file,
+    header=0,
+    sep='\t',
+    index_col=0)
+
+
+# In[10]:
 
 
 # Replace ensembl ids with gene symbols
@@ -128,7 +160,7 @@ if gene_id_mapping.shape[0] > 0:
 # ### Our DEGs
 # Genes are ranked by their adjusted p-value and the median rank reported across 25 simulated experiments is shown in column `Median rank (simulated)`.
 
-# In[9]:
+# In[11]:
 
 
 # Read data
@@ -141,7 +173,7 @@ print(gene_stats.shape)
 gene_stats.head()
 
 
-# In[11]:
+# In[12]:
 
 
 # Get list of our genes
@@ -151,7 +183,7 @@ gene_ids = list(gene_stats.index)
 # ### Published DEGs
 # These DEGs are based on the [Crow et. al. publication](https://www.pnas.org/content/pnas/116/13/6491.full.pdf). Their genes are ranked 0 = not commonly DE; 1 = commonly DE. Genes by the number differentially expressed gene sets they appear in and then ranking genes by this score.
 
-# In[12]:
+# In[13]:
 
 
 # Get generic genes identified by Crow et. al.
@@ -164,7 +196,7 @@ DE_prior = pd.read_csv(DE_prior_file,
 DE_prior.head()
 
 
-# In[13]:
+# In[14]:
 
 
 # Get list of published generic genes
@@ -179,27 +211,28 @@ published_generic_genes = list(DE_prior['Gene_Name'])
 # Get intersection of gene lists
 shared_genes = set(gene_ids).intersection(published_generic_genes)
 print(len(shared_genes))
-
-
-# In[25]:
-
-
-# Get genes only in ours not theirs
-our_unique_genes = set(gene_ids) - set(shared_genes)
-print(len(our_unique_genes))
-our_unique_genes
+# check that all our genes are a subset of the published ones, no genes unique to ours
 
 
 # In[16]:
 
 
+# Get genes only in ours not theirs
+#our_unique_genes = set(gene_ids) - set(shared_genes)
+#print(len(our_unique_genes))
+#our_unique_genes
+
+
+# In[17]:
+
+
 # Get rank of intersect genes
-our_gene_rank_df = pd.DataFrame(gene_stats.loc[shared_genes,'Median rank (simulated)'])
+our_gene_rank_df = pd.DataFrame(gene_stats.loc[shared_genes,'Rank (simulated)'])
 print(our_gene_rank_df.shape)
 our_gene_rank_df.head()
 
 
-# In[17]:
+# In[18]:
 
 
 # Merge published ranking
@@ -216,41 +249,103 @@ shared_gene_rank_df.head()
 # In[19]:
 
 
+# Plot our ranking vs published ranking
 sns.jointplot(data=shared_gene_rank_df,
-              x='Median rank (simulated)',
+              x='Rank (simulated)',
               y='DE_Prior_Rank',
              kind='hex')
 
 # Make prettier if better way to show it
 
 
+# ### Calculate correlation
+
 # In[20]:
 
 
-# Plot our rank vs their rank on shared genes
-fig = ggplot(shared_gene_rank_df, aes(x='Median rank (simulated)', y='DE_Prior_Rank'))
-fig += geom_point()
-fig += labs(x ='Our Rank',
-            y = 'Published Rank',
-            title = 'Ranking of generic genes')
-fig += theme_bw()
-fig += theme(
-    legend_title_align = "center",
-    plot_background=element_rect(fill='white'),
-    legend_key=element_rect(fill='white', colour='white'), 
-    legend_title=element_text(family='sans-serif', size=15),
-    legend_text=element_text(family='sans-serif', size=12),
-    plot_title=element_text(family='sans-serif', size=15),
-    axis_text=element_text(family='sans-serif', size=12),
-    axis_title=element_text(family='sans-serif', size=15)
-    )
+#%%R
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("RVAideMemoire")
+#deps <- c("ade4", "car", "cramer", "dunn.test", "FactoMineR", 
+#       "lme4", "mixOmics", "multcompView", "pls", "pspearman",
+#       "statmod", "vegan")
+#install.packages(deps)
 
-print(fig)
+
+# In[21]:
+
+
+#%%R
+#library(RVAideMemoire)
+
+
+# In[22]:
+
+
+from scipy import stats
+
+def spearmanr_ci(x,y,alpha=0.05):
+    ''' calculate Pearson correlation along with the confidence interval using scipy and numpy
+    Parameters
+    ----------
+    x, y : iterable object such as a list or np.array
+      Input for correlation calculation
+    alpha : float
+      Significance level. 0.05 by default
+    Returns
+    -------
+    r : float
+      Pearson's correlation coefficient
+    pval : float
+      The corresponding p value
+    lo, hi : float
+      The lower and upper bound of confidence intervals
+    '''
+
+    r, p = stats.spearmanr(x,y)
+    r_z = np.arctanh(r)
+    se = 1/np.sqrt(x.size-3)
+    z = stats.norm.ppf(1-alpha/2)
+    lo_z, hi_z = r_z-z*se, r_z+z*se
+    lo, hi = np.tanh((lo_z, hi_z))
+    return r, p, lo, hi
+
+
+# In[23]:
+
+
+spearmanr_ci(shared_gene_rank_df['Rank (simulated)'],
+            shared_gene_rank_df['DE_Prior_Rank'])
+
+
+# In[24]:
+
+
+#Spearman R^2 value: 0.29211
+#CI: (0.2786,0.3054)
+
+
+# In[ ]:
+
+
+#%%R -i shared_gene_rank_df 
+
+#our_rank <- shared_gene_rank_df[,1]
+#their_rank <- shared_gene_rank_df[,2]
+
+#spearman.ci(our_rank, their_rank, nrep = 1000, conf.level = 0.95)
+
+
+# In[ ]:
+
+
+# Calculate correlation between ours vs DE_prior ranking
 
 
 # ## Generic pathways
 
-# In[21]:
+# In[ ]:
 
 
 """
@@ -264,7 +359,7 @@ pathway_stats = pd.read_csv(
 pathway_stats.head()"""
 
 
-# In[22]:
+# In[ ]:
 
 
 """# Define what are the set of generic genes
@@ -273,7 +368,7 @@ generic_pathway_data = pathway_stats.sort_values(by="Z score", ascending=True)[0
 generic_pathway_data.head()"""
 
 
-# In[23]:
+# In[ ]:
 
 
 # Manually compare against Powers et. al publication 
