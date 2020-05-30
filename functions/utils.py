@@ -56,3 +56,19 @@ gene_id_mapping):
 
     # Save
     DE_stats.to_csv(DE_stats_file, float_format='%.5f', sep='\t')
+
+def get_gene_id_mapping(genes_to_map,
+gene_id_dict_file):
+    gene_ids_hgnc = {}
+    for gene_id in gene_ids:
+        gene_id_strip = gene_id.split(".")[0]
+        if gene_id_strip in list(gene_id_mapping.index):
+            if len(gene_id_mapping.loc[gene_id_strip]) > 1:
+                gene_ids_hgnc[gene_id] = gene_id_mapping.loc[gene_id_strip].iloc[0][0]
+            else:
+                gene_ids_hgnc[gene_id] = gene_id_mapping.loc[gene_id_strip][0]
+
+    gene_ids_hgnc
+    outfile = open(gene_id_dict_file,'wb')
+    pickle.dump(gene_ids_hgnc,outfile)
+    outfile.close()
