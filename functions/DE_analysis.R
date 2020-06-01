@@ -14,6 +14,29 @@ get_DE_stats <- function(metadata_file,
                       local_dir,
                       run){
   
+  # This function performs DE analysis using expression data in expression_file
+  # where samples are grouped based on metadata_file
+  #
+  # Arguments
+  # ---------
+  # metadata_file: str
+  #   File containing mapping between sample id and group
+  #
+  # experiment_id: str
+  #   Experiment id used to label saved output filee
+  #
+  # expression_file: str
+  #   File containing gene expression data
+  #
+  # data_type: str
+  #   Either 'template' or 'simulated' to label saved output file
+  #
+  # local_dir: str
+  #   Directory to save output files to
+  #
+  # run: str
+  #   Used as identifier for different simulated experiments 
+  
   # Read in data
   expression_data <- t(as.matrix(read.table(expression_file, sep="\t", header=TRUE, row.names=1)))
   metadata <- as.matrix(read.table(metadata_file, sep="\t", header=TRUE, row.names=1))
@@ -71,6 +94,9 @@ create_volcano <- function(expression_file,
                            experiment_id,
                            pval,
                            local_dir){
+
+    # This functioni generates a volcano plot using the output from
+    # the DE analysis script 'get_DE_stats' and output it to local_dir
 
     # Read in expression data
     res <- read.table(expression_file, header=TRUE)

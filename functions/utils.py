@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy import stats
 
 def read_config(filename):
     """
@@ -15,6 +16,19 @@ def read_config(filename):
 
 def replace_ensembl_ids(DE_stats_file,
 gene_id_mapping):
+
+    """
+    Replaces ensembl gene ids with hgnc symbols 
+
+    Arguments
+    ---------
+    DE_stats_file: str
+        File containing DE stats. Matrix is gene x stats features
+
+    gene_id_mapping: df
+        Dataframe mapping ensembl ids (used in DE_stats_file) to hgnc symbols,
+        used in Crow et. al.
+    """
     # Read in data
     DE_stats = pd.read_csv(
         DE_stats_file,
@@ -57,18 +71,33 @@ gene_id_mapping):
     # Save
     DE_stats.to_csv(DE_stats_file, float_format='%.5f', sep='\t')
 
-def get_gene_id_mapping(genes_to_map,
-gene_id_dict_file):
-    gene_ids_hgnc = {}
-    for gene_id in gene_ids:
-        gene_id_strip = gene_id.split(".")[0]
-        if gene_id_strip in list(gene_id_mapping.index):
-            if len(gene_id_mapping.loc[gene_id_strip]) > 1:
-                gene_ids_hgnc[gene_id] = gene_id_mapping.loc[gene_id_strip].iloc[0][0]
-            else:
-                gene_ids_hgnc[gene_id] = gene_id_mapping.loc[gene_id_strip][0]
+def spearman_ci(gene_rank_df,
+num_permutations):
+    """
+    Returns spearman correlation score and 95% confidence interval
 
-    gene_ids_hgnc
-    outfile = open(gene_id_dict_file,'wb')
-    pickle.dump(gene_ids_hgnc,outfile)
-    outfile.close()
+    Arguments
+    ---------
+    gene_ranking_df: df
+        Dataframe containing the our rank and Crow et. al. rank
+
+    num_permutations: int
+        The number of permutations to estimate the confidence interval
+    """
+
+    r, p = stats.spearmanr(gene_rank_df['Rank (simulated)'],
+                gene_rank_df['DE_Prior_Rank'])
+
+    r_perm_values = []
+    for i in range(num_permutations):
+        
+        sample = gene_rank_df.sample(n=len(gene_rank_df), replace=True)
+        
+        r_perm, p_perm = stats.spearmanr(sample['Rank (simulated)'],
+                            sample['DE_Prior_Rank'])
+        r_perm_values.append(r_perm)
+
+    sort_r_perm_values = sorted(r_perm_values)
+    offset = int(num_permutations*0.025)
+
+    return(r,p,sort_r_perm_values[offset],sort_r_perm_values[num_permutations-offset])

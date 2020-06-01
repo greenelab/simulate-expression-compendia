@@ -295,7 +295,7 @@ def shift_template_experiment(
     the relationship between samples within an experiment.
 
     Workflow:
-    1. Randomly select 1 experiment and get the gene expression data for that experiment
+    1. Use selected_experiment_id as template. Get the gene expression data for that experiment
     (here we are assuming that there is only biological variation within this experiment)
     2. Encode this experiment into a latent space using the trained VAE model
     3. Encode the entire dataset from the <normalized_data_file>
@@ -329,7 +329,7 @@ def shift_template_experiment(
         Format 'NN_<intermediate layer>_<latent layer>'
 
     dataset_name: str
-        Name for analysis directory. Either "Human" or "Pseudomonas"
+        Name for analysis directory. Either "Human", "Pseudomonas" or "Ranked_pathways"
 
     scaler: minmax model
         Model used to transform data into a different range
@@ -394,9 +394,6 @@ def shift_template_experiment(
             sep='\t',
             index_col=0)
 
-    #print("Normalized gene expression data contains {} samples and {} genes".format(
-    #    normalized_data.shape[0], normalized_data.shape[1]))
-
     # Get corresponding sample ids
     sample_ids = get_sample_ids(
         selected_experiment_id, dataset_name)
@@ -451,9 +448,6 @@ def shift_template_experiment(
     simulated_data_scaled_df = pd.DataFrame(simulated_data_scaled,
                                             columns=simulated_data_decoded_df.columns,
                                             index=simulated_data_decoded_df.index)
-
-    #print("Return: simulated gene expression data containing {} samples and {} genes".format(
-    #    simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]))
 
     # Save
     out_file = os.path.join(local_dir,

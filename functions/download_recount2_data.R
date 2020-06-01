@@ -12,16 +12,9 @@
 
 get_recount2_template_experiment <- function(project_id,
 local_dir){
-  # Format of the metadata
-  # Based on definitions from NCBI and blog post: 
-  # https://www.ncbi.nlm.nih.gov/books/NBK56913/#search.what_do_the_different_sra_accessi
-  # https://www.ccdatalab.org/blog/2019/3/29/gene-expression-repos-explained
-  # Project: A sequencing study (i.e. NCBI sequencing study).    
-  # Sample: Physical biospecimen on which sequencing was performed, biological source material (i.e. HeLa cell line).  
-  #         A project contains many samples
-  # Experiment: Unique sequencing library for a specific sample.  A sample can have multiple experiments, most have 1 experiment.
-  # Run: Sequencing run.  An experiment can contain many runs (i.e. technical replicates)
-  # In this case, we want to group runs into projects (for "experiment-level" simulation)
+
+  # This function downloads the gene expression data associated
+  # with the input project_id and saves it in the local_dir
 
   ## Data
 
@@ -58,13 +51,14 @@ write.table(data_counts_rpkm,
 
 
 get_recount2_compendium <- function(template_project_id,
-base_dir,
 local_dir){
 
+  # This function downloads 50 random experiments, including the 
+  # the experiment associated with the input project_id.
+  # These experiments makeup a compendium of gene expression experiments
+  # that are saved in the local_dir
+
   # Download metadata file
-  # Already downloaded from Human/download_data.R
-  #metadata_file <- paste(base_dir,'Human/data/metadata/recount2_metadata.tsv',sep="/")
-  #metadata <- read.table(metadata_file, sep="\t", header=TRUE, row.names=1)
   metadata <- all_metadata()
   write.table(metadata, '~/Documents/Repos/simulate-expression-compendia/Rank_pathways/data/metadata/recount2_metadata.tsv', sep='\t', row.names=FALSE)
 
