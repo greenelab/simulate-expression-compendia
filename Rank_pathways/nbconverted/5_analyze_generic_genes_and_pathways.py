@@ -16,12 +16,14 @@ get_ipython().run_line_magic('autoreload', '2')
 
 import os
 import sys
+import pickle
 import pandas as pd
 import numpy as np
 import random
 import warnings
 import rpy2.robjects
 import seaborn as sns
+from scipy import stats
 
 from plotnine import (ggplot,
                       labs,   
@@ -74,7 +76,7 @@ params = utils.read_config(config_file)
 
 # Load params
 local_dir = params["local_dir"]
-col_to_rank = 'logFC'
+col_to_rank = params['col_to_rank']
 
 
 # In[4]:
@@ -91,6 +93,7 @@ pathway_summary_file = os.path.join(
 
 
 # ## Generic genes
+# Studies have found that there are some genes that are more likely to be differentially expressed even across a wide range of experimental designs. These *generic genes* are not necessarily specific to the biological process being studied but instead represents a more systematic change. We want to compare the ability to detect these generic genes using our method vs those found by Crow et. al.
 
 # ### Map gene ids
 # Our gene ids are ensembl while the published gene ids are using hgnc symbols. We need to map ensembl to hgnc ids in order to compare results.
@@ -135,6 +138,21 @@ pathway_summary_file = os.path.join(
 # In[9]:
 
 
+# Read data
+gene_stats = pd.read_csv(
+    gene_summary_file,
+    header=0,
+    sep='\t',
+    index_col=0)
+
+print(gene_stats.shape)
+sample_gene_id = gene_stats.index[0].split(".")[0]
+gene_stats.head()
+
+
+# In[10]:
+
+
 # Read file mapping ensembl ids to hgnc symbols
 gene_id_file = os.path.join(
     local_dir,
@@ -146,34 +164,38 @@ gene_id_mapping = pd.read_csv(
     sep='\t',
     index_col=0)
 
+gene_id_mapping.set_index("ensembl_gene_id", inplace=True)
+gene_id_mapping.head()
 
-# In[10]:
-
-
-# Replace ensembl ids with gene symbols
-# Only replace if ensembl ids exist
-if gene_id_mapping.shape[0] > 0:
-    utils.replace_ensembl_ids(gene_summary_file,
-                          gene_id_mapping)
-
-
-# ### Our DEGs
-# Genes are ranked by their adjusted p-value and the median rank reported across 25 simulated experiments is shown in column `Median rank (simulated)`.
 
 # In[11]:
 
 
-# Read data
+# Replace ensembl ids with gene symbols
+# Only replace if ensembl ids exist
+if sample_gene_id in list(gene_id_mapping.index):
+    print("replacing ensembl ids")
+    utils.replace_ensembl_ids(gene_summary_file,
+                              gene_id_mapping)
+
+
+# ### Our DEGs
+# Genes are ranked by their adjusted p-value and the median rank reported across 25 simulated experiments is shown in column `Rank (simulated)`.
+
+# In[12]:
+
+
+# Read data back after renaming gene ids
 gene_stats = pd.read_csv(
     gene_summary_file,
     header=0,
     sep='\t',
     index_col=0)
-print(gene_stats.shape)
+
 gene_stats.head()
 
 
-# In[12]:
+# In[13]:
 
 
 # Get list of our genes
@@ -183,7 +205,7 @@ gene_ids = list(gene_stats.index)
 # ### Published DEGs
 # These DEGs are based on the [Crow et. al. publication](https://www.pnas.org/content/pnas/116/13/6491.full.pdf). Their genes are ranked 0 = not commonly DE; 1 = commonly DE. Genes by the number differentially expressed gene sets they appear in and then ranking genes by this score.
 
-# In[13]:
+# In[14]:
 
 
 # Get generic genes identified by Crow et. al.
@@ -196,7 +218,7 @@ DE_prior = pd.read_csv(DE_prior_file,
 DE_prior.head()
 
 
-# In[14]:
+# In[15]:
 
 
 # Get list of published generic genes
@@ -205,34 +227,42 @@ published_generic_genes = list(DE_prior['Gene_Name'])
 
 # ### Compare DEG ranks
 
-# In[15]:
+# In[16]:
 
 
 # Get intersection of gene lists
 shared_genes = set(gene_ids).intersection(published_generic_genes)
 print(len(shared_genes))
-# check that all our genes are a subset of the published ones, no genes unique to ours
-
-
-# In[16]:
-
-
-# Get genes only in ours not theirs
-#our_unique_genes = set(gene_ids) - set(shared_genes)
-#print(len(our_unique_genes))
-#our_unique_genes
 
 
 # In[17]:
 
 
-# Get rank of intersect genes
+# Load shared genes
+#shared_genes_file = os.path.join(
+#    local_dir,
+#    "shared_gene_ids.pickle")
+
+#shared_genes = pickle.load(open(shared_genes_file, "rb" ))
+#print(len(shared_genes))
+
+
+# In[18]:
+
+
+# check that all our genes are a subset of the published ones, no genes unique to ours
+
+
+# In[20]:
+
+
+# Get rank of shared genes
 our_gene_rank_df = pd.DataFrame(gene_stats.loc[shared_genes,'Rank (simulated)'])
 print(our_gene_rank_df.shape)
 our_gene_rank_df.head()
 
 
-# In[18]:
+# In[21]:
 
 
 # Merge published ranking
@@ -246,106 +276,67 @@ print(shared_gene_rank_df.shape)
 shared_gene_rank_df.head()
 
 
-# In[19]:
-
-
-# Plot our ranking vs published ranking
-sns.jointplot(data=shared_gene_rank_df,
-              x='Rank (simulated)',
-              y='DE_Prior_Rank',
-             kind='hex')
-
-# Make prettier if better way to show it
-
-
-# ### Calculate correlation
-
-# In[20]:
-
-
-#%%R
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#BiocManager::install("RVAideMemoire")
-#deps <- c("ade4", "car", "cramer", "dunn.test", "FactoMineR", 
-#       "lme4", "mixOmics", "multcompView", "pls", "pspearman",
-#       "statmod", "vegan")
-#install.packages(deps)
-
-
-# In[21]:
-
-
-#%%R
-#library(RVAideMemoire)
-
-
 # In[22]:
 
 
-from scipy import stats
-
-def spearmanr_ci(x,y,alpha=0.05):
-    ''' calculate Pearson correlation along with the confidence interval using scipy and numpy
-    Parameters
-    ----------
-    x, y : iterable object such as a list or np.array
-      Input for correlation calculation
-    alpha : float
-      Significance level. 0.05 by default
-    Returns
-    -------
-    r : float
-      Pearson's correlation coefficient
-    pval : float
-      The corresponding p value
-    lo, hi : float
-      The lower and upper bound of confidence intervals
-    '''
-
-    r, p = stats.spearmanr(x,y)
-    r_z = np.arctanh(r)
-    se = 1/np.sqrt(x.size-3)
-    z = stats.norm.ppf(1-alpha/2)
-    lo_z, hi_z = r_z-z*se, r_z+z*se
-    lo, hi = np.tanh((lo_z, hi_z))
-    return r, p, lo, hi
+# Scale published ranking to our range
+max_rank = max(shared_gene_rank_df['Rank (simulated)'])
+shared_gene_rank_df['DE_Prior_Rank'] = round(shared_gene_rank_df['DE_Prior_Rank']*max_rank)
+shared_gene_rank_df.head()
 
 
 # In[23]:
 
 
-spearmanr_ci(shared_gene_rank_df['Rank (simulated)'],
-            shared_gene_rank_df['DE_Prior_Rank'])
+# Get top ranked genes by both methods
+#shared_gene_rank_df[(shared_gene_rank_df['Rank (simulated)']>17500) & (shared_gene_rank_df['DE_Prior_Rank']>17500)]
 
 
 # In[24]:
 
 
-#Spearman R^2 value: 0.29211
-#CI: (0.2786,0.3054)
+# Get low ranked genes by both methods
+#shared_gene_rank_df[(shared_gene_rank_df['Rank (simulated)']<300) & (shared_gene_rank_df['DE_Prior_Rank']<300)]
 
 
-# In[ ]:
+# In[25]:
 
 
-#%%R -i shared_gene_rank_df 
+# Plot our ranking vs published ranking
+fig_file = os.path.join(
+    local_dir, 
+    "gene_ranking_"+col_to_rank+".svg")
 
-#our_rank <- shared_gene_rank_df[,1]
-#their_rank <- shared_gene_rank_df[,2]
+fig = sns.jointplot(data=shared_gene_rank_df,
+                    x='Rank (simulated)',
+                    y='DE_Prior_Rank',
+                    kind='hex',
+                    marginal_kws={'color':'white'})
+fig.set_axis_labels("Our preliminary method", "DE prior (Crow et. al. 2019)", fontsize=14)
 
-#spearman.ci(our_rank, their_rank, nrep = 1000, conf.level = 0.95)
+fig.savefig(fig_file,
+            format='svg',
+            bbox_inches="tight",
+            transparent=True,
+            pad_inches=0,
+            dpi=300,)
 
 
-# In[ ]:
+# ### Calculate correlation
+
+# In[26]:
 
 
-# Calculate correlation between ours vs DE_prior ranking
+# Get correlation
+r, p, ci_high, ci_low = utils.spearman_ci(shared_gene_rank_df,
+                                         1000)
+
+print(r, p, ci_high, ci_low)
 
 
 # ## Generic pathways
 
-# In[ ]:
+# In[27]:
 
 
 """
@@ -359,7 +350,7 @@ pathway_stats = pd.read_csv(
 pathway_stats.head()"""
 
 
-# In[ ]:
+# In[28]:
 
 
 """# Define what are the set of generic genes
@@ -368,7 +359,7 @@ generic_pathway_data = pathway_stats.sort_values(by="Z score", ascending=True)[0
 generic_pathway_data.head()"""
 
 
-# In[ ]:
+# In[29]:
 
 
 # Manually compare against Powers et. al publication 

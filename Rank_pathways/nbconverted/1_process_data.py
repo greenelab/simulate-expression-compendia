@@ -65,7 +65,7 @@ project_id = params['project_id']
 # In[4]:
 
 
-get_ipython().run_cell_magic('R', '', '# Select 59\n# Run one time\n#if (!requireNamespace("BiocManager", quietly = TRUE))\n#    install.packages("BiocManager")\nBiocManager::install("recount")')
+get_ipython().run_cell_magic('R', '', '# Select 59\n# Run one time\n#if (!requireNamespace("BiocManager", quietly = TRUE))\n#    install.packages("BiocManager")\n#BiocManager::install("recount")')
 
 
 # In[5]:
@@ -77,11 +77,11 @@ get_ipython().run_cell_magic('R', '', "library('recount')")
 # In[6]:
 
 
-#%%R -i project_id -i base_dir -i local_dir
+#%%R -i project_id -i local_dir
 
 #source('../functions/download_recount2_data.R')
 
-#get_recount2_compendium(project_id, base_dir, local_dir)
+#get_recount2_compendium(project_id, local_dir)
 
 
 # ### Download expression data for selected project id
@@ -93,7 +93,7 @@ get_ipython().run_cell_magic('R', '-i project_id -i local_dir', "\nsource('../fu
 
 
 # ### Subset genes
-# For our downstream we will be comparing our set of differentially expression genes against the set found in [Crow et. al. publication](https://www.pnas.org/content/pnas/116/13/6491.full.pdf), we will limit our genes to include only those genes shared between our starting set of genes and those in publication. 
+# For our downstream analysis we will be comparing our set of differentially expression genes against the set found in [Crow et. al. publication](https://www.pnas.org/content/pnas/116/13/6491.full.pdf), therefore we will limit our genes to include only those genes shared between our starting set of genes and those in publication. 
 
 # In[8]:
 
@@ -131,78 +131,89 @@ template_data = pd.read_csv(
     sep='\t',
     index_col=0)
 
-gene_ids = list(template_data.columns)
+our_gene_ids = list(template_data.columns)
 
 
 # In[11]:
 
 
-# Read file mapping ensembl ids to hgnc symbols
+# File mapping ensembl ids to hgnc symbols
 gene_id_file = os.path.join(
     local_dir,
     "ensembl_hgnc_mapping.tsv")
-
-gene_id_mapping = pd.read_csv(
-    gene_id_file,
-    header=0,
-    sep='\t',
-    index_col=0)
 
 
 # In[12]:
 
 
-"""gene_ids_hgnc = {}
-for gene_id in gene_ids:
-    gene_id_strip = gene_id.split(".")[0]
-    if gene_id_strip in list(gene_id_mapping.index):
-        if len(gene_id_mapping.loc[gene_id_strip]) > 1:
-            gene_ids_hgnc[gene_id] = gene_id_mapping.loc[gene_id_strip].iloc[0][0]
-        else:
-            gene_ids_hgnc[gene_id] = gene_id_mapping.loc[gene_id_strip][0]
-
-gene_ids_hgnc"""
+get_ipython().run_cell_magic('R', '', 'suppressWarnings(library("biomaRt"))')
 
 
 # In[13]:
 
 
-# Save scaler transform
-gene_id_dict_file = os.path.join(
-    local_dir,
-    "gene_id_dict.pickle")
-"""
-outfile = open(gene_id_dict_file,'wb')
-pickle.dump(gene_ids_hgnc,outfile)
-outfile.close()"""
+get_ipython().run_cell_magic('R', '-i template_data_file -i gene_id_file', "\n# Get mapping between ensembl gene ids (ours) to HGNC gene symbols (published)\n\nsource('../functions/GSEA_analysis.R')\n\nif (file.exists(gene_id_file) == FALSE){\n    gene_id_mapping <- get_ensembl_symbol_mapping(template_data_file, gene_id_file)\n}")
 
 
 # In[14]:
 
 
-# Load pickled files
-gene_ids_hgnc = pickle.load(open(gene_id_dict_file, "rb" ))
+# Read gene id mapping
+gene_id_mapping = pd.read_csv(
+        gene_id_file,
+        header=0,
+        sep='\t',
+        index_col=0)
+
+print(gene_id_mapping.shape)
+gene_id_mapping.head()
 
 
 # In[15]:
 
 
-# Get intersection of gene lists
-shared_genes_hgnc = set(gene_ids_hgnc.values()).intersection(published_generic_genes)
-print(len(shared_genes_hgnc))
+# Get mapping between ensembl ids with and without version numbers
+# Expressiond data uses ensembl gene ids with version number 
+ensembl_gene_ids = pd.DataFrame(data={'ensembl_version': our_gene_ids,
+                                      'ensembl_parsed': [gene_id.split('.')[0] for gene_id in our_gene_ids]})
+
+print(ensembl_gene_ids.shape)
+ensembl_gene_ids.head()
 
 
 # In[16]:
 
 
-# Convert shared gene ids back to ensembl ids
-shared_genes = []
-for gene_ensembl, gene_hgnc in gene_ids_hgnc.items():
-    if gene_hgnc in shared_genes_hgnc:
-        shared_genes.append(gene_ensembl)
+# Map ensembl ids with version number to gene_id_mapping_df
+gene_id_mapping = pd.merge(gene_id_mapping, 
+                           ensembl_gene_ids, 
+                           left_on='ensembl_gene_id',
+                           right_on='ensembl_parsed', 
+                           how='outer')
+
+print(gene_id_mapping.shape)
+gene_id_mapping.set_index('ensembl_version', inplace=True)
+gene_id_mapping.head()
 
 
-# In[27]:
+# In[17]:
+
+
+# Get intersection of gene lists
+our_gene_ids_hgnc = gene_id_mapping.loc[our_gene_ids]['hgnc_symbol']
+shared_genes_hgnc = set(our_gene_ids_hgnc).intersection(published_generic_genes)
+print(len(shared_genes_hgnc))
+
+
+# In[18]:
+
+
+# Convert shared hgnc gene ids back to ensembl ids with version
+shared_genes = list(gene_id_mapping[gene_id_mapping['hgnc_symbol'].isin(shared_genes_hgnc)].index)
+print(len(shared_genes))
+
+
+# In[19]:
 
 
 # Save shared genes
@@ -217,7 +228,7 @@ outfile.close()
 
 # Since this experiment contains both RNA-seq and smRNA-seq samples which are in different ranges so we will drop smRNA samples so that samples are within the same range. The analysis identifying these two subsets of samples can be found in this [notebook](0_explore_input_data.ipynb)
 
-# In[17]:
+# In[20]:
 
 
 # Drop smRNA samples so that samples are within the same range
@@ -235,14 +246,14 @@ smRNA_samples = ["SRR493961",
                  "SRR493972"]
 
 
-# In[18]:
+# In[21]:
 
 
 # Drop samples
 template_data = template_data.drop(smRNA_samples)
 
 
-# In[19]:
+# In[22]:
 
 
 # Drop genes
@@ -252,7 +263,7 @@ print(template_data.shape)
 template_data.head()
 
 
-# In[20]:
+# In[23]:
 
 
 # Save 
@@ -261,7 +272,7 @@ template_data.to_csv(template_data_file, float_format='%.5f', sep='\t')
 
 # ### Normalize compendium 
 
-# In[21]:
+# In[24]:
 
 
 # Load real gene expression data
@@ -270,7 +281,7 @@ original_compendium_file = os.path.join(
     "recount2_compedium_data.tsv")
 
 
-# In[22]:
+# In[25]:
 
 
 # Read data
@@ -287,7 +298,7 @@ print(original_compendium.shape)
 original_compendium.head()
 
 
-# In[29]:
+# In[26]:
 
 
 # 0-1 normalize per gene
@@ -301,7 +312,7 @@ print(original_data_scaled_df.shape)
 original_data_scaled_df.head()
 
 
-# In[28]:
+# In[27]:
 
 
 # Save data
@@ -327,10 +338,10 @@ outfile.close()
 
 # ### Train VAE 
 
-# In[25]:
+# In[28]:
 
 
-# Setup directories
+"""# Setup directories
 # Create VAE directories
 output_dirs = [os.path.join(base_dir, dataset_name, "models"),
                os.path.join(base_dir, dataset_name, "logs")]
@@ -346,14 +357,14 @@ for each_dir in output_dirs:
     new_dir = os.path.join(each_dir, NN_architecture)
     if os.path.exists(new_dir) == False:
         print('creating new directory: {}'.format(new_dir))
-        os.makedirs(new_dir, exist_ok=True)
+        os.makedirs(new_dir, exist_ok=True)"""
 
 
-# In[26]:
+# In[29]:
 
 
-# Train VAE on new compendium data
+"""# Train VAE on new compendium data
 # Write out model to rank_pathways directory
 pipeline.train_vae(config_file,
-                   normalized_data_file)
+                   normalized_data_file)"""
 

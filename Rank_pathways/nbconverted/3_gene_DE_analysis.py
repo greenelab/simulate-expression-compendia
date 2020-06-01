@@ -60,8 +60,9 @@ local_dir = params["local_dir"]
 dataset_name = params['dataset_name']
 num_runs = params['num_simulated']
 project_id = params['project_id']
+col_to_rank = params['col_to_rank']
 
-rerun_template = True
+rerun_template = False
 rerun_simulated = False
 
 
@@ -159,8 +160,6 @@ sns.distplot(num_sign_DEGs_simulated,
             kde=False)
 
 
-# **Observation:** All simulated experiments found 0 DEGs using adjusted p-value cutoff of <5%
-
 # **Check**
 # 
 # As a check, we compared the number of DEGs identified here versus what was reported in the [Kim et. al. publication](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3566005/#pone.0055596.s008), which found:
@@ -169,19 +168,13 @@ sns.distplot(num_sign_DEGs_simulated,
 # * Used edgeR to identify DEGs
 # 
 # By comparison:
-# * Our study found 2623 DEGs using limma and applying FDR < 0.001 
+# * Our study found 2358 DEGs using limma and applying FDR < 0.001 
 # * Spot checking the genes identified with their list of DEGs from S2, we found the some of the same genes and FC direction was consistent. 
 # * Currently we are normalizing read counts [downloaded from recount2](https://bioconductor.org/packages/devel/bioc/vignettes/recount/inst/doc/recount-quickstart.html) using RPKM and piping that through limma to identify DEG (this is legacy code from when we expected microarray input instead of RNA-seq)
 
 # ## Get statistics for differential expression analysis
 
 # In[14]:
-
-
-col_to_rank = 'logFC'
-
-
-# In[15]:
 
 
 # Get ranks of template experiment
@@ -204,7 +197,7 @@ else:
 template_DE_stats.head()
 
 
-# In[16]:
+# In[15]:
 
 
 # Concatenate simulated experiments
@@ -232,7 +225,7 @@ print(simulated_DE_stats_all.shape)
 simulated_DE_stats_all.head()
 
 
-# In[17]:
+# In[16]:
 
 
 # Aggregate statistics across all simulated experiments
@@ -248,10 +241,10 @@ else:
 simulated_DE_summary_stats.head()
 
 
-# In[18]:
+# In[17]:
 
 
-# Rank gene by median value of col_to_rank
+# Rank gene by median value of col_to_rank for simulated experiments
 
 # If ranking by p-value or adjusted p-value then high rank = low value
 if col_to_rank in ['P.Value', 'adj.P.Val']:
@@ -271,13 +264,13 @@ else:
 simulated_DE_summary_stats.head()
 
 
-# In[19]:
+# In[18]:
 
 
 simulated_DE_summary_stats.tail()
 
 
-# In[20]:
+# In[19]:
 
 
 # Merge template statistics with simulated statistics
@@ -288,13 +281,13 @@ print(template_simulated_DE_stats.shape)
 template_simulated_DE_stats.head()
 
 
-# In[21]:
+# In[20]:
 
 
 sns.distplot(template_simulated_DE_stats[('ranking',"")].values, kde=False)
 
 
-# In[22]:
+# In[21]:
 
 
 # Parse columns
@@ -305,7 +298,7 @@ count_simulated = template_simulated_DE_stats[(col_to_rank,'count')]
 rank_simulated = template_simulated_DE_stats[('ranking','')]
 
 
-# In[23]:
+# In[22]:
 
 
 summary = pd.DataFrame(data={'Gene ID': template_simulated_DE_stats.index,
@@ -323,7 +316,7 @@ summary['Z score'] = (summary['Test statistic (Real)'] - summary['Mean test stat
 summary.head()
 
 
-# In[24]:
+# In[23]:
 
 
 # Save file

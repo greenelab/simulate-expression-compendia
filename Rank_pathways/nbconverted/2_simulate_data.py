@@ -133,7 +133,6 @@ template_data = pd.read_csv(
 # In[6]:
 
 
-"""
 # Simulate experiments
 # Make sure range is correct
 # Generate multiple simulated datasets
@@ -146,10 +145,10 @@ for i in range(num_runs):
         scaler,
         local_dir,
         base_dir,
-        i)"""
+        i)
 
 
-# In[7]:
+# In[ ]:
 
 
 # Load shared genes
@@ -157,14 +156,12 @@ shared_genes_file = os.path.join(
     local_dir,
     "shared_gene_ids.pickle")
 
-# Load pickled files
 shared_genes = pickle.load(open(shared_genes_file, "rb" ))
 
 
-# In[8]:
+# In[ ]:
 
 
-"""
 # Truncate simulated experiments
 smRNA_samples = ["SRR493961",
                  "SRR493962",
@@ -198,7 +195,7 @@ for i in range(num_runs):
     simulated_data = simulated_data[shared_genes]
     
     # Save 
-    simulated_data.to_csv(simulated_data_file, float_format='%.5f', sep='\t')"""
+    simulated_data.to_csv(simulated_data_file, float_format='%.5f', sep='\t')
 
 
 # ### Quick validation of simulated experiments
@@ -207,7 +204,7 @@ for i in range(num_runs):
 # 1. Values are different between different simulated data files (meaning it was a different simulated dataset), and different from the template experiment
 # 2. Range of values is scaled the same as the compendium
 
-# In[9]:
+# In[ ]:
 
 
 # Compendium
@@ -215,13 +212,13 @@ print(compendium.shape)
 compendium.head()
 
 
-# In[10]:
+# In[ ]:
 
 
 sns.distplot(compendium['ENSG00000000003.14'])
 
 
-# In[11]:
+# In[ ]:
 
 
 # Template experiment
@@ -229,13 +226,13 @@ print(template_data.shape)
 template_data.head()
 
 
-# In[12]:
+# In[ ]:
 
 
 sns.distplot(template_data['ENSG00000000003.14'])
 
 
-# In[13]:
+# In[ ]:
 
 
 # Manual select one simulated experiment
@@ -255,13 +252,13 @@ print(simulated_test_1.shape)
 simulated_test_1.head()
 
 
-# In[14]:
+# In[ ]:
 
 
 sns.distplot(simulated_test_1['ENSG00000000003.14'])
 
 
-# In[15]:
+# In[ ]:
 
 
 # Manual select another simulated experiment
@@ -281,7 +278,7 @@ print(simulated_test_2.shape)
 simulated_test_2.head()
 
 
-# In[16]:
+# In[ ]:
 
 
 sns.distplot(simulated_test_2['ENSG00000000003.14'])
@@ -293,7 +290,7 @@ sns.distplot(simulated_test_2['ENSG00000000003.14'])
 
 # **Visualization in latent space**
 
-# In[17]:
+# In[ ]:
 
 
 # Load VAE models
@@ -321,13 +318,13 @@ loaded_model.load_weights(weights_encoder_file)
 loaded_decode_model.load_weights(weights_decoder_file)
 
 
-# In[18]:
+# In[ ]:
 
 
 pca = PCA(n_components=2)
 
 
-# In[19]:
+# In[ ]:
 
 
 # Embedding of real compendium (encoded)
@@ -358,7 +355,7 @@ compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[20]:
+# In[ ]:
 
 
 # Embedding of real template experiment (encoded)
@@ -384,7 +381,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[21]:
+# In[ ]:
 
 
 # Embedding of simulated experiment (encoded)
@@ -410,7 +407,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[22]:
+# In[ ]:
 
 
 # Concatenate dataframes
@@ -421,7 +418,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[23]:
+# In[ ]:
 
 
 # Plot
@@ -455,7 +452,7 @@ print(fig)
 
 # **Visualization in gene space**
 
-# In[24]:
+# In[ ]:
 
 
 # Embedding of real compendium
@@ -472,7 +469,7 @@ compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[25]:
+# In[ ]:
 
 
 # Embedding of real template experiment
@@ -487,7 +484,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[26]:
+# In[ ]:
 
 
 # Embedding of simulated template experiment
@@ -502,7 +499,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[27]:
+# In[ ]:
 
 
 # Concatenate dataframes
@@ -513,7 +510,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[28]:
+# In[ ]:
 
 
 # Plot
