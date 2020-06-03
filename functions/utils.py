@@ -14,7 +14,7 @@ def read_config(filename):
         config_dict[items[0]] = eval(items[1])
     return config_dict
 
-def replace_ensembl_ids(DE_stats_file,
+def replace_ensembl_ids(expression_df,
 gene_id_mapping):
 
     """
@@ -22,54 +22,67 @@ gene_id_mapping):
 
     Arguments
     ---------
-    DE_stats_file: str
-        File containing DE stats. Matrix is gene x stats features
+    expression_df: df
+        gene expression data matrix (sample x gene)
 
     gene_id_mapping: df
         Dataframe mapping ensembl ids (used in DE_stats_file) to hgnc symbols,
         used in Crow et. al.
     """
     # Read in data
-    DE_stats = pd.read_csv(
-        DE_stats_file,
-        header=0,
-        sep='\t',
-        index_col=0)
+    gene_expression = expression_df
 
-    # There is the same ensembl id that maps to different gene symbols
+    # Different cases of many-many mapping between gene ids
+    #count = 0
+    #symbols = []
+    #for symbol, group in gene_id_mapping.groupby("ensembl_gene_id"):
+    #    if group['hgnc_symbol'].nunique() > 1:
+    #        print(group)
+    #        count += 1
+    #        symbols.append(symbol)
+    #count
 
-    # Manually checked a few duplicates and found that
-    # 1. Some ensembl ids are mapped to same gene symbol twice
-    # 2. Some duplicates are due to different version numbers.
-    # Higher ensembl version number (i.e. more updated) corresponds to the
-    # first gene id symbol. So we can remove the second occurring duplicate
-
-    # Doesn't appear that there exists a conversion using version numbers
+    # Case 1: Ensembl ids are paralogs (geneA, geneA_PAR_Y) and map to the
+    # same hgnc symbol. Homologous sequences are paralogous 
+    # if they were separated by a gene duplication event: if a gene in an 
+    # organism is duplicated to occupy two different positions in the same 
+    # genome, then the two copies are paralogous
     
-    #gene_id_mapping[gene_id_mapping.index.duplicated()]
-    #gene_id_mapping[gene_id_mapping.index == 'ENSG00000276085']
-    #gene_id_mapping[gene_id_mapping.index == 'ENSG00000230417']
-    #gene_id_mapping[gene_id_mapping.index == 'ENSG00000124334']
-    #gene_id_mapping[gene_id_mapping.index == 'ENSG00000223484']
+    # Remove paralogs
 
-    # Lookup version of duplicated ensembls 
-    #template_DE_stats[template_DE_stats.index.str.contains("ENSG00000276085")]
+    gene_expression = gene_expression.iloc[:,~gene_expression.columns.str.contains("PAR_Y")]
+
+
+    # Case 2: Same ensembl ids are mapped to different gene symbol twice (CCL3L1, CCL3L3)
+    # ENSG00000187510.7  ENSG00000187510    C12orf74  
+    # ENSG00000187510.7  ENSG00000187510     PLEKHG7  
+    # Manually map based on what is found on ensembl site
+    manual_mapping = dict({'ENSG00000187510.7':'PLEKHG7',
+               'ENSG00000230417.11':'LINC00595',
+               'ENSG00000255374.3':'TAS2R45',
+               'ENSG00000276085.1': 'CCL3L1'
+              })
+
+    gene_expression.rename(manual_mapping, axis='columns', inplace=True)
+
+    # Case 3: Some rows are duplicates
+    # ENSG00000223773.7	ENSG00000223773	CD99P1	
+    # ENSG00000124334.17	ENSG00000124334	IL9R
 
     # Keep first occurence of duplicated ensembl ids
     gene_id_mapping = gene_id_mapping.loc[~gene_id_mapping.index.duplicated(keep='first')]
 
-    # Format ensembl ids
-    # Remove version number 
-    DE_stats.index = DE_stats.index.str.split(".").str[0]
-
     # Replace ensembl ids with gene symbol
-    DE_stats.index = DE_stats.index.map(gene_id_mapping['hgnc_symbol'])
+    gene_expression.columns = gene_expression.columns.map(gene_id_mapping['hgnc_symbol'])
 
     # Remove rows where we couldn't map ensembl id to gene symbol
-    DE_stats = DE_stats[~(DE_stats.index == "")]
+    gene_expression = gene_expression.iloc[:,gene_expression.columns != ""]
+    gene_expression = gene_expression.iloc[:,gene_expression.columns.notnull()]
+
 
     # Save
-    DE_stats.to_csv(DE_stats_file, float_format='%.5f', sep='\t')
+    #gene_expression.t.to_csv(expression_file, float_format='%.5f', sep='\t')
+    return(gene_expression)
 
 def spearman_ci(gene_rank_df,
 num_permutations):
