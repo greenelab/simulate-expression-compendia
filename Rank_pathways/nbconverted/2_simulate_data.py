@@ -102,7 +102,7 @@ scaler_transform_file = os.path.join(
     local_dir,
     "scaler_transform.pickle")
 
-scaler = pickle.load(open(scaler_transform_file, "rb" ) )
+scaler = pickle.load(open(scaler_transform_file, "rb"))
 
 
 # In[5]:
@@ -148,18 +148,7 @@ for i in range(num_runs):
         i)
 
 
-# In[ ]:
-
-
-# Load shared genes
-shared_genes_file = os.path.join(
-    local_dir,
-    "shared_gene_ids.pickle")
-
-shared_genes = pickle.load(open(shared_genes_file, "rb" ))
-
-
-# In[ ]:
+# In[7]:
 
 
 # Truncate simulated experiments
@@ -192,7 +181,7 @@ for i in range(num_runs):
     # Drop samples
     simulated_data = simulated_data.drop(smRNA_samples)
     # Drop genes
-    simulated_data = simulated_data[shared_genes]
+    #simulated_data = simulated_data[shared_genes]
     
     # Save 
     simulated_data.to_csv(simulated_data_file, float_format='%.5f', sep='\t')
@@ -204,7 +193,7 @@ for i in range(num_runs):
 # 1. Values are different between different simulated data files (meaning it was a different simulated dataset), and different from the template experiment
 # 2. Range of values is scaled the same as the compendium
 
-# In[ ]:
+# In[8]:
 
 
 # Compendium
@@ -212,13 +201,13 @@ print(compendium.shape)
 compendium.head()
 
 
-# In[ ]:
+# In[9]:
 
 
-sns.distplot(compendium['ENSG00000000003.14'])
+sns.distplot(compendium['GPR176'])
 
 
-# In[ ]:
+# In[10]:
 
 
 # Template experiment
@@ -226,13 +215,13 @@ print(template_data.shape)
 template_data.head()
 
 
-# In[ ]:
+# In[11]:
 
 
-sns.distplot(template_data['ENSG00000000003.14'])
+sns.distplot(template_data['GPR176'])
 
 
-# In[ ]:
+# In[12]:
 
 
 # Manual select one simulated experiment
@@ -252,13 +241,13 @@ print(simulated_test_1.shape)
 simulated_test_1.head()
 
 
-# In[ ]:
+# In[13]:
 
 
-sns.distplot(simulated_test_1['ENSG00000000003.14'])
+sns.distplot(simulated_test_1['GPR176'])
 
 
-# In[ ]:
+# In[14]:
 
 
 # Manual select another simulated experiment
@@ -278,19 +267,17 @@ print(simulated_test_2.shape)
 simulated_test_2.head()
 
 
-# In[ ]:
+# In[15]:
 
 
-sns.distplot(simulated_test_2['ENSG00000000003.14'])
+sns.distplot(simulated_test_2['GPR176'])
 
 
 # **Check clustering of simulated samples**
 # 
-# Check UMAP of original experiment and simulated experiments. Expect to see a similar structure in the template and simulated experiments. Also expect to see that the simulated experiment follows the distribution of the compendium.
+# Check PCA embedding of original experiment and simulated experiments. We expect to see a similar structure in the template and simulated experiments. Also expect to see that the simulated experiment follows the distribution of the compendium.
 
-# **Visualization in latent space**
-
-# In[ ]:
+# In[16]:
 
 
 # Load VAE models
@@ -318,44 +305,43 @@ loaded_model.load_weights(weights_encoder_file)
 loaded_decode_model.load_weights(weights_decoder_file)
 
 
-# In[ ]:
+# In[17]:
 
 
 pca = PCA(n_components=2)
 
 
-# In[ ]:
+# In[18]:
 
 
 # Embedding of real compendium (encoded)
 
 # Scale compendium
-compendium_scaled = scaler.transform(compendium)
-compendium_scaled_df = pd.DataFrame(compendium_scaled,
-                                    columns=compendium.columns,
-                                    index=compendium.index)
+#compendium_scaled = scaler.transform(compendium)
+#compendium_scaled_df = pd.DataFrame(compendium_scaled,
+#                                    columns=compendium.columns,
+#                                    index=compendium.index)
 
-# Encode compendium into latent space
-compendium_encoded = loaded_model.predict_on_batch(compendium_scaled_df)
+# Encode normalized compendium into latent space
+compendium_encoded = loaded_model.predict_on_batch(normalized_compendium)
 
 compendium_encoded_df = pd.DataFrame(data=compendium_encoded, 
                                      index=compendium.index)
 
-# Get and save model
-#model = umap.UMAP(random_state=randomState).fit(compendium_encoded_df)
+# Get and save PCA model
 model = pca.fit(compendium_encoded_df)
 
-compendium_UMAPencoded = model.transform(compendium_encoded_df)
+compendium_PCAencoded = model.transform(compendium_encoded_df)
 
-compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
+compendium_PCAencoded_df = pd.DataFrame(data=compendium_PCAencoded,
                                          index=compendium_encoded_df.index,
                                          columns=['1','2'])
 
 # Add label
-compendium_UMAPencoded_df['experiment_id'] = 'background'
+compendium_PCAencoded_df['experiment_id'] = 'background'
 
 
-# In[ ]:
+# In[19]:
 
 
 # Embedding of real template experiment (encoded)
@@ -367,62 +353,71 @@ template_data_scaled_df = pd.DataFrame(template_data_scaled,
                                     index=template_data.index)
 
 # Encode template experiment into latent space
-template_encoded = loaded_model.predict_on_batch(template_data_scaled)
+template_encoded = loaded_model.predict_on_batch(template_data_scaled_df)
 template_encoded_df = pd.DataFrame(data=template_encoded,
                                    index=template_data.index)
 
-template_UMAPencoded = model.transform(template_encoded_df)
+template_PCAencoded = model.transform(template_encoded_df)
 
-template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
+template_PCAencoded_df = pd.DataFrame(data=template_PCAencoded,
                                          index=template_encoded_df.index,
                                          columns=['1','2'])
 
 # Add back label column
-template_UMAPencoded_df['experiment_id'] = 'template_experiment'
+template_PCAencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[ ]:
+# **Visualization in latent space**
+
+# In[20]:
+
+
+encoded_simulated_file = os.path.join(local_dir,
+    "pseudo_experiment",
+    "selected_simulated_encoded_data_"+project_id+"_10.txt")
+
+
+# In[21]:
 
 
 # Embedding of simulated experiment (encoded)
 
-# Scale simulated data
-simulated_test_2_scaled = scaler.transform(simulated_test_2)
-simulated_test_2_scaled_df = pd.DataFrame(simulated_test_2_scaled,
-                                          columns=simulated_test_2.columns,
-                                          index=simulated_test_2.index)
+simulated_encoded_df = pd.read_csv(
+    encoded_simulated_file,
+    header=0,
+    sep='\t',
+    index_col=0)
 
-# Encode simulated experiment into latent space
-simulated_encoded = loaded_model.predict_on_batch(simulated_test_2_scaled)
-simulated_encoded_df = pd.DataFrame(
-    simulated_encoded, index=simulated_test_2.index)
+# Drop samples
+simulated_encoded_df = simulated_encoded_df.drop(smRNA_samples)
 
-simulated_UMAPencoded = model.transform(simulated_encoded_df)
+simulated_PCAencoded = model.transform(simulated_encoded_df)
 
-simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
+simulated_PCAencoded_df = pd.DataFrame(data=simulated_PCAencoded,
                                          index=simulated_encoded_df.index,
                                          columns=['1','2'])
 
 # Add back label column
-simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
+simulated_PCAencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[ ]:
+# In[22]:
 
 
 # Concatenate dataframes
-combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df, 
-                                    template_UMAPencoded_df,
-                                    simulated_UMAPencoded_df])
+combined_PCAencoded_df = pd.concat([compendium_PCAencoded_df, 
+                                    template_PCAencoded_df,
+                                    simulated_PCAencoded_df])
 
-combined_UMAPencoded_df.shape
+print(combined_PCAencoded_df.shape)
+combined_PCAencoded_df.head()
 
 
-# In[ ]:
+# In[23]:
 
 
 # Plot
-fig = ggplot(combined_UMAPencoded_df, aes(x='1', y='2'))
+fig = ggplot(combined_PCAencoded_df, aes(x='1', y='2'))
 fig += geom_point(aes(color='experiment_id'), alpha=0.2)
 fig += labs(x ='PCA 1',
             y = 'PCA 2',
@@ -440,10 +435,82 @@ fig += theme(
     )
 fig += guides(colour=guide_legend(override_aes={'alpha': 1}))
 fig += scale_color_manual(['#bdbdbd', 'red', 'blue'])
-fig += geom_point(data=combined_UMAPencoded_df[combined_UMAPencoded_df['experiment_id'] == 'template_experiment'],
+fig += geom_point(data=combined_PCAencoded_df[combined_PCAencoded_df['experiment_id'] == 'template_experiment'],
                   alpha=0.2, 
                   color='blue')
-fig += geom_point(data=combined_UMAPencoded_df[combined_UMAPencoded_df['experiment_id'] == 'simulated_experiment'],
+fig += geom_point(data=combined_PCAencoded_df[combined_PCAencoded_df['experiment_id'] == 'simulated_experiment'],
+                  alpha=0.1, 
+                  color='red')
+
+print(fig)
+
+
+# **Visualization in latent space (re-encoded)**
+
+# In[24]:
+
+
+# Embedding of simulated experiment (encoded)
+
+# Scale simulated data
+simulated_test_2_scaled = scaler.transform(simulated_test_2)
+simulated_test_2_scaled_df = pd.DataFrame(simulated_test_2_scaled,
+                                          columns=simulated_test_2.columns,
+                                          index=simulated_test_2.index)
+
+# Encode simulated experiment into latent space
+simulated_encoded = loaded_model.predict_on_batch(simulated_test_2_scaled_df)
+simulated_encoded_df = pd.DataFrame(simulated_encoded, 
+                                    index=simulated_test_2.index)
+
+simulated_PCAencoded = model.transform(simulated_encoded_df)
+
+simulated_PCAencoded_df = pd.DataFrame(data=simulated_PCAencoded,
+                                         index=simulated_encoded_df.index,
+                                         columns=['1','2'])
+
+# Add back label column
+simulated_PCAencoded_df['experiment_id'] = 'simulated_experiment'
+
+
+# In[25]:
+
+
+# Concatenate dataframes
+combined_PCAencoded_df = pd.concat([compendium_PCAencoded_df, 
+                                    template_PCAencoded_df,
+                                    simulated_PCAencoded_df])
+
+print(combined_PCAencoded_df.shape)
+combined_PCAencoded_df.head()
+
+
+# In[26]:
+
+
+# Plot
+fig = ggplot(combined_PCAencoded_df, aes(x='1', y='2'))
+fig += geom_point(aes(color='experiment_id'), alpha=0.2)
+fig += labs(x ='PCA 1',
+            y = 'PCA 2',
+            title = 'PCA original data with experiments (latent space)')
+fig += theme_bw()
+fig += theme(
+    legend_title_align = "center",
+    plot_background=element_rect(fill='white'),
+    legend_key=element_rect(fill='white', colour='white'), 
+    legend_title=element_text(family='sans-serif', size=15),
+    legend_text=element_text(family='sans-serif', size=12),
+    plot_title=element_text(family='sans-serif', size=15),
+    axis_text=element_text(family='sans-serif', size=12),
+    axis_title=element_text(family='sans-serif', size=15)
+    )
+fig += guides(colour=guide_legend(override_aes={'alpha': 1}))
+fig += scale_color_manual(['#bdbdbd', 'red', 'blue'])
+fig += geom_point(data=combined_PCAencoded_df[combined_PCAencoded_df['experiment_id'] == 'template_experiment'],
+                  alpha=0.2, 
+                  color='blue')
+fig += geom_point(data=combined_PCAencoded_df[combined_PCAencoded_df['experiment_id'] == 'simulated_experiment'],
                   alpha=0.1, 
                   color='red')
 
@@ -452,24 +519,24 @@ print(fig)
 
 # **Visualization in gene space**
 
-# In[ ]:
+# In[28]:
 
 
 # Embedding of real compendium
 
 # Get and save model
-model = umap.UMAP(random_state=randomState).fit(compendium_scaled_df)
+model = umap.UMAP(random_state=randomState).fit(normalized_compendium)
 
-compendium_UMAPencoded = model.transform(compendium_scaled_df)
+compendium_UMAPencoded = model.transform(normalized_compendium)
 
 compendium_UMAPencoded_df = pd.DataFrame(data=compendium_UMAPencoded,
-                                         index=compendium_scaled_df.index,
+                                         index=normalized_compendium.index,
                                          columns=['1','2'])
 # Add label
 compendium_UMAPencoded_df['experiment_id'] = 'background'
 
 
-# In[ ]:
+# In[29]:
 
 
 # Embedding of real template experiment
@@ -484,7 +551,7 @@ template_UMAPencoded_df = pd.DataFrame(data=template_UMAPencoded,
 template_UMAPencoded_df['experiment_id'] = 'template_experiment'
 
 
-# In[ ]:
+# In[30]:
 
 
 # Embedding of simulated template experiment
@@ -499,7 +566,7 @@ simulated_UMAPencoded_df = pd.DataFrame(data=simulated_UMAPencoded,
 simulated_UMAPencoded_df['experiment_id'] = 'simulated_experiment'
 
 
-# In[ ]:
+# In[31]:
 
 
 # Concatenate dataframes
@@ -510,7 +577,7 @@ combined_UMAPencoded_df = pd.concat([compendium_UMAPencoded_df,
 combined_UMAPencoded_df.shape
 
 
-# In[ ]:
+# In[32]:
 
 
 # Plot
@@ -541,3 +608,8 @@ fig += geom_point(data=combined_UMAPencoded_df[combined_UMAPencoded_df['experime
 
 print(fig)
 
+
+# **Observation:**
+# The latent space encoded simulated data embedded into the first 2 PCs shows the linear shift of the simulated experiment compared to the template experiment, as expected. However, we noticed that the shift is fairly large and moves the experiment outside of the background distribution. This is something to consider for future iterations of this simulation.
+# 
+# The latent space visualization (re-encoded) is another visualization using PCA. In this case, the simulated data, which was shifted in the latent space and decoded into gene space, is encoded into latent space. We can see the shift fo the simulated data, however the relationship between samples are not an exact match to the template experiment because we have decoded the simulated data, which is a nonlinear transformation. This nonlinear transformation of the data is even more apparent when we embed the simulated data in gene space into UMAP space.

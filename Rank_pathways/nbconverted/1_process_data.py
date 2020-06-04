@@ -196,24 +196,32 @@ gene_id_mapping.set_index('ensembl_version', inplace=True)
 gene_id_mapping.head()
 
 
+# Since this experiment contains both RNA-seq and smRNA-seq samples which are in different ranges so we will drop smRNA samples so that samples are within the same range. The analysis identifying these two subsets of samples can be found in this [notebook](0_explore_input_data.ipynb)
+
 # In[17]:
 
 
-# Get intersection of gene lists
-our_gene_ids_hgnc = gene_id_mapping.loc[our_gene_ids]['hgnc_symbol']
-shared_genes_hgnc = set(our_gene_ids_hgnc).intersection(published_generic_genes)
-print(len(shared_genes_hgnc))
+# Replace ensembl ids with gene symbols
+template_data = utils.replace_ensembl_ids(template_data,
+                                          gene_id_mapping)
 
 
 # In[18]:
 
 
-# Convert shared hgnc gene ids back to ensembl ids with version
-shared_genes = list(gene_id_mapping[gene_id_mapping['hgnc_symbol'].isin(shared_genes_hgnc)].index)
-print(len(shared_genes))
+template_data.head()
 
 
 # In[19]:
+
+
+# Get intersection of gene lists
+our_gene_ids_hgnc = template_data.columns
+shared_genes_hgnc = list(set(our_gene_ids_hgnc).intersection(published_generic_genes))
+print(len(shared_genes_hgnc))
+
+
+# In[20]:
 
 
 # Save shared genes
@@ -222,13 +230,11 @@ shared_genes_file = os.path.join(
     "shared_gene_ids.pickle")
 
 outfile = open(shared_genes_file,'wb')
-pickle.dump(shared_genes,outfile)
+pickle.dump(shared_genes_hgnc,outfile)
 outfile.close()
 
 
-# Since this experiment contains both RNA-seq and smRNA-seq samples which are in different ranges so we will drop smRNA samples so that samples are within the same range. The analysis identifying these two subsets of samples can be found in this [notebook](0_explore_input_data.ipynb)
-
-# In[20]:
+# In[21]:
 
 
 # Drop smRNA samples so that samples are within the same range
@@ -246,24 +252,32 @@ smRNA_samples = ["SRR493961",
                  "SRR493972"]
 
 
-# In[21]:
+# In[22]:
 
 
 # Drop samples
 template_data = template_data.drop(smRNA_samples)
 
 
-# In[22]:
+# In[23]:
 
 
 # Drop genes
-template_data = template_data[shared_genes]
+template_data = template_data[shared_genes_hgnc]
 
 print(template_data.shape)
 template_data.head()
 
 
-# In[23]:
+# In[24]:
+
+
+print(len(template_data.columns) - len(shared_genes_hgnc))
+
+
+# *Note:* There is a difference in the number of `shared_genes_hgnc` and genes in the template experiment because 3 genes have 2 different ensembl gene ids have map to the same hgnc symbol (one forward, one reverse)
+
+# In[25]:
 
 
 # Save 
@@ -272,7 +286,7 @@ template_data.to_csv(template_data_file, float_format='%.5f', sep='\t')
 
 # ### Normalize compendium 
 
-# In[24]:
+# In[26]:
 
 
 # Load real gene expression data
@@ -281,7 +295,7 @@ original_compendium_file = os.path.join(
     "recount2_compedium_data.tsv")
 
 
-# In[25]:
+# In[27]:
 
 
 # Read data
@@ -291,14 +305,28 @@ original_compendium = pd.read_table(
     sep='\t',
     index_col=0)
 
-# Drop genes
-original_compendium = original_compendium[shared_genes]
-
 print(original_compendium.shape)
 original_compendium.head()
 
 
-# In[26]:
+# In[28]:
+
+
+# Replace ensembl ids with gene symbols
+original_compendium = utils.replace_ensembl_ids(original_compendium,
+                                                gene_id_mapping)
+
+
+# In[29]:
+
+
+# Drop genes
+original_compendium = original_compendium[shared_genes_hgnc]
+
+original_compendium.head()
+
+
+# In[30]:
 
 
 # 0-1 normalize per gene
@@ -312,7 +340,7 @@ print(original_data_scaled_df.shape)
 original_data_scaled_df.head()
 
 
-# In[27]:
+# In[31]:
 
 
 # Save data
@@ -338,10 +366,10 @@ outfile.close()
 
 # ### Train VAE 
 
-# In[28]:
+# In[32]:
 
 
-"""# Setup directories
+# Setup directories
 # Create VAE directories
 output_dirs = [os.path.join(base_dir, dataset_name, "models"),
                os.path.join(base_dir, dataset_name, "logs")]
@@ -357,14 +385,14 @@ for each_dir in output_dirs:
     new_dir = os.path.join(each_dir, NN_architecture)
     if os.path.exists(new_dir) == False:
         print('creating new directory: {}'.format(new_dir))
-        os.makedirs(new_dir, exist_ok=True)"""
+        os.makedirs(new_dir, exist_ok=True)
 
 
-# In[29]:
+# In[33]:
 
 
-"""# Train VAE on new compendium data
+# Train VAE on new compendium data
 # Write out model to rank_pathways directory
 pipeline.train_vae(config_file,
-                   normalized_data_file)"""
+                   normalized_data_file)
 

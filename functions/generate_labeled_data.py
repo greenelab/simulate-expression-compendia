@@ -450,9 +450,16 @@ def shift_template_experiment(
                                             index=simulated_data_decoded_df.index)
 
     # Save
-    out_file = os.path.join(local_dir,
+    out_decoded_file = os.path.join(local_dir,
     "pseudo_experiment",
     "selected_simulated_data_"+selected_experiment_id+"_"+str(run)+".txt")
 
+    out_encoded_file = os.path.join(local_dir,
+    "pseudo_experiment",
+    "selected_simulated_encoded_data_"+selected_experiment_id+"_"+str(run)+".txt")
+
     simulated_data_scaled_df.to_csv(
-        out_file, float_format='%.3f', sep='\t')
+        out_decoded_file, float_format='%.3f', sep='\t')
+
+    simulated_data_encoded_df.to_csv(
+        out_encoded_file, float_format='%.3f', sep='\t')

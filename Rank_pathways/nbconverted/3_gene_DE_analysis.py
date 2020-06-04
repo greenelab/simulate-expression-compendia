@@ -62,8 +62,8 @@ num_runs = params['num_simulated']
 project_id = params['project_id']
 col_to_rank = params['col_to_rank']
 
-rerun_template = False
-rerun_simulated = False
+rerun_template = True
+rerun_simulated = True
 
 
 # In[4]:

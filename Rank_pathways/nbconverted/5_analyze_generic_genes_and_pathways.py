@@ -138,7 +138,7 @@ pathway_summary_file = os.path.join(
 # In[9]:
 
 
-# Read data
+"""# Read data
 gene_stats = pd.read_csv(
     gene_summary_file,
     header=0,
@@ -147,13 +147,13 @@ gene_stats = pd.read_csv(
 
 print(gene_stats.shape)
 sample_gene_id = gene_stats.index[0].split(".")[0]
-gene_stats.head()
+gene_stats.head()"""
 
 
 # In[10]:
 
 
-# Read file mapping ensembl ids to hgnc symbols
+"""# Read file mapping ensembl ids to hgnc symbols
 gene_id_file = os.path.join(
     local_dir,
     "ensembl_hgnc_mapping.tsv")
@@ -165,18 +165,18 @@ gene_id_mapping = pd.read_csv(
     index_col=0)
 
 gene_id_mapping.set_index("ensembl_gene_id", inplace=True)
-gene_id_mapping.head()
+gene_id_mapping.head()"""
 
 
 # In[11]:
 
 
-# Replace ensembl ids with gene symbols
+"""# Replace ensembl ids with gene symbols
 # Only replace if ensembl ids exist
 if sample_gene_id in list(gene_id_mapping.index):
     print("replacing ensembl ids")
     utils.replace_ensembl_ids(gene_summary_file,
-                              gene_id_mapping)
+                              gene_id_mapping)"""
 
 
 # ### Our DEGs
@@ -185,7 +185,7 @@ if sample_gene_id in list(gene_id_mapping.index):
 # In[12]:
 
 
-# Read data back after renaming gene ids
+# Read data 
 gene_stats = pd.read_csv(
     gene_summary_file,
     header=0,
@@ -234,6 +234,8 @@ published_generic_genes = list(DE_prior['Gene_Name'])
 shared_genes = set(gene_ids).intersection(published_generic_genes)
 print(len(shared_genes))
 
+## CHECK NUMBERS OF GENES
+
 
 # In[17]:
 
@@ -253,7 +255,7 @@ print(len(shared_genes))
 # check that all our genes are a subset of the published ones, no genes unique to ours
 
 
-# In[20]:
+# In[19]:
 
 
 # Get rank of shared genes
@@ -262,7 +264,7 @@ print(our_gene_rank_df.shape)
 our_gene_rank_df.head()
 
 
-# In[21]:
+# In[20]:
 
 
 # Merge published ranking
@@ -276,7 +278,7 @@ print(shared_gene_rank_df.shape)
 shared_gene_rank_df.head()
 
 
-# In[22]:
+# In[21]:
 
 
 # Scale published ranking to our range
@@ -285,21 +287,21 @@ shared_gene_rank_df['DE_Prior_Rank'] = round(shared_gene_rank_df['DE_Prior_Rank'
 shared_gene_rank_df.head()
 
 
-# In[23]:
+# In[22]:
 
 
 # Get top ranked genes by both methods
 #shared_gene_rank_df[(shared_gene_rank_df['Rank (simulated)']>17500) & (shared_gene_rank_df['DE_Prior_Rank']>17500)]
 
 
-# In[24]:
+# In[23]:
 
 
 # Get low ranked genes by both methods
 #shared_gene_rank_df[(shared_gene_rank_df['Rank (simulated)']<300) & (shared_gene_rank_df['DE_Prior_Rank']<300)]
 
 
-# In[25]:
+# In[24]:
 
 
 # Plot our ranking vs published ranking
@@ -324,7 +326,7 @@ fig.savefig(fig_file,
 
 # ### Calculate correlation
 
-# In[26]:
+# In[25]:
 
 
 # Get correlation
@@ -336,7 +338,7 @@ print(r, p, ci_high, ci_low)
 
 # ## Generic pathways
 
-# In[27]:
+# In[26]:
 
 
 """
@@ -350,7 +352,7 @@ pathway_stats = pd.read_csv(
 pathway_stats.head()"""
 
 
-# In[28]:
+# In[27]:
 
 
 """# Define what are the set of generic genes
@@ -359,7 +361,7 @@ generic_pathway_data = pathway_stats.sort_values(by="Z score", ascending=True)[0
 generic_pathway_data.head()"""
 
 
-# In[29]:
+# In[28]:
 
 
 # Manually compare against Powers et. al publication 
