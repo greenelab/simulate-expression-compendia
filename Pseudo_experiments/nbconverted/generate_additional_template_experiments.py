@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Create pseudo experiments using simulated compendia
@@ -23,7 +23,7 @@ import glob
 from sklearn import preprocessing
 
 sys.path.append("../")
-from functions import utils, generate_labeled_data
+from ponyo import utils, generate_labeled_data
 
 import warnings
 warnings.filterwarnings(action='ignore')
