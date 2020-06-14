@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Test reduced variance of gene expression data
@@ -31,7 +31,7 @@ import random
 from keras.models import load_model
 
 sys.path.append("../")
-from functions import utils
+from ponyo import utils
 
 import warnings
 
@@ -167,7 +167,7 @@ df_vae = pd.DataFrame(list(zip(var_no_vae, var_vae)),
 df_vae.head()
 
 
-# In[24]:
+# In[9]:
 
 
 # Plot distribution of variances using original data and original data passed through the VAE
