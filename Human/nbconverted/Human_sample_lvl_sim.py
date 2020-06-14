@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Human sample level analysis
@@ -49,7 +49,7 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 sys.path.append("../")
-from functions import pipeline, utils
+from ponyo import pipeline, utils
 
 from numpy.random import seed
 randomState = 123
@@ -619,4 +619,10 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
 
 print(panel_C)
 ggsave(plot=panel_C, filename=pca_corrected_file, dpi=300)
+
+
+# In[ ]:
+
+
+
 
