@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # # Generate and visualize experiment-level simulated data
@@ -47,7 +47,6 @@ from plotnine import (ggplot,
                       element_line,
                       coords)
 
-sys.path.append("../")
 from ponyo import utils, generate_labeled_data
 
 from numpy.random import seed
@@ -361,10 +360,4 @@ fig += geom_point(data=combined_data_df[combined_data_df['experiment_id'] == exa
 
 print(fig)
 ggsave(plot=fig, filename=experiment_simulated_file)
-
-
-# In[ ]:
-
-
-
 

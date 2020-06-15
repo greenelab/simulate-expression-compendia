@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # # Test reduced variance of gene expression data
@@ -30,7 +30,6 @@ import numpy as np
 import random
 from keras.models import load_model
 
-sys.path.append("../")
 from ponyo import utils
 
 import warnings

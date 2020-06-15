@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # ## Visualize heatmaps of differentially expressed genes
@@ -21,7 +21,6 @@ import random
 import glob
 from sklearn import preprocessing
 
-sys.path.append("../")
 from ponyo import utils, generate_labeled_data
 
 import warnings

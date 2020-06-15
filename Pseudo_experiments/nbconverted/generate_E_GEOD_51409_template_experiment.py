@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # # Simulate pseudo experiments using template experiment
@@ -24,9 +24,8 @@ import random
 import glob
 from sklearn import preprocessing
 
-sys.path.append("../")
 from ponyo import utils
-import generate_labeled_data
+from ponyo import generate_labeled_data
 
 import warnings
 warnings.filterwarnings(action='ignore')
