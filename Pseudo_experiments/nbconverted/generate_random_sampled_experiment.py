@@ -21,8 +21,7 @@ import random
 import glob
 from sklearn import preprocessing
 
-sys.path.append("../")
-from functions import utils
+from ponyo import utils
 
 import warnings
 warnings.filterwarnings(action='ignore')

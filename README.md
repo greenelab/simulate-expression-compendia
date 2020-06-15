@@ -44,16 +44,7 @@ conda env create -f environment.yml
 conda activate simulate_expression_compendia
 ```
 
-Additional statistical packages from R bioconductor are required:
-
-Using R 3.6.3 install the following packages:
-```
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("limma")
-BiocManager::install("sva")
-``` 
+R scripts were run using R 3.6.3 
 
 ## How to run this simulation using your own data
 

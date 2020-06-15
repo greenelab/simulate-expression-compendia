@@ -47,8 +47,7 @@ from plotnine import (ggplot,
                       element_line,
                       coords)
 
-sys.path.append("../")
-from functions import utils, generate_labeled_data
+from ponyo import utils, generate_labeled_data
 
 from numpy.random import seed
 randomState = 123

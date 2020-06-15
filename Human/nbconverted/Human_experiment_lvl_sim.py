@@ -43,8 +43,7 @@ from sklearn.decomposition import PCA
 import warnings
 warnings.filterwarnings(action='ignore')
 
-sys.path.append("../")
-from functions import pipeline, utils
+from ponyo import pipeline, utils
 
 from numpy.random import seed
 randomState = 123

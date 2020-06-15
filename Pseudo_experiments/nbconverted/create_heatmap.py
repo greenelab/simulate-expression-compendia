@@ -21,8 +21,7 @@ import random
 import glob
 from sklearn import preprocessing
 
-sys.path.append("../")
-from functions import utils, generate_labeled_data
+from ponyo import utils, generate_labeled_data
 
 import warnings
 def fxn():
