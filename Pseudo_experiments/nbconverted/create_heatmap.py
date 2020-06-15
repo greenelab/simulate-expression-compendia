@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # ## Visualize heatmaps of differentially expressed genes
@@ -22,7 +22,7 @@ import glob
 from sklearn import preprocessing
 
 sys.path.append("../")
-from functions import utils, generate_labeled_data
+from ponyo import utils, generate_labeled_data
 
 import warnings
 def fxn():

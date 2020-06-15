@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Simulate pseudo experiments using random sampling
@@ -22,7 +22,7 @@ import glob
 from sklearn import preprocessing
 
 sys.path.append("../")
-from functions import utils
+from ponyo import utils
 
 import warnings
 warnings.filterwarnings(action='ignore')
