@@ -86,7 +86,7 @@ Further customization can be accomplished by doing the following:
 | kappa | float: How fast to linearly ramp up KL loss|
 | intermediate_dim| int: Size of the hidden layer|
 | latent_dim | int: Size of the bottleneck layer|
-| epsilond_std | float: Standard deviation of Normal distribution to sample latent space|
+| epsilon_std | float: Standard deviation of Normal distribution to sample latent space|
 | num_simulated_samples | int: Simulate a compendia with these many samples|
 | num_simulated_experiments| int: Simulate a compendia with these many experiments|
 | lst_num_experiments | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
