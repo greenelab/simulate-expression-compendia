@@ -128,7 +128,8 @@ normalized_data_file = os.path.join(
 if os.path.exists(normalized_data_file) == False:
     pipeline.normalize_expression_data(base_dir,
                                        config_file,
-                                       rpkm_data_file)
+                                       rpkm_data_file,
+                                       normalized_data_file)
 
 
 # In[8]:
@@ -171,11 +172,11 @@ if len(os.listdir(vae_log_dir)) == 0:
 
 
 # Run simulation without correction 
-#corrected=False
-#pipeline.run_simulation(config_file,
-#                         normalized_data_file,
-#                        corrected,
-#                        experiment_id_file)
+corrected=False
+pipeline.run_simulation(config_file,
+                        normalized_data_file,
+                        corrected,
+                        experiment_id_file)
 
 
 # ## Run simulation with correction applied

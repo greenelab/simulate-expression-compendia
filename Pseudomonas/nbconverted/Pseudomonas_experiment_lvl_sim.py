@@ -90,12 +90,34 @@ metadata_file = os.path.join(
     "sample_annotations.tsv")
 
 
+# In[ ]:
+
+
+# Output files
+normalized_processed_data_file = os.path.join(
+    base_dir,
+    dataset_name,
+    "data",
+    "input",
+    "train_set_normalized_processed.txt.xz")
+
+
 # ## Setup directories
 
 # In[5]:
 
 
 pipeline.setup_dir(config_file)
+
+
+# ## Process data
+# This pipeline is expecting data to be of the form sample x gene. The downloaded data is gene x sample.
+
+# In[ ]:
+
+
+pipeline.transpose_data(normalized_data_file,
+                        normalized_processed_data_file)
 
 
 # ## Pre-process data
@@ -118,9 +140,9 @@ experiment_id_file = os.path.join(
 # Only run pre-processind step if experiment id file is NOT created
 if os.path.exists(experiment_id_file) == False:
     pipeline.create_experiment_id_file(metadata_file,
-                                      normalized_data_file,
-                                      experiment_id_file,
-                                      config_file)
+                                       normalized_processed_data_file,
+                                       experiment_id_file,
+                                       config_file)
 
 
 # ## Train VAE
@@ -143,7 +165,7 @@ vae_log_dir = os.path.join(
 # Check if VAE training completed first
 if len(os.listdir(vae_log_dir)) == 0:
     pipeline.train_vae(config_file,
-                       normalized_data_file)
+                       normalized_processed_data_file)
 
 
 # ## Run simulation experiment without noise correction
@@ -154,7 +176,7 @@ if len(os.listdir(vae_log_dir)) == 0:
 # Run simulation without correction 
 corrected=False
 pipeline.run_simulation(config_file,
-                        normalized_data_file,
+                        normalized_processed_data_file,
                         corrected,
                         experiment_id_file)
 
@@ -167,7 +189,7 @@ pipeline.run_simulation(config_file,
 # Run simulation without correction
 corrected=True
 pipeline.run_simulation(config_file,
-                        normalized_data_file,
+                        normalized_processed_data_file,
                         corrected,
                         experiment_id_file)
 

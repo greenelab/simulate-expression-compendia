@@ -119,7 +119,8 @@ normalized_data_file = os.path.join(
 if os.path.exists(normalized_data_file) == False:
     pipeline.normalize_expression_data(base_dir,
                                        config_file,
-                                       rpkm_data_file)
+                                       rpkm_data_file,
+                                       normalized_data_file)
 
 
 # ## Train VAE
@@ -140,9 +141,9 @@ vae_log_dir = os.path.join(
 
 # Train VAE
 # Check if VAE training completed first
-#if len(os.listdir(vae_log_dir)) == 0:
-pipeline.train_vae(config_file,
-                   normalized_data_file)
+if len(os.listdir(vae_log_dir)) == 0:
+    pipeline.train_vae(config_file,
+                       normalized_data_file)
 
 
 # ## Run simulation experiment without noise correction
