@@ -22,7 +22,7 @@ jobs:
           $CONDA/bin/conda env update --file environment.yml --name base
           $CONDA/bin/pip install -e .
           # Until ponyo is deployed to PyPi i will link to repo
-          $CONDA/bin/pip install git+https://github.com/ajlee21/ponyo.git
+          $CONDA/bin/pip install git+https://github.com/ajlee21/ponyo.git@pypi
           $CONDA/bin/pip install pytest
           $CONDA/bin/pip install nbval
 
