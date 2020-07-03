@@ -44,6 +44,11 @@ conda env create -f environment.yml
 conda activate simulate_expression_compendia
 ```
 
+Also need to pip install modules from this repository:
+```
+pip install .
+```
+
 R scripts were run using R 3.6.3 
 
 ## How to run this simulation using your own data

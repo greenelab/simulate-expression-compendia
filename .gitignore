@@ -3,3 +3,4 @@
 *.pyc
 *.~lock*
 *.Rhistory
+*.egg-info/
