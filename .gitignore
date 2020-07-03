@@ -4,3 +4,4 @@
 *.~lock*
 *.Rhistory
 *.egg-info/
+*.pytest_cache/
