@@ -1,8 +1,4 @@
 *.pcl filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
-*.xz filter=lfs diff=lfs merge=lfs -text
-data/experiment_simulated/analysis*/*.txt.xz filter=lfs diff=lfs merge=lfs -text
-data/simulated/analysis*/*.txt.xz filter=lfs diff=lfs merge=lfs -text
-*.txt.xz filter=lfs diff=lfs merge=lfs -text
 Human/data/input/* filter=lfs diff=lfs merge=lfs -text
 Pseudomonas/data/input/* filter=lfs diff=lfs merge=lfs -text
