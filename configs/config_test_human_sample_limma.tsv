@@ -1,4 +1,5 @@
 local_dir	"../Batch_effects_test/"
+scaler_transform_file	"../Batch_effects_test/scaler_transform.pickle"
 dataset_name	"Human_tests"
 simulation_type	"sample_lvl_sim"
 NN_architecture	"NN_2500_30"
