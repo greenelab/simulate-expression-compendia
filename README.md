@@ -49,39 +49,41 @@ Also need to pip install modules from this repository:
 pip install .
 ```
 
-R scripts were run using R 3.6.3 
+Note: R scripts were run using R 3.6.3 
 
 ## How to run this simulation using your own data
 
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
-First we need to set up your local repository: 
+First you need to set up your local repository: 
 1. Clone the ```simulate-expression-compendia``` repository
 2. Set up conda environment using the command above
 3. Create a new analysis folder in the main directory. This is equivalent to the ```Pseudomonas``` directory
-4. Within your analysis folder create ```data/``` directory and ```input/```, ```metadata/``` subdirectories
-5. Copy ```Pseudomonas_sample_lvl_sim.ipynb``` and ```Pseudomonas_experiment_lvl_sim.ipynb``` into your respective folder.  
+4. Copy ```Pseudomonas_sample_lvl_sim.ipynb``` and ```Pseudomonas_experiment_lvl_sim.ipynb``` into your analysis folder. 
+5. Within your analysis folder create ```data/``` directory and ```input/```, ```metadata/``` subdirectories
 
 Next we need to modify the code for your analysis:
 1. Update the ```config_Pa_sample_limma.tsv``` and ```config_Pa_experiment_limma.tsv``` based on your analysis
-2. Update the analysis notebooks to use your config file and input file
-3. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns.
+2. Update the analysis notebooks to use your config file (see below) and input file
+3. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py)
 4. Add your metadata file to ```data/metadata/``` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
-5. The module ```create_experiment_id_file``` in ```pipeline.py``` will need to be updated based on the format of your metadata file
-6. Run notebooks
+5. Run notebooks
 
 ## Additional customization
 
 Further customization can be accomplished by doing the following:
 
-1. The ```apply_correction_io``` function in the ```functions/generate_data_parallel.py``` file can be modified to use a different correction method.
+1. The ```apply_correction_io``` function in the ```generate_data_parallel.py``` file can be modified to use a different correction method.
 2. If there are additional pre-processing specific to your data, these can be added as modules in the ```pipeline.py``` file and called in the analysis notebook
 
 ## Configuration file
 
+The tables lists parameters required to generate simulated data using modules from [ponyo](https://github.com/greenelab/ponyo). Those marked with * indicate additional accessory parameters that are required to run the analysis in this repository.
+
 | Name | Description |
 | :--- | :---------- |
 | local_dir| str: Parent directory on local machine to store intermediate results|
+| scaler_transform_file| str: Files to store mapping from normalized to raw gene expression range|
 | dataset_name| str: Name for analysis directory. Either "Human" or "Pseudomonas"|
 | simulation_type | str: "sample_lvl_sim" or "experiment_lvl_sim"|
 | NN_architecture | str: Name of neural network architecture to use. Format 'NN_<intermediate layer>_<latent layer>'|
@@ -92,16 +94,17 @@ Further customization can be accomplished by doing the following:
 | intermediate_dim| int: Size of the hidden layer|
 | latent_dim | int: Size of the bottleneck layer|
 | epsilon_std | float: Standard deviation of Normal distribution to sample latent space|
+| validation_frac | float: Fraction of input samples to use to validate for VAE training.|
 | num_simulated_samples | int: Simulate a compendia with these many samples|
 | num_simulated_experiments| int: Simulate a compendia with these many experiments|
-| lst_num_experiments | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
-| lst_num_partitions | list:  List of different numbers of partitions to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
-| use_pca | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity|
-| num_PCs | int: Number of top PCs to use to represent expression data|
-| correction_method | str: Noise correction method to use. Either "limma" or "combat"|
+| lst_num_experiments* | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
+| lst_num_partitions* | list:  List of different numbers of partitions to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
+| use_pca* | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity|
+| num_PCs* | int: Number of top PCs to use to represent expression data|
+| correction_method* | str: Noise correction method to use. Either "limma" or "combat"|
 | metadata_colname | str: Column header that contains sample id that maps expression data and metadata|
-| iterations | int: Number of simulations to run|
-| num_cores | int: Number of processing cores to use|
+| iterations* | int: Number of simulations to run|
+| num_cores* | int: Number of processing cores to use|
 
 ## Acknowledgements
 We would like to thank YoSon Park, David Nicholson, Ben Heil and Ariel Hippen-Anderson for insightful discussions and code review
