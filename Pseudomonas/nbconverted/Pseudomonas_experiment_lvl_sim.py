@@ -41,7 +41,8 @@ from sklearn.decomposition import PCA
 import warnings
 warnings.filterwarnings(action='ignore')
 
-from ponyo import pipeline, utils
+from simulate_expression_compendia_modules import pipeline
+from ponyo import utils, train_vae_modules
 
 from numpy.random import seed
 randomState = 123
@@ -107,7 +108,7 @@ normalized_processed_data_file = os.path.join(
 # In[5]:
 
 
-pipeline.setup_dir(config_file)
+utils.setup_dir(config_file)
 
 
 # ## Process data
@@ -137,12 +138,12 @@ experiment_id_file = os.path.join(
 # In[7]:
 
 
-# Only run pre-processind step if experiment id file is NOT created
+# Create experiment id file
 if os.path.exists(experiment_id_file) == False:
-    pipeline.create_experiment_id_file(metadata_file,
-                                       normalized_processed_data_file,
-                                       experiment_id_file,
-                                       config_file)
+    utils.create_experiment_id_file(metadata_file,
+                                    normalized_processed_data_file,
+                                    experiment_id_file,
+                                    config_file)
 
 
 # ## Train VAE
@@ -162,10 +163,9 @@ vae_log_dir = os.path.join(
 
 
 # Train VAE
-# Check if VAE training completed first
 if len(os.listdir(vae_log_dir)) == 0:
-    pipeline.train_vae(config_file,
-                       normalized_processed_data_file)
+    train_vae_modules.train_vae(config_file,
+                                normalized_processed_data_file)
 
 
 # ## Run simulation experiment without noise correction
