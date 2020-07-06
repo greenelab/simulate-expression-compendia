@@ -1,4 +1,5 @@
 local_dir	"/home/alexandra/Documents/Data/Batch_effects/"
+scaler_transform_file	"/home/alexandra/Documents/Data/Batch_effects/scaler_transform.pickle"
 dataset_name	"Pseudomonas"
 simulation_type	"experiment_lvl_sim"
 NN_architecture	"NN_2500_30"
