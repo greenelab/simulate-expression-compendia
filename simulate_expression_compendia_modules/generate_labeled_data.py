@@ -257,9 +257,7 @@ def simulate_compendium_labeled(
     #    keep=False)]
 
     print(
-        "Return: simulated gene expression data containing {} samples and {} genes".format(
-            simulated_data_scaled_df.shape[0], simulated_data_scaled_df.shape[1]
-        )
+        f"Return: simulated gene expression data containing {simulated_data_scaled_df.shape[0]} samples and {simulated_data_scaled_df.shape[1]} genes"
     )
 
     # Save

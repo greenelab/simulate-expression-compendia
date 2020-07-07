@@ -78,33 +78,35 @@ Further customization can be accomplished by doing the following:
 
 ## Configuration file
 
-The tables lists parameters required to generate simulated data using modules from [ponyo](https://github.com/greenelab/ponyo). Those marked with * indicate additional accessory parameters that are required to run the analysis in this repository.
+The tables lists parameters required to run the analysis in this repository.
+
+Note: Some of these parameters are required by the imported [ponyo](https://github.com/greenelab/ponyo) modules. 
 
 | Name | Description |
 | :--- | :---------- |
 | local_dir| str: Parent directory on local machine to store intermediate results|
-| scaler_transform_file| str: Files to store mapping from normalized to raw gene expression range|
+| scaler_transform_file| str: File to store mapping from normalized to raw gene expression range|
 | dataset_name| str: Name for analysis directory. Either "Human" or "Pseudomonas"|
 | simulation_type | str: "sample_lvl_sim" or "experiment_lvl_sim"|
 | NN_architecture | str: Name of neural network architecture to use. Format 'NN_<intermediate layer>_<latent layer>'|
-| learning_rate| float: Parent directory on local machine to store intermediate results|
-| batch_size | str: Name for analysis directory. Either "Human" or "Pseudomonas"|
+| learning_rate| float: Step size used for gradient descent. In other words, it's how quickly the  methods is learning|
+| batch_size | str: Training is performed in batches. So this determines the number of samples to consider at a given time|
 | epochs | int: Number of times to train over the entire input dataset|
 | kappa | float: How fast to linearly ramp up KL loss|
 | intermediate_dim| int: Size of the hidden layer|
 | latent_dim | int: Size of the bottleneck layer|
 | epsilon_std | float: Standard deviation of Normal distribution to sample latent space|
-| validation_frac | float: Fraction of input samples to use to validate for VAE training.|
+| validation_frac | float: Fraction of input samples to use to validate for VAE training|
 | num_simulated_samples | int: Simulate a compendia with these many samples|
 | num_simulated_experiments| int: Simulate a compendia with these many experiments|
-| lst_num_experiments* | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
-| lst_num_partitions* | list:  List of different numbers of partitions to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
-| use_pca* | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity|
-| num_PCs* | int: Number of top PCs to use to represent expression data|
-| correction_method* | str: Noise correction method to use. Either "limma" or "combat"|
+| lst_num_experiments | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
+| lst_num_partitions | list:  List of different numbers of partitions to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
+| use_pca | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity|
+| num_PCs | int: Number of top PCs to use to represent expression data|
+| correction_method | str: Noise correction method to use. Either "limma" or "combat"|
 | metadata_colname | str: Column header that contains sample id that maps expression data and metadata|
-| iterations* | int: Number of simulations to run|
-| num_cores* | int: Number of processing cores to use|
+| iterations | int: Number of simulations to run|
+| num_cores | int: Number of processing cores to use|
 
 ## Acknowledgements
 We would like to thank YoSon Park, David Nicholson, Ben Heil and Ariel Hippen-Anderson for insightful discussions and code review

@@ -408,7 +408,7 @@ def apply_correction_io(
                 local_dir,
                 "experiment_simulated",
                 dataset_name + "_" + analysis_name,
-                "Experiment_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz",
+                f"Experiment_{num_experiments[i]}_{run}.txt.xz",
             )
 
             experiment_map_file = os.path.join(
@@ -434,14 +434,14 @@ def apply_correction_io(
                 local_dir,
                 "partition_simulated",
                 dataset_name + "_" + analysis_name,
-                "Partition_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz",
+                f"Partition_{num_experiments[i]}_{run}.txt.xz",
             )
 
             experiment_map_file = os.path.join(
                 local_dir,
                 "partition_simulated",
                 dataset_name + "_" + analysis_name,
-                "Partition_map_" + str(num_experiments[i]) + "_" + str(run) + ".txt.xz",
+                f"Partition_map_{num_experiments[i]}_{run}.txt.xz",
             )
 
             # Read in data
