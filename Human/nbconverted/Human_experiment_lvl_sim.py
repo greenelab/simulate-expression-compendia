@@ -43,7 +43,8 @@ from sklearn.decomposition import PCA
 import warnings
 warnings.filterwarnings(action='ignore')
 
-from ponyo import pipeline, utils
+from simulate_expression_compendia_modules import pipeline
+from ponyo import utils, train_vae_modules
 
 from numpy.random import seed
 randomState = 123
@@ -97,7 +98,7 @@ metadata_file = os.path.join(
 # In[5]:
 
 
-pipeline.setup_dir(config_file)
+utils.setup_dir(config_file)
 
 
 # ## Pre-process data
@@ -124,23 +125,23 @@ normalized_data_file = os.path.join(
 # In[7]:
 
 
-# Only run pre-processind step if normalized data file is NOT created
+# Normalize data
 if os.path.exists(normalized_data_file) == False:
-    pipeline.normalize_expression_data(base_dir,
-                                       config_file,
-                                       rpkm_data_file,
-                                       normalized_data_file)
+    train_vae_modules.normalize_expression_data(base_dir,
+                                                config_file,
+                                                rpkm_data_file,
+                                                normalized_data_file)
 
 
 # In[8]:
 
 
-# Only run pre-processind step if experiment id file is NOT created
+# Create experiment id file
 if os.path.exists(experiment_id_file) == False:
-    pipeline.create_experiment_id_file(metadata_file,
-                                      normalized_data_file,
-                                      experiment_id_file,
-                                      config_file)
+    utils.create_experiment_id_file(metadata_file,
+                                    normalized_data_file,
+                                    experiment_id_file,
+                                    config_file)
 
 
 # ## Train VAE
@@ -160,10 +161,9 @@ vae_log_dir = os.path.join(
 
 
 # Train VAE
-# Check if VAE training completed first
 if len(os.listdir(vae_log_dir)) == 0:
-    pipeline.train_vae(config_file,
-                       normalized_data_file)
+    train_vae_modules.train_vae(config_file,
+                                normalized_data_file)
 
 
 # ## Run simulation experiment without noise correction

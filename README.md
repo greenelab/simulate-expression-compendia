@@ -44,49 +44,59 @@ conda env create -f environment.yml
 conda activate simulate_expression_compendia
 ```
 
-R scripts were run using R 3.6.3 
+Install local modules into this environment:
+```
+pip install .
+```
+
+Note: R scripts were run using R 3.6.3 
 
 ## How to run this simulation using your own data
 
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
-First we need to set up your local repository: 
-1. Clone the ```simulate-expression-compendia``` repository
+First you need to set up your local repository: 
+1. Clone the `simulate-expression-compendia` repository
 2. Set up conda environment using the command above
-3. Create a new analysis folder in the main directory. This is equivalent to the ```Pseudomonas``` directory
-4. Within your analysis folder create ```data/``` directory and ```input/```, ```metadata/``` subdirectories
-5. Copy ```Pseudomonas_sample_lvl_sim.ipynb``` and ```Pseudomonas_experiment_lvl_sim.ipynb``` into your respective folder.  
+3. Create a new analysis folder in the main directory. This is equivalent to the `Pseudomonas` directory
+4. Copy `Pseudomonas_sample_lvl_sim.ipynb` and `Pseudomonas_experiment_lvl_sim.ipynb` into your analysis folder. 
+5. Within your analysis folder create `data/` directory and `input/`, `metadata/` subdirectories
 
 Next we need to modify the code for your analysis:
-1. Update the ```config_Pa_sample_limma.tsv``` and ```config_Pa_experiment_limma.tsv``` based on your analysis
-2. Update the analysis notebooks to use your config file and input file
-3. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns.
-4. Add your metadata file to ```data/metadata/``` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
-5. The module ```create_experiment_id_file``` in ```pipeline.py``` will need to be updated based on the format of your metadata file
-6. Run notebooks
+1. Update the `config_Pa_sample_limma.tsv` and `config_Pa_experiment_limma.tsv` based on your analysis
+2. Update the analysis notebooks to use your config file (see below) and input file
+3. Add your gene expression data file to the `data/input/` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py)
+4. Add your metadata file to `data/metadata/` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
+5. Run notebooks
 
 ## Additional customization
 
 Further customization can be accomplished by doing the following:
 
-1. The ```apply_correction_io``` function in the ```functions/generate_data_parallel.py``` file can be modified to use a different correction method.
-2. If there are additional pre-processing specific to your data, these can be added as modules in the ```pipeline.py``` file and called in the analysis notebook
+1. The `apply_correction_io` function in the `generate_data_parallel.py` file can be modified to use a different correction method.
+2. If there are additional pre-processing specific to your data, these can be added as modules in the `pipeline.py` file and called in the analysis notebook
 
 ## Configuration file
+
+The tables lists parameters required to run the analysis in this repository.
+
+Note: Some of these parameters are required by the imported [ponyo](https://github.com/greenelab/ponyo) modules. 
 
 | Name | Description |
 | :--- | :---------- |
 | local_dir| str: Parent directory on local machine to store intermediate results|
+| scaler_transform_file| str: File to store mapping from normalized to raw gene expression range|
 | dataset_name| str: Name for analysis directory. Either "Human" or "Pseudomonas"|
 | simulation_type | str: "sample_lvl_sim" or "experiment_lvl_sim"|
 | NN_architecture | str: Name of neural network architecture to use. Format 'NN_<intermediate layer>_<latent layer>'|
-| learning_rate| float: Parent directory on local machine to store intermediate results|
-| batch_size | str: Name for analysis directory. Either "Human" or "Pseudomonas"|
+| learning_rate| float: Step size used for gradient descent. In other words, it's how quickly the  methods is learning|
+| batch_size | str: Training is performed in batches. So this determines the number of samples to consider at a given time|
 | epochs | int: Number of times to train over the entire input dataset|
 | kappa | float: How fast to linearly ramp up KL loss|
 | intermediate_dim| int: Size of the hidden layer|
 | latent_dim | int: Size of the bottleneck layer|
 | epsilon_std | float: Standard deviation of Normal distribution to sample latent space|
+| validation_frac | float: Fraction of input samples to use to validate for VAE training|
 | num_simulated_samples | int: Simulate a compendia with these many samples|
 | num_simulated_experiments| int: Simulate a compendia with these many experiments|
 | lst_num_experiments | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|

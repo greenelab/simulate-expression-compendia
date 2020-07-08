@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0c79f6f0b88409b7f625fa65af1baaa9970a3ea5dd078748e45bc8c90916177a
-size 434
+local_dir	"/home/alexandra/Documents/Data/Batch_effects/"
+scaler_transform_file	"/home/alexandra/Documents/Data/Batch_effects/scaler_transform.pickle"
+dataset_name	"Human"
+simulation_type	"experiment_lvl_sim"
+NN_architecture	"NN_2500_30"
+learning_rate	0.001
+batch_size	10
+epochs	100
+kappa	0.01
+intermediate_dim	2500
+latent_dim	30
+epsilon_std	1.0
+num_simulated_experiments	50
+lst_num_partitions	[1, 2, 3, 5, 10, 20, 30, 50]
+use_pca	True
+num_PCs	10
+correction_method	'limma'
+metadata_colname	'run'
+iterations	range(5)
+num_cores	5

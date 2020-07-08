@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:cb2a7cbb35f0db86079326b299251a238ed3f6f998b37f72e468140556494fe1
-size 483
+local_dir	"/home/alexandra/Documents/Data/Batch_effects/"
+scaler_transform_file	"/home/alexandra/Documents/Data/Batch_effects/scaler_transform.pickle"
+dataset_name	"Pseudomonas"
+simulation_type	"experiment_lvl_sim"
+NN_architecture	"NN_2500_30"
+learning_rate	0.001
+batch_size	100
+epochs	100
+kappa	0.01
+intermediate_dim	2500
+latent_dim	30
+epsilon_std	1.0
+num_simulated_experiments	600
+lst_num_partitions	[1, 2, 3, 5, 10, 20, 30, 50, 70, 100, 200, 300, 400, 500]
+use_pca	True
+num_PCs	10
+correction_method	'combat'
+metadata_colname	'ml_data_source'
+iterations	range(5)
+num_cores	5
