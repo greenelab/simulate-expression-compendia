@@ -44,7 +44,7 @@ conda env create -f environment.yml
 conda activate simulate_expression_compendia
 ```
 
-Also need to pip install modules from this repository:
+Install local modules into this environment:
 ```
 pip install .
 ```
@@ -56,25 +56,25 @@ Note: R scripts were run using R 3.6.3
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
 First you need to set up your local repository: 
-1. Clone the ```simulate-expression-compendia``` repository
+1. Clone the `simulate-expression-compendia` repository
 2. Set up conda environment using the command above
-3. Create a new analysis folder in the main directory. This is equivalent to the ```Pseudomonas``` directory
-4. Copy ```Pseudomonas_sample_lvl_sim.ipynb``` and ```Pseudomonas_experiment_lvl_sim.ipynb``` into your analysis folder. 
-5. Within your analysis folder create ```data/``` directory and ```input/```, ```metadata/``` subdirectories
+3. Create a new analysis folder in the main directory. This is equivalent to the `Pseudomonas` directory
+4. Copy `Pseudomonas_sample_lvl_sim.ipynb` and `Pseudomonas_experiment_lvl_sim.ipynb` into your analysis folder. 
+5. Within your analysis folder create `data/` directory and `input/`, `metadata/` subdirectories
 
 Next we need to modify the code for your analysis:
-1. Update the ```config_Pa_sample_limma.tsv``` and ```config_Pa_experiment_limma.tsv``` based on your analysis
+1. Update the `config_Pa_sample_limma.tsv` and `config_Pa_experiment_limma.tsv` based on your analysis
 2. Update the analysis notebooks to use your config file (see below) and input file
-3. Add your gene expression data file to the ```data/input/``` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py)
-4. Add your metadata file to ```data/metadata/``` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
+3. Add your gene expression data file to the `data/input/` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py)
+4. Add your metadata file to `data/metadata/` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
 5. Run notebooks
 
 ## Additional customization
 
 Further customization can be accomplished by doing the following:
 
-1. The ```apply_correction_io``` function in the ```generate_data_parallel.py``` file can be modified to use a different correction method.
-2. If there are additional pre-processing specific to your data, these can be added as modules in the ```pipeline.py``` file and called in the analysis notebook
+1. The `apply_correction_io` function in the `generate_data_parallel.py` file can be modified to use a different correction method.
+2. If there are additional pre-processing specific to your data, these can be added as modules in the `pipeline.py` file and called in the analysis notebook
 
 ## Configuration file
 
