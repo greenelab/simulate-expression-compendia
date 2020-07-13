@@ -8,8 +8,6 @@ dependencies:
 - bioconda::bioconductor-limma
 - bioconda::bioconductor-sva
 - conda-forge::python=3.7
-- conda-forge::keras
-- conda-forge::tensorflow=1
 - conda-forge::pandas=0.24.2
 - conda-forge::seaborn=0.8.1
 - conda-forge::numexpr
@@ -31,3 +29,4 @@ dependencies:
   - matplotlib==3.0.0
   - pillow
   - requests
+  - ponyo
