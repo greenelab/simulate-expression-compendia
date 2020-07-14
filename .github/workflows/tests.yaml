@@ -20,9 +20,7 @@ jobs:
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
           $CONDA/bin/conda env update --file environment.yml --name base
-          $CONDA/bin/pip install -e .
-          # Until ponyo is deployed to PyPi i will link to repo
-          $CONDA/bin/pip install git+https://github.com/greenelab/ponyo.git
+          $CONDA/bin/pip install .
           $CONDA/bin/pip install pytest
           $CONDA/bin/pip install nbval
 

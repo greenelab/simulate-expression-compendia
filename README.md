@@ -32,38 +32,47 @@ There are 2 analyses using Pseudomonas dataset in the `Pseudomonas` directory an
 | [Human_experiment_lvl_sim](Human/Human_experiment_lvl_sim.ipynb) | Human experiment-level gene expression simulation|
 
 
-## Computational Environment
-
-All processing and analysis scripts were performed using the conda environment specified in `environment.yml`.
-To build and activate this environment run:
-
-```bash
-# conda version 4.6.12
-conda env create -f environment.yml
-
-conda activate simulate_expression_compendia
-```
-
-Install local modules into this environment:
-```
-pip install .
-```
-
-Note: R scripts were run using R 3.6.3 
-
-## How to run this simulation using your own data
+## How to run notebooks from simulate-expression-compendia
 
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
 First you need to set up your local repository: 
 1. Clone the `simulate-expression-compendia` repository
-2. Set up conda environment using the command above
-3. Create a new analysis folder in the main directory. This is equivalent to the `Pseudomonas` directory
-4. Copy `Pseudomonas_sample_lvl_sim.ipynb` and `Pseudomonas_experiment_lvl_sim.ipynb` into your analysis folder. 
-5. Within your analysis folder create `data/` directory and `input/`, `metadata/` subdirectories
+2. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+3. Set up conda environment by running the following command in the terminal:
+```bash
+# conda version 4.6.12
+conda env create -f environment.yml
+
+conda activate simulate_expression_compendia
+
+pip install -e .
+```
+4. Navigate to either the `Pseudomonas` or `Human` directories and run the notebooks.
+
+
+## How to run using your own data
+
+In order to run this simulation on your own gene expression data the following steps should be performed:
+
+First you need to set up your local repository and environment: 
+1. Clone the `simulate-expression-compendia` repository
+2. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+3. Set up conda environment by running the following command in the terminal:
+```bash
+# conda version 4.6.12
+conda env create -f environment.yml
+
+conda activate simulate_expression_compendia
+
+pip install -e .
+```
+4. Create a new analysis folder in the main directory. This is equivalent to the `Pseudomonas` directory
+5. Copy `Pseudomonas_sample_lvl_sim.ipynb` or `Pseudomonas_experiment_lvl_sim.ipynb` into your analysis folder depending on if you would like to use the sample level(see [simulate_by_random_sampling()](https://github.com/greenelab/ponyo/blob/master/ponyo/simulate_expression_data.py)) or experiment level simulation (see [simulate_by_latent_transformation()](https://github.com/greenelab/ponyo/blob/master/ponyo/simulate_expression_data.py))approach. 
+6. Within your analysis folder create `data/` directory and `input/`, `metadata/` subdirectories
 
 Next we need to modify the code for your analysis:
-1. Update the `config_Pa_sample_limma.tsv` and `config_Pa_experiment_limma.tsv` based on your analysis
+1. Create a configuration file in `configs/` using the parameters outlined below.
 2. Update the analysis notebooks to use your config file (see below) and input file
 3. Add your gene expression data file to the `data/input/` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py)
 4. Add your metadata file to `data/metadata/` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
