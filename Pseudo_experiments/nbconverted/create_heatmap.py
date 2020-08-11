@@ -272,14 +272,6 @@ print(sign_DEG_compressed.shape[0])
 sign_DEG_compressed.sort_values(by=['adj.P.Val'])
 sign_DEG_compressed = sign_DEG_compressed.iloc[0:14,]
 
-if sign_DEG_compressed.shape[0] == 0:
-    # Reset data
-    sign_DEG_compressed = DE_stats_compressed_only_data
-    
-    # Sort significant DEGs and select top 30 genes
-    sign_DEG_compressed.sort_values(by=['adj.P.Val'])
-    sign_DEG_compressed = sign_DEG_compressed.iloc[0:14,]
-
 sign_DEG_compressed.head(10)
 
 
@@ -387,7 +379,7 @@ f.fig.suptitle('Original experiment')
 f.savefig(heatmap_original_file)
 
 
-# In[43]:
+# In[17]:
 
 
 # Plot compressed data
@@ -434,7 +426,7 @@ f.savefig(heatmap_control_file)
 
 # ## Compare gene ranks
 
-# In[40]:
+# In[20]:
 
 
 gene_stats = DE_stats_original_data.join(DE_stats_compressed_only_data['logFC'], rsuffix='_vae_compressed')[['logFC', 'logFC_vae_compressed']]
@@ -444,7 +436,7 @@ gene_stats = gene_stats.join(DE_stats_control_data['logFC'], rsuffix='_sample_lv
 gene_stats.head()
 
 
-# In[41]:
+# In[21]:
 
 
 # Get within sample correlation
@@ -452,7 +444,7 @@ gene_stat_corr = gene_stats.corr()
 gene_stat_corr
 
 
-# In[42]:
+# In[22]:
 
 
 ax = sns.heatmap(

@@ -47,6 +47,12 @@ base_dir = os.path.abspath(
 
 
 # Input files
+# File containing expression data from original compendium
+original_compendium_file = os.path.join(
+    local_dir,
+    "input",
+    "Pa_compendium_02.22.2014.pcl")
+
 # File containing expression data from template experiment
 selected_original_data_file = os.path.join(
     local_dir,
@@ -97,6 +103,12 @@ DE_stats_compressed_only_file = os.path.join(
     "output_original",
     "DE_stats_compressed_only_data_"+experiment_id+"_example.txt")
 
+DE_stats_original_file = os.path.join(
+    local_dir,
+    "pseudo_experiment",
+    "output_original",
+    "DE_stats_original_data_"+experiment_id+"_example.txt")
+
 
 # ## Normalize expression data
 
@@ -104,6 +116,19 @@ DE_stats_compressed_only_file = os.path.join(
 
 
 # Read compendium
+original_compendium = pd.read_csv(original_compendium_file,
+                                header=0,
+                                index_col=0,
+                                sep="\t").T
+
+print(original_compendium.shape)
+original_compendium.head()
+
+
+# In[7]:
+
+
+# Read template experiment
 original_template = pd.read_csv(selected_original_data_file,
                                 header=0,
                                 index_col=0,
@@ -113,12 +138,20 @@ print(original_template.shape)
 original_template.head()
 
 
-# In[7]:
+# In[8]:
 
 
-# 0-1 normalize per gene
+# 0-1 normalize compendium per gene
 scaler = preprocessing.MinMaxScaler()
-original_data_scaled = scaler.fit_transform(original_template)
+original_compendium_scaled = scaler.fit_transform(original_compendium)
+
+
+# In[9]:
+
+
+# 0-1 normalize template experiment using scaler above
+original_data_scaled = scaler.transform(original_template)
+
 original_data_scaled_df = pd.DataFrame(original_data_scaled,
                                 columns=original_template.columns,
                                 index=original_template.index)
@@ -129,7 +162,7 @@ original_data_scaled_df.head()
 
 # ## Encode and decode data
 
-# In[8]:
+# In[10]:
 
 
 # Pass original data through VAE
@@ -150,7 +183,7 @@ print(vae_data.shape)
 vae_data.head()
 
 
-# In[9]:
+# In[11]:
 
 
 # Scale data back into original range for DE analysis
@@ -163,13 +196,13 @@ vae_data_scaled_df = pd.DataFrame(
 )
 
 
-# In[10]:
+# In[12]:
 
 
 vae_data_scaled_df.head()
 
 
-# In[11]:
+# In[13]:
 
 
 # Save expression data for use in heatmap plot
@@ -178,19 +211,19 @@ vae_data_scaled_df.to_csv(selected_compressed_data_file, sep="\t")
 
 # ## DE analysis
 
-# In[12]:
+# In[14]:
 
 
 get_ipython().run_cell_magic('R', '', '#if (!requireNamespace("BiocManager", quietly = TRUE))\n#  install.packages("BiocManager")\n\n#BiocManager::install("limma")')
 
 
-# In[13]:
+# In[15]:
 
 
 get_ipython().run_cell_magic('R', '', 'suppressPackageStartupMessages(library("limma"))')
 
 
-# In[14]:
+# In[16]:
 
 
 # files for analysis
@@ -200,8 +233,8 @@ metadata_file = os.path.join(
     "metadata_deg_temp.txt")
 
 
-# In[15]:
+# In[17]:
 
 
-get_ipython().run_cell_magic('R', '-i metadata_file -i experiment_id -i selected_compressed_data_file -i DE_stats_compressed_only_file', 'get_DE_stats <- function(metadata_file, \n                         experiment_id, \n                         expression_file,\n                         out_file){\n    # Read in data\n    expression_data <- t(as.matrix(read.csv(expression_file, sep="\\t", header=TRUE, row.names=1)))\n    metadata <- as.matrix(read.csv(metadata_file, sep="\\t", header=TRUE, row.names=1))\n    \n    print("Checking sample ordering...")\n    print(all.equal(colnames(expression_data), rownames(metadata)))\n  \n    # NOTE: It make sure the metadata is in the same order \n    # as the column names of the expression matrix.\n    group <- interaction(metadata[,1])\n  \n    mm <- model.matrix(~0 + group)\n  \n    ## DEGs of simulated data\n    # lmFit expects input array to have structure: gene x sample\n    # lmFit fits a linear model using weighted least squares for each gene:\n    fit <- lmFit(expression_data, mm)\n  \n    # Comparisons between groups (log fold-changes) are obtained as contrasts of these fitted linear models:\n    # Samples are grouped based on experimental condition\n    # The variability of gene expression is compared between these groups\n    # For experiment E-GEOD-51409, we are comparing the expression profile\n    # of samples grown in 37 degrees versus those grown in 22 degrees\n    contr <- makeContrasts(group37 - group22, levels = colnames(coef(fit)))\n\n    # Estimate contrast for each gene\n    tmp <- contrasts.fit(fit, contr)\n\n    # Empirical Bayes smoothing of standard errors (shrinks standard errors \n    # that are much larger or smaller than those from other genes towards the average standard error)\n    tmp <- eBayes(tmp)\n  \n    # Get significant DEGs\n    top.table <- topTable(tmp, sort.by = "P", n = Inf)\n    all_genes <-  as.data.frame(top.table)\n  \n    # Find all DEGs based on Bonferroni corrected p-value cutoff\n    threshold = 0.05/5549\n    num_sign_DEGs <- all_genes[all_genes[,\'P.Value\']<threshold,]\n  \n  # Save summary statistics of DEGs\n  write.table(all_genes, file = out_file, row.names = T, sep = "\\t", quote = F)\n  \n}\n\nget_DE_stats(metadata_file, experiment_id, selected_compressed_data_file, DE_stats_compressed_only_file)')
+get_ipython().run_cell_magic('R', '-i metadata_file -i experiment_id -i selected_compressed_data_file -i DE_stats_compressed_only_file -i selected_original_data_file -i DE_stats_original_file', 'get_DE_stats <- function(metadata_file, \n                         experiment_id, \n                         expression_file,\n                         out_file){\n    # Read in data\n    expression_data <- t(as.matrix(read.csv(expression_file, sep="\\t", header=TRUE, row.names=1)))\n    metadata <- as.matrix(read.csv(metadata_file, sep="\\t", header=TRUE, row.names=1))\n    \n    print("Checking sample ordering...")\n    print(all.equal(colnames(expression_data), rownames(metadata)))\n  \n    # NOTE: It make sure the metadata is in the same order \n    # as the column names of the expression matrix.\n    group <- interaction(metadata[,1])\n  \n    mm <- model.matrix(~0 + group)\n  \n    ## DEGs of simulated data\n    # lmFit expects input array to have structure: gene x sample\n    # lmFit fits a linear model using weighted least squares for each gene:\n    fit <- lmFit(expression_data, mm)\n  \n    # Comparisons between groups (log fold-changes) are obtained as contrasts of these fitted linear models:\n    # Samples are grouped based on experimental condition\n    # The variability of gene expression is compared between these groups\n    # For experiment E-GEOD-51409, we are comparing the expression profile\n    # of samples grown in 37 degrees versus those grown in 22 degrees\n    contr <- makeContrasts(group37 - group22, levels = colnames(coef(fit)))\n\n    # Estimate contrast for each gene\n    tmp <- contrasts.fit(fit, contr)\n\n    # Empirical Bayes smoothing of standard errors (shrinks standard errors \n    # that are much larger or smaller than those from other genes towards the average standard error)\n    tmp <- eBayes(tmp)\n  \n    # Get significant DEGs\n    top.table <- topTable(tmp, sort.by = "P", n = Inf)\n    all_genes <-  as.data.frame(top.table)\n  \n    # Find all DEGs based on Bonferroni corrected p-value cutoff\n    threshold = 0.05/5549\n    num_sign_DEGs <- all_genes[all_genes[,\'P.Value\']<threshold,]\n  \n  # Save summary statistics of DEGs\n  write.table(all_genes, file = out_file, row.names = T, sep = "\\t", quote = F)\n  \n}\n\nget_DE_stats(metadata_file, experiment_id, selected_compressed_data_file, DE_stats_compressed_only_file)\nget_DE_stats(metadata_file, experiment_id, selected_original_data_file, DE_stats_original_file)')
 
