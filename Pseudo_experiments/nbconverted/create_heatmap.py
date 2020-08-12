@@ -141,6 +141,12 @@ heatmap_control_file = os.path.join(
     "results",
     "DE_heatmap_control_"+experiment_id+"_example.svg")
 
+corr_file = os.path.join(
+    base_dir,
+    "Pseudomonas",
+    "results",
+    "corr_gene_logFC_"+experiment_id+"_example.svg")
+
 original_sign_DEG_file = os.path.join(
     base_dir,
     "Pseudomonas",
@@ -441,17 +447,26 @@ gene_stats.head()
 
 # Get within sample correlation
 gene_stat_corr = gene_stats.corr()
+gene_stat_corr.columns = ['original experiment',
+                         'VAE compressed experiment',
+                         'Experiment-level simulated experiment',
+                         'Sample-level simulated experiment']
+gene_stat_corr.index = ['original experiment',
+                         'VAE compressed experiment',
+                         'Experiment-level simulated experiment',
+                         'Sample-level simulated experiment']
 gene_stat_corr
 
 
 # In[22]:
 
 
-ax = sns.heatmap(
+f = sns.heatmap(
     gene_stat_corr, 
     vmin=-1, vmax=1, center=0,
     cmap=sns.diverging_palette(20, 220, n=200),
     square=True
 )
-ax.set_title("Correlation between genes")
+f.set_title("Correlation between genes (using logFC statistic)")
+f.figure.savefig(corr_file)
 
