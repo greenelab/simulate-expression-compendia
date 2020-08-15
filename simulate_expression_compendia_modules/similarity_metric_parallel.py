@@ -216,16 +216,21 @@ def sim_svcca_io(
             original_data_df = pd.DataFrame(
                 original_data_PCAencoded, index=compendium_1.index
             )
-            # Use trained model to encode expression data into SAME latent space
-            noisy_original_data_PCAencoded = pca.fit_transform(compendium_other)
+            # Train new PCA model to encode expression data into DIFFERENT latent space
+            pca_new = PCA(n_components=num_PCs)
+            noisy_original_data_PCAencoded = pca_new.fit_transform(compendium_other)
             noisy_original_data_df = pd.DataFrame(
                 noisy_original_data_PCAencoded, index=compendium_other.index
             )
-        else:
-            # Use trained model to encode expression data into SAME latent space
-            original_data_df = compendium_1
 
+            # pca_new = PCA(n_components=num_PCs)
             # Use trained model to encode expression data into SAME latent space
+            # noisy_original_data_PCAencoded = pca_new.fit_transform(compendium_other)
+            # noisy_original_data_df = pd.DataFrame(
+            #    noisy_original_data_PCAencoded, index=compendium_other.index
+            # )
+        else:
+            original_data_df = compendium_1
             noisy_original_data_df = compendium_other
 
         # SVCCA
@@ -242,7 +247,7 @@ def sim_svcca_io(
             simulated_data_PCAencoded, index=simulated_data.index
         )
 
-        shuffled_data_PCAencoded = pca.fit_transform(permuted_simulated_data)
+        shuffled_data_PCAencoded = pca_new.fit_transform(permuted_simulated_data)
         shuffled_data_PCAencoded_df = pd.DataFrame(
             shuffled_data_PCAencoded, index=permuted_simulated_data.index
         )

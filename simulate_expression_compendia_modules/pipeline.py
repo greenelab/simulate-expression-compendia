@@ -105,7 +105,7 @@ def run_simulation(config_file, input_data_file, corrected, experiment_ids_file=
             f"{dataset_name}_{simulation_type}_svcca_corrected_{correction_method}.pickle",
         )
 
-        ci_uncorrected_file = os.path.join(
+        ci_file = os.path.join(
             base_dir,
             dataset_name,
             "results",
@@ -122,7 +122,7 @@ def run_simulation(config_file, input_data_file, corrected, experiment_ids_file=
             f"{dataset_name}_{simulation_type}_svcca_uncorrected_{correction_method}.pickle",
         )
 
-        ci_uncorrected_file = os.path.join(
+        ci_file = os.path.join(
             base_dir,
             dataset_name,
             "results",
@@ -224,5 +224,117 @@ def run_simulation(config_file, input_data_file, corrected, experiment_ids_file=
 
     # Pickle dataframe of mean scores scores for first run, interval
     mean_scores.to_pickle(similarity_uncorrected_file)
-    ci.to_pickle(ci_uncorrected_file)
+    ci.to_pickle(ci_file)
     np.save(similarity_permuted_file, permuted_score)
+
+
+def run_experiment_effect_simulation(
+    config_file,
+    input_data_file,
+    num_simulated_experiments,
+    lst_num_partitions,
+    corrected,
+    experiment_ids_file=None,
+):
+    """
+    Runs simulation experiment without applying correction method
+
+    Arguments
+    ----------
+    config_file: str
+        File containing user defined parameters
+
+    input_data_file: str
+        File path corresponding to input dataset to use
+
+    num_simulated_experiments: int
+
+    lst_num_partitions: list
+
+    experiment_ids_file: str
+        File containing experiment ids with expression data associated generated from ```create_experiment_id_file```
+
+    """
+
+    # Read in config variables
+    params = utils.read_config(config_file)
+
+    # Load parameters
+    dataset_name = params["dataset_name"]
+    simulation_type = params["simulation_type"]
+    NN_architecture = params["NN_architecture"]
+    use_pca = params["use_pca"]
+    num_PCs = params["num_PCs"]
+    local_dir = params["local_dir"]
+    correction_method = params["correction_method"]
+    sample_id_colname = params["metadata_colname"]
+    iterations = params["iterations"]
+    num_cores = params["num_cores"]
+
+    # Output files
+    base_dir = os.path.abspath(os.pardir)
+
+    # Run multiple simulations
+    if corrected:
+        file_prefix = "Partition_corrected"
+    else:
+        file_prefix = "Partition"
+    results = Parallel(n_jobs=num_cores, verbose=100)(
+        delayed(simulations.experiment_effect_simulation)(
+            i,
+            NN_architecture,
+            dataset_name,
+            simulation_type,
+            num_simulated_experiments,
+            lst_num_partitions,
+            corrected,
+            correction_method,
+            use_pca,
+            num_PCs,
+            file_prefix,
+            input_data_file,
+            experiment_ids_file,
+            sample_id_colname,
+            local_dir,
+            base_dir,
+        )
+        for i in iterations
+    )
+
+    # permuted score
+    permuted_score = results[0][0]
+
+    # Concatenate output dataframes
+    svcca_scores = pd.DataFrame()
+
+    for i in iterations:
+        svcca_scores = pd.concat([svcca_scores, results[i][1]], axis=1)
+
+    # Get mean svcca score for each row (number of experiments)
+    mean_scores = svcca_scores.mean(axis=1).to_frame()
+    mean_scores.columns = ["score"]
+    print(mean_scores)
+
+    # Get standard dev for each row (number of experiments)
+    std_scores = (svcca_scores.std(axis=1) / math.sqrt(10)).to_frame()
+    std_scores.columns = ["score"]
+    print(std_scores)
+
+    # Get confidence interval for each row (number of experiments)
+    # z-score for 95% confidence interval
+    err = std_scores * 1.96
+
+    # Get boundaries of confidence interval
+    ymax = mean_scores + err
+    ymin = mean_scores - err
+
+    ci = pd.concat([ymin, ymax], axis=1)
+    ci.columns = ["ymin", "ymax"]
+    print(ci)
+
+    return (
+        mean_scores,
+        ci,
+        permuted_score,
+    )
+
