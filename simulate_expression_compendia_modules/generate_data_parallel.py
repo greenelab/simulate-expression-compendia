@@ -312,7 +312,6 @@ def add_experiments_grped_io(
             # Note: 'array_split' will chunk data into almost equal sized chunks.
             # Returns arrays of size N % i and one array with the remainder
             partition = np.array_split(experiment_ids, i)
-            print("Here are the actual partitions:", partition)
 
             for j in range(i):
                 # Randomly select experiment ids

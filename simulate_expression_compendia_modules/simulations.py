@@ -415,9 +415,14 @@ def experiment_effect_simulation(
         Similarity score comparing the permuted data to the simulated data per run
     """
     # Generate simulated data
-    # Only simulate the data once so that the uncorrected and corrected steps
-    # are using the same compendia
-    print(f"Simulate a compendia with {num_simulated_experiments} experiments")
+    # Note: We are simulating the data twice - once for the uncorrected and once for
+    # the corrected steps (i.e. the 2-experiment compendia used for the baseline
+    # for the uncorrected comparison will not be the same 2-experiment compendia
+    # used for the corrected comparison, so different 2 experiments).
+    # In this case we would ideally like to use the same compendia
+    # But because of the way the code was originally structured, this would required
+    # a major refactor. However we don't believe the trends should change significantly
+    # having a matched compendia vs non-matched.
     simulated_data = simulate_expression_data.simulate_by_latent_transformation(
         num_simulated_experiments,
         input_file,

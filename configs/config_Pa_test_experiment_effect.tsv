@@ -1,0 +1,20 @@
+local_dir	"/home/alexandra/Documents/Data/Batch_effects/"
+scaler_transform_file	"/home/alexandra/Documents/Data/Batch_effects/scaler_transform.pickle"
+dataset_name	"Pseudomonas"
+simulation_type	"test_experiment_effect"
+NN_architecture	"NN_2500_30"
+learning_rate	0.001
+batch_size	100
+epochs	100
+kappa	0.01
+intermediate_dim	2500
+latent_dim	30
+epsilon_std	1.0
+num_simulated_experiments	[2, 3, 5, 10, 20, 30, 50, 70, 100, 200, 300, 400, 500, 600]
+lst_num_partitions	'NA'
+use_pca	True
+num_PCs	10
+correction_method	'limma'
+metadata_colname	'ml_data_source'
+iterations	range(5)
+num_cores	5
