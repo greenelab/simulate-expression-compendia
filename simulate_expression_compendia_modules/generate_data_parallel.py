@@ -31,8 +31,6 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fxn()
 
-np.random.seed(123)
-
 
 def permute_data(simulated_data):
     """

@@ -21,8 +21,6 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fxn()
 
-np.random.seed(123)
-
 
 def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysis_name):
     """

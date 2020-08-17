@@ -27,10 +27,6 @@ with warnings.catch_warnings():
     fxn()
 
 
-random_state = 123
-seed(random_state)
-
-
 def get_sample_ids(experiment_id, dataset_name):
     """
     Return sample ids for a given experiment id

@@ -24,8 +24,6 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fxn()
 
-np.random.seed(123)
-
 
 def sample_level_simulation(
     run,
@@ -423,6 +421,8 @@ def experiment_effect_simulation(
     # But because of the way the code was originally structured, this would required
     # a major refactor. However we don't believe the trends should change significantly
     # having a matched compendia vs non-matched.
+    np.random.seed(run * 3)
+    print("run", run)
     simulated_data = simulate_expression_data.simulate_by_latent_transformation(
         num_simulated_experiments,
         input_file,
@@ -434,7 +434,8 @@ def experiment_effect_simulation(
         local_dir,
         base_dir,
     )
-
+    print(simulated_data.shape)
+    print(simulated_data.head())
     # Permute simulated data to be used as a negative control
     permuted_data = generate_data_parallel.permute_data(simulated_data)
 

@@ -30,9 +30,6 @@ with warnings.catch_warnings():
     fxn()
 
 
-np.random.seed(123)
-
-
 def transpose_data(data_file, out_file):
     """
     Transpose and save expression data so that it is of the form sample x gene
@@ -310,31 +307,40 @@ def run_experiment_effect_simulation(
     for i in iterations:
         svcca_scores = pd.concat([svcca_scores, results[i][1]], axis=1)
 
+    print("test")
+    print(svcca_scores)
+
     # Get mean svcca score for each row (number of experiments)
     mean_scores = svcca_scores.mean(axis=1).to_frame()
     mean_scores.columns = ["score"]
+    print("mean svcca scores")
     print(mean_scores)
 
-    # Get standard dev for each row (number of experiments)
-    std_scores = (svcca_scores.std(axis=1) / math.sqrt(10)).to_frame()
-    std_scores.columns = ["score"]
-    print(std_scores)
+    # Get CI for each row (number of experiments)
+    ci_threshold = 0.95
+    alpha = 1 - ci_threshold
+    offset = int(len(iterations) * (alpha / 2))
 
-    # Get confidence interval for each row (number of experiments)
-    # z-score for 95% confidence interval
-    err = std_scores * 1.96
+    ymax = []
+    ymin = []
+    for size_compendia in [1, num_simulated_experiments]:
+        sort_scores = sorted(svcca_scores.loc[size_compendia])
+        ymin.append(sort_scores[offset])
+        if offset == 0:
+            ymax.append(sort_scores[-1])
+        else:
+            ymax.append(sort_scores[len(iterations) - offset])
 
-    # Get boundaries of confidence interval
-    ymax = mean_scores + err
-    ymin = mean_scores - err
+    ci_df = pd.DataFrame(
+        data={"ymin": ymin, "ymax": ymax}, index=[1, num_simulated_experiments]
+    )
 
-    ci = pd.concat([ymin, ymax], axis=1)
-    ci.columns = ["ymin", "ymax"]
-    print(ci)
+    print("confidence interval")
+    print(ci_df)
 
     return (
         mean_scores,
-        ci,
+        ci_df,
         permuted_score,
     )
 
