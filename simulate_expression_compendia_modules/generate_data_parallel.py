@@ -299,12 +299,6 @@ def add_experiments_grped_io(
 
             partition_data_map_df.to_csv(partition_map_file, sep="\t", compression="xz")
 
-            print(f"simulated data in UNCORRECTED with {i} partitions RUN{run}")
-            print(f"UNCORRECTED with {i} partitions RUN{run}", simulated_data_out.shape)
-            print(
-                f"UNCORRECTED with {i} partitions RUN{run}", simulated_data_out.head()
-            )
-
         else:
             partition_data = simulated_data.copy()
 
@@ -362,22 +356,6 @@ def add_experiments_grped_io(
             )
 
             partition_data_map_df.to_csv(partition_map_file, sep="\t", compression="xz")
-
-            print(
-                f"simulated data in UNCORRECTED with {i} partitions AFTER noise added RUN {run}"
-            )
-            print(
-                f"UNCORRECTED with {i} partitions AFTER noise added RUN {run}",
-                partition,
-            )
-            print(
-                f"UNCORRECTED with {i} partitions AFTER noise added RUN {run}",
-                partition_data.shape,
-            )
-            print(
-                f"UNCORRECTED with {i} partitions AFTER noise added RUN {run}",
-                partition_data.head(),
-            )
 
 
 def apply_correction_io(
@@ -469,25 +447,10 @@ def apply_correction_io(
             experiment_data = pd.read_csv(
                 experiment_file, header=0, index_col=0, sep="\t"
             ).T
-            print(
-                f"simulated data in CORRECTION with {num_experiments[i]} partitions BEFORE RUN {run}"
-            )
-            print(
-                f"CORRECTION with {num_experiments[i]} partitions BEFORE RUN {run}",
-                experiment_data.T.shape,
-            )
-            print(
-                f"CORRECTION with {num_experiments[i]} partitions BEFORE RUN {run}",
-                experiment_data.T.head(),
-            )
 
             experiment_map = pd.read_csv(
                 experiment_map_file, header=0, index_col=0, sep="\t"
             )["partition"]
-            print(
-                f"CORRECTION with {num_experiments[i]} partitions BEFORE RUN {run}",
-                experiment_map,
-            )
 
         if i == 0:
             corrected_experiment_data_df = experiment_data.copy()

@@ -335,11 +335,9 @@ def experiment_effect_simulation(
     analysis_name,
     num_simulated_experiments,
     lst_num_partitions,
-    corrected,
     correction_method,
     use_pca,
     num_PCs,
-    file_prefix,
     input_file,
     experiment_ids_file,
     sample_id_colname,
@@ -472,27 +470,6 @@ def experiment_effect_simulation(
     )
 
     uncorrected_similarity_score_df.index.name = "number of partitions"
-
-    # print(
-    #    f"Second time simulating a compendia with {num_simulated_experiments} experiments"
-    # )
-    # simulated_data = simulate_expression_data.simulate_by_latent_transformation(
-    #    num_simulated_experiments,
-    #    input_file,
-    #    NN_architecture,
-    #    dataset_name,
-    #    analysis_name,
-    #    experiment_ids_file,
-    #    sample_id_colname,
-    #    local_dir,
-    #    base_dir,
-    # )
-    # print(simulated_data.shape)
-    # print(simulated_data.head())
-
-    # Read saved `simulated_data` which contains `experiment_id` column
-    # This annotation column is removed during the SVCCA calculation
-    # simulated_data = pd.read_pickle(data_file)
 
     # Remove technical variation
     generate_data_parallel.apply_correction_io(

@@ -121,33 +121,21 @@ for size_simulated_compendia in num_simulated_experiments:
     
     # Run simulation comparing compendia with `size_simulated_compendia` experiments
     # with the same size compendia with `size_simulated_compendia` partitions
-    corrected=False
-    (uncorrected_mean_score,
+    (uncorrected_mean_scores,
      ci_uncorrected,
-     permuted_score) = pipeline.run_experiment_effect_simulation(config_file,
-                                                                 normalized_processed_data_file,
-                                                                 size_simulated_compendia,
-                                                                 lst_num_partitions,
-                                                                 corrected,
-                                                                 experiment_id_file)
-       
-    # Run simulation comparing compendia with `size_simulated_compendia` partitions
-    # with the compendia after applying batch correction for the number of partitions
-    corrected=True
-    (corrected_mean_score, 
-     ci_corrected, 
-     corrected_permuted_score) = pipeline.run_experiment_effect_simulation(config_file,
-                                                                           normalized_processed_data_file,
-                                                                           size_simulated_compendia,
-                                                                           lst_num_partitions,
-                                                                           corrected,
-                                                                           experiment_id_file)
+     permuted_score,
+     corrected_mean_scores,
+     ci_corrected) = pipeline.run_experiment_effect_simulation(config_file,
+                                                               normalized_processed_data_file,
+                                                               size_simulated_compendia,
+                                                               lst_num_partitions,
+                                                               experiment_id_file)
     
-    mean_uncorrected_scores.append(uncorrected_mean_score.loc[size_simulated_compendia,'score'])
+    mean_uncorrected_scores.append(uncorrected_mean_scores.loc[size_simulated_compendia,'score'])
     ci_uncorrected_min.append(ci_uncorrected.loc[size_simulated_compendia, 'ymin'])
     ci_uncorrected_max.append(ci_uncorrected.loc[size_simulated_compendia, 'ymax'])
     permuted_uncorrected_scores.append(permuted_score)
-    mean_corrected_scores.append(corrected_mean_score.loc[size_simulated_compendia,'score'])
+    mean_corrected_scores.append(corrected_mean_scores.loc[size_simulated_compendia,'score'])
     ci_corrected_min.append(ci_corrected.loc[size_simulated_compendia, 'ymin'])
     ci_corrected_max.append(ci_corrected.loc[size_simulated_compendia, 'ymax']) 
      
@@ -235,9 +223,9 @@ panel_A = ggplot(summary_df)     + geom_line(summary_df,
                 size=1,
                 color="darkgrey",
                 show_legend=False) \
-    + labs(x = "Number of Partitions", 
+    + labs(x = "Number of Experiments", 
            y = "Similarity score (SVCCA)", 
-           title = "Similarity across varying numbers of partitions") \
+           title = "Similarity across varying numbers of experiments") \
     + theme(
             plot_background=element_rect(fill="white"),
             panel_background=element_rect(fill="white"),
@@ -254,8 +242,8 @@ panel_A = ggplot(summary_df)     + geom_line(summary_df,
     + scale_color_manual(['#1976d2', '#b3e5fc']) \
 
 print(panel_A)
-#ggsave(plot=panel_A, filename=svcca_file, device="svg", dpi=300)
-#ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
+ggsave(plot=panel_A, filename=svcca_file, device="svg", dpi=300)
+ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
     
 
 
@@ -302,6 +290,10 @@ for i in lst_num_partitions_to_plot:
     # Add grouping column for plotting
     original_data_df['num_partitions'] = '1'
     
+    if original_data_df.shape[0] > 500:
+        # downsample
+        original_data_df = original_data_df.sample(n=500)
+    
     # Get data with additional batch effects added
     partition_other_file = os.path.join(
         compendia_dir,
@@ -318,6 +310,10 @@ for i in lst_num_partitions_to_plot:
     
     # Add grouping column for plotting
     partition_data_df['num_partitions'] = 'multiple'
+    
+    if partition_data_df.shape[0] > 500:
+        # downsample
+        partition_data_df = partition_data_df.sample(n=500)
     
     # Concatenate datasets together
     combined_data_df = pd.concat([original_data_df, partition_data_df])
@@ -399,7 +395,7 @@ panel_B = ggplot(all_data_df[all_data_df['Comparison'] != '1'],
                  color='#bdbdbd')
 
 print(panel_B)
-#ggsave(plot=panel_B, filename=pca_uncorrected_file)
+ggsave(plot=panel_B, filename=pca_uncorrected_file)
 
 
 # ### Corrected PCA
@@ -437,6 +433,10 @@ for i in lst_num_partitions_to_plot:
     # Add grouping column for plotting
     original_data_df['num_partitions'] = '1'
     
+    if original_data_df.shape[0] > 500:
+        # downsample
+        original_data_df = original_data_df.sample(n=500)
+    
     # Get data with additional batch effects added and corrected
     partition_other_file = os.path.join(
         compendia_dir,
@@ -456,6 +456,10 @@ for i in lst_num_partitions_to_plot:
     
     # Add grouping column for plotting
     partition_data_df['num_partitions'] = 'multiple'
+    
+    if original_data_df.shape[0] > 500:
+        # downsample
+        original_data_df = original_data_df.sample(n=500)
     
     # Match format of column names in before and after df
     partition_data_df.columns = original_data_df.columns.astype(str)
@@ -538,5 +542,19 @@ panel_C = ggplot(all_corrected_data_df[all_corrected_data_df['Comparison'] != '1
                  color='#bdbdbd')
 
 print(panel_C)
-#ggsave(plot=panel_C, filename=pca_corrected_file)
+ggsave(plot=panel_C, filename=pca_corrected_file)
+
+
+# In[18]:
+
+
+# Compendium directory
+compendium_dir = os.path.join(
+   local_dir, "experiment_simulated", "Pseudomonas_sample_lvl_sim"
+)
+#file = os.path.join(compendium_dir, "Experiment_corrected_1_0.txt.xz")
+file = "data/input/train_set_normalized_processed.txt.xz"
+data = pd.read_csv(file, sep="\t", index_col=0)
+
+data.head(10)
 

@@ -230,7 +230,6 @@ def run_experiment_effect_simulation(
     input_data_file,
     num_simulated_experiments,
     lst_num_partitions,
-    corrected,
     experiment_ids_file=None,
 ):
     """
@@ -272,10 +271,6 @@ def run_experiment_effect_simulation(
     base_dir = os.path.abspath(os.pardir)
 
     # Run multiple simulations
-    if corrected:
-        file_prefix = "Partition_corrected"
-    else:
-        file_prefix = "Partition"
     results = Parallel(n_jobs=num_cores, verbose=100)(
         delayed(simulations.experiment_effect_simulation)(
             i,
@@ -284,11 +279,9 @@ def run_experiment_effect_simulation(
             simulation_type,
             num_simulated_experiments,
             lst_num_partitions,
-            corrected,
             correction_method,
             use_pca,
             num_PCs,
-            file_prefix,
             input_data_file,
             experiment_ids_file,
             sample_id_colname,
