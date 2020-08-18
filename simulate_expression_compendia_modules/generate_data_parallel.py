@@ -310,6 +310,8 @@ def add_experiments_grped_io(
             # Note: 'array_split' will chunk data into almost equal sized chunks.
             # Returns arrays of size N % i and one array with the remainder
             partition = np.array_split(experiment_ids, i)
+            print(f"Partitions for {run}:")
+            print(partition)
 
             for j in range(i):
                 # Randomly select experiment ids
@@ -447,6 +449,9 @@ def apply_correction_io(
             experiment_data = pd.read_csv(
                 experiment_file, header=0, index_col=0, sep="\t"
             ).T
+            print(f"Correcting data for {i]} partitions in run {run}")
+            print(experiment_data.T.shape)
+            print(experiment_data.T.head())
 
             experiment_map = pd.read_csv(
                 experiment_map_file, header=0, index_col=0, sep="\t"

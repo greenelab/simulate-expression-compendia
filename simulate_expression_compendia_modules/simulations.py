@@ -423,6 +423,7 @@ def experiment_effect_simulation(
     # having a matched compendia vs non-matched.
     np.random.seed(run * 3)
     print("run", run)
+    print(f"Simulate a compendia with {num_simulated_experiments} experiments")
     simulated_data = simulate_expression_data.simulate_by_latent_transformation(
         num_simulated_experiments,
         input_file,
@@ -434,33 +435,20 @@ def experiment_effect_simulation(
         local_dir,
         base_dir,
     )
+    print(f"simulated data for {run}")
     print(simulated_data.shape)
     print(simulated_data.head())
+
     # Permute simulated data to be used as a negative control
     permuted_data = generate_data_parallel.permute_data(simulated_data)
 
-    if not corrected:
-        # Add technical variation
-        generate_data_parallel.add_experiments_grped_io(
-            simulated_data,
-            lst_num_partitions,
-            run,
-            local_dir,
-            dataset_name,
-            analysis_name,
-        )
+    # Add technical variation
+    generate_data_parallel.add_experiments_grped_io(
+        simulated_data, lst_num_partitions, run, local_dir, dataset_name, analysis_name,
+    )
 
-    if corrected:
-        # Remove technical variation
-        generate_data_parallel.apply_correction_io(
-            local_dir,
-            run,
-            dataset_name,
-            analysis_name,
-            lst_num_partitions,
-            correction_method,
-        )
-
+    file_prefix = "Partition"
+    corrected = False
     # Calculate similarity between compendium and compendium + noise
     batch_scores, permuted_score = similarity_metric_parallel.sim_svcca_io(
         simulated_data,
@@ -475,14 +463,77 @@ def experiment_effect_simulation(
         dataset_name,
         analysis_name,
     )
+    print(f"simulated data AFTER svcca uncorrected for {run}")
+    print(simulated_data.shape)
 
     # Convert similarity scores to pandas dataframe
-    similarity_score_df = pd.DataFrame(
+    uncorrected_similarity_score_df = pd.DataFrame(
         data={"score": batch_scores}, index=lst_num_partitions, columns=["score"]
     )
 
-    similarity_score_df.index.name = "number of partitions"
+    uncorrected_similarity_score_df.index.name = "number of partitions"
+
+    # print(
+    #    f"Second time simulating a compendia with {num_simulated_experiments} experiments"
+    # )
+    # simulated_data = simulate_expression_data.simulate_by_latent_transformation(
+    #    num_simulated_experiments,
+    #    input_file,
+    #    NN_architecture,
+    #    dataset_name,
+    #    analysis_name,
+    #    experiment_ids_file,
+    #    sample_id_colname,
+    #    local_dir,
+    #    base_dir,
+    # )
+    # print(simulated_data.shape)
+    # print(simulated_data.head())
+
+    # Read saved `simulated_data` which contains `experiment_id` column
+    # This annotation column is removed during the SVCCA calculation
+    # simulated_data = pd.read_pickle(data_file)
+
+    # Remove technical variation
+    generate_data_parallel.apply_correction_io(
+        local_dir,
+        run,
+        dataset_name,
+        analysis_name,
+        lst_num_partitions,
+        correction_method,
+    )
+    print("About to start correction step")
+    print(simulated_data.shape)
+
+    # Calculate similarity between compendium and compendium + noise
+    file_prefix = "Partition_corrected"
+    corrected = True
+    batch_scores, x_permuted_score = similarity_metric_parallel.sim_svcca_io(
+        simulated_data,
+        permuted_data,
+        corrected,
+        file_prefix,
+        run,
+        lst_num_partitions,
+        use_pca,
+        num_PCs,
+        local_dir,
+        dataset_name,
+        analysis_name,
+    )
+
+    # Convert similarity scores to pandas dataframe
+    corrected_similarity_score_df = pd.DataFrame(
+        data={"score": batch_scores}, index=lst_num_partitions, columns=["score"]
+    )
+
+    corrected_similarity_score_df.index.name = "number of partitions"
 
     # Return similarity scores and permuted score
-    return (permuted_score, similarity_score_df)
+    return (
+        permuted_score,
+        uncorrected_similarity_score_df,
+        corrected_similarity_score_df,
+    )
 

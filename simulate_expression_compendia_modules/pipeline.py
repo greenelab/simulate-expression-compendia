@@ -302,45 +302,74 @@ def run_experiment_effect_simulation(
     permuted_score = results[0][0]
 
     # Concatenate output dataframes
-    svcca_scores = pd.DataFrame()
+    uncorrected_svcca_scores = pd.DataFrame()
+    corrected_svcca_scores = pd.DataFrame()
 
     for i in iterations:
-        svcca_scores = pd.concat([svcca_scores, results[i][1]], axis=1)
-
-    print("test")
-    print(svcca_scores)
+        # svcca_scores = pd.concat([svcca_scores, results[i][1]], axis=1)
+        uncorrected_svcca_scores = pd.concat(
+            [uncorrected_svcca_scores, results[i][1]], axis=1
+        )
+        corrected_svcca_scores = pd.concat(
+            [corrected_svcca_scores, results[i][2]], axis=1
+        )
 
     # Get mean svcca score for each row (number of experiments)
-    mean_scores = svcca_scores.mean(axis=1).to_frame()
-    mean_scores.columns = ["score"]
-    print("mean svcca scores")
-    print(mean_scores)
+    uncorrected_mean_scores = uncorrected_svcca_scores.mean(axis=1).to_frame()
+    uncorrected_mean_scores.columns = ["score"]
+    corrected_mean_scores = corrected_svcca_scores.mean(axis=1).to_frame()
+    corrected_mean_scores.columns = ["score"]
+    print("mean uncorrected svcca scores")
+    print(uncorrected_mean_scores)
+    print("mean corrected svcca scores")
+    print(corrected_mean_scores)
 
     # Get CI for each row (number of experiments)
     ci_threshold = 0.95
     alpha = 1 - ci_threshold
     offset = int(len(iterations) * (alpha / 2))
 
+    # Get CI for uncorrected data
     ymax = []
     ymin = []
     for size_compendia in [1, num_simulated_experiments]:
-        sort_scores = sorted(svcca_scores.loc[size_compendia])
+        sort_scores = sorted(uncorrected_svcca_scores.loc[size_compendia])
         ymin.append(sort_scores[offset])
         if offset == 0:
             ymax.append(sort_scores[-1])
         else:
             ymax.append(sort_scores[len(iterations) - offset])
 
-    ci_df = pd.DataFrame(
+    ci_uncorrected = pd.DataFrame(
         data={"ymin": ymin, "ymax": ymax}, index=[1, num_simulated_experiments]
     )
 
-    print("confidence interval")
-    print(ci_df)
+    print("uncorrected confidence interval")
+    print(ci_uncorrected)
+
+    # Get CI for corrected data
+    ymax = []
+    ymin = []
+    for size_compendia in [1, num_simulated_experiments]:
+        sort_scores = sorted(corrected_svcca_scores.loc[size_compendia])
+        ymin.append(sort_scores[offset])
+        if offset == 0:
+            ymax.append(sort_scores[-1])
+        else:
+            ymax.append(sort_scores[len(iterations) - offset])
+
+    ci_corrected = pd.DataFrame(
+        data={"ymin": ymin, "ymax": ymax}, index=[1, num_simulated_experiments]
+    )
+
+    print("corrected_confidence interval")
+    print(ci_corrected)
 
     return (
-        mean_scores,
-        ci_df,
+        uncorrected_mean_scores,
+        ci_uncorrected,
         permuted_score,
+        corrected_mean_scores,
+        ci_corrected,
     )
 
