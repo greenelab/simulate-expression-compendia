@@ -55,13 +55,14 @@ def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysi
     """
 
     if "experiment_id" in list(simulated_data.columns):
-        simulate_data_numeric = simulated_data.drop(columns="experiment_id")
+        simulated_data_numeric = simulated_data.drop(columns="experiment_id")
 
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir, "partition_simulated", dataset_name + "_" + analysis_name
         )
     else:
+        simulated_data_numeric = simulated_data.copy()
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir, "experiment_simulated", dataset_name + "_" + analysis_name
