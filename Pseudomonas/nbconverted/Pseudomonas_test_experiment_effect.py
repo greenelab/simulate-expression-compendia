@@ -249,7 +249,7 @@ ggsave(plot=panel_A, filename=svcca_png_file, device="svg", dpi=300)
 
 # ### Uncorrected PCA
 
-# In[9]:
+# In[19]:
 
 
 # File directories
@@ -259,7 +259,7 @@ compendia_dir = os.path.join(
     dataset_name + "_" + analysis_name)
 
 
-# In[10]:
+# In[20]:
 
 
 lst_num_partitions_to_plot = [lst_num_partitions[-1]]
@@ -345,7 +345,7 @@ for i in lst_num_partitions_to_plot:
     all_data_df = pd.concat([all_data_df, combined_data_PCAencoded_df])     
 
 
-# In[11]:
+# In[21]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -360,13 +360,13 @@ all_data_df = all_data_df.assign(num_partitions_cat = num_partitions_cat)
 all_data_df = all_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[12]:
+# In[22]:
 
 
 all_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[13]:
+# In[23]:
 
 
 # Plot all comparisons in one figure
@@ -400,7 +400,7 @@ ggsave(plot=panel_B, filename=pca_uncorrected_file)
 
 # ### Corrected PCA
 
-# In[14]:
+# In[24]:
 
 
 lst_num_partitions_to_plot = [lst_num_partitions[-1]]
@@ -457,9 +457,9 @@ for i in lst_num_partitions_to_plot:
     # Add grouping column for plotting
     partition_data_df['num_partitions'] = 'multiple'
     
-    if original_data_df.shape[0] > 500:
+    if partition_data_df.shape[0] > 500:
         # downsample
-        original_data_df = original_data_df.sample(n=500)
+        partition_data_df = partition_data_df.sample(n=500)
     
     # Match format of column names in before and after df
     partition_data_df.columns = original_data_df.columns.astype(str)
@@ -491,7 +491,7 @@ for i in lst_num_partitions_to_plot:
     all_corrected_data_df = pd.concat([all_corrected_data_df, combined_data_PCAencoded_df])
 
 
-# In[15]:
+# In[25]:
 
 
 # Convert 'num_experiments' into categories to preserve the ordering
@@ -506,13 +506,13 @@ all_corrected_data_df = all_corrected_data_df.assign(num_partitions_cat = num_pa
 all_corrected_data_df = all_corrected_data_df.assign(comparison_cat = comparison_cat)
 
 
-# In[16]:
+# In[26]:
 
 
 all_corrected_data_df.columns = ['PC1', 'PC2', 'num_partitions', 'comparison', 'No. of partitions', 'Comparison']
 
 
-# In[17]:
+# In[27]:
 
 
 # Plot all comparisons in one figure
@@ -545,7 +545,7 @@ print(panel_C)
 ggsave(plot=panel_C, filename=pca_corrected_file)
 
 
-# In[18]:
+# In[28]:
 
 
 # Compendium directory
