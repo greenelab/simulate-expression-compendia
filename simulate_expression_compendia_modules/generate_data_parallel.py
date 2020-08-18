@@ -449,7 +449,7 @@ def apply_correction_io(
             experiment_data = pd.read_csv(
                 experiment_file, header=0, index_col=0, sep="\t"
             ).T
-            print(f"Correcting data for {i]} partitions in run {run}")
+            print(f"Correcting data for {i} partitions in run {run}")
             print(experiment_data.T.shape)
             print(experiment_data.T.head())
 

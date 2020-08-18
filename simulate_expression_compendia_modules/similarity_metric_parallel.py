@@ -55,7 +55,7 @@ def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysi
     """
 
     if "experiment_id" in list(simulated_data.columns):
-        simulated_data.drop(columns="experiment_id", inplace=True)
+        simulate_data_numeric = simulated_data.drop(columns="experiment_id")
 
         # Compendium directory
         compendium_dir = os.path.join(
@@ -79,7 +79,7 @@ def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysi
     if file_prefix.split("_")[-1] == "corrected":
         compendium_1 = compendium_1.T
 
-    return [simulated_data, compendium_dir, compendium_1]
+    return [simulated_data_numeric, compendium_dir, compendium_1]
 
 
 def sim_svcca_io(
