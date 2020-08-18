@@ -422,8 +422,6 @@ def experiment_effect_simulation(
     # a major refactor. However we don't believe the trends should change significantly
     # having a matched compendia vs non-matched.
     np.random.seed(run * 3)
-    print("run", run)
-    print(f"Simulate a compendia with {num_simulated_experiments} experiments")
     simulated_data = simulate_expression_data.simulate_by_latent_transformation(
         num_simulated_experiments,
         input_file,
@@ -435,9 +433,13 @@ def experiment_effect_simulation(
         local_dir,
         base_dir,
     )
-    print(f"simulated data for {run}")
-    print(simulated_data.shape)
-    print(simulated_data.head())
+    print(f"simulated data with {num_simulated_experiments} to START run {run}")
+    print(f"{num_simulated_experiments} to START run {run}", simulated_data.shape)
+    print(
+        f"{num_simulated_experiments} to START run {run}",
+        simulated_data["experiment_id"].unique(),
+    )
+    print(f"{num_simulated_experiments} to START run {run}", simulated_data.head())
 
     # Permute simulated data to be used as a negative control
     permuted_data = generate_data_parallel.permute_data(simulated_data)
@@ -463,8 +465,6 @@ def experiment_effect_simulation(
         dataset_name,
         analysis_name,
     )
-    print(f"simulated data AFTER svcca uncorrected for {run}")
-    print(simulated_data.shape)
 
     # Convert similarity scores to pandas dataframe
     uncorrected_similarity_score_df = pd.DataFrame(
@@ -503,8 +503,6 @@ def experiment_effect_simulation(
         lst_num_partitions,
         correction_method,
     )
-    print("About to start correction step")
-    print(simulated_data.shape)
 
     # Calculate similarity between compendium and compendium + noise
     file_prefix = "Partition_corrected"
