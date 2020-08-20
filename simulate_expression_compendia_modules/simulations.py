@@ -47,6 +47,11 @@ def sample_level_simulation(
     2. Add varying numbers of technical variation
     3. Compare the similarity of the gene expression structure between the simulated data
         vs simulated data + technical variation.
+    4. Simulate gene expression data, ignorning the sample-experiment relationship (different
+        than data in 1)
+    5. Add varying numbers of technical variation and apply noise correction
+    6. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + noise correction.
 
     Arguments
     ----------
@@ -110,6 +115,14 @@ def sample_level_simulation(
     """
 
     # Generate simulated data
+    # Note: We are simulating the data twice - once for the uncorrected and once for
+    # the corrected steps
+    # In this case we would ideally like to use the same compendia
+    # This code was originally structured to treat the uncorrected and corrected
+    # as two separate analyses. This can be changed by following the example in the
+    # `experiment_effect_simulation` function and `run_experiment_effect_simulation` in
+    # pipeline.py. However we don't believe the trends
+    # should change significantly having a matched compendia vs non-matched.
     simulated_data = simulate_expression_data.simulate_by_random_sampling(
         input_file,
         NN_architecture,
@@ -197,6 +210,11 @@ def experiment_level_simulation(
     2. Add varying numbers of technical variation
     3. Compare the similarity of the gene expression structure between the simulated data
         vs simulated data + technical variation.
+    4. Simulate gene expression data, keeping track of which sample is associated
+        with a given experiment (different than data in 1)
+    5. Add varying numbers of technical variation and apply noise correction
+    6. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + noise correction.
 
     Arguments
     ----------
@@ -265,6 +283,14 @@ def experiment_level_simulation(
     """
 
     # Generate simulated data
+    # Note: We are simulating the data twice - once for the uncorrected and once for
+    # the corrected steps
+    # In this case we would ideally like to use the same compendia
+    # This code was originally structured to treat the uncorrected and corrected
+    # as two separate analyses. This can be changed by following the example in the
+    # `experiment_effect_simulation` function and `run_experiment_effect_simulation` in
+    # pipeline.py. However we don't believe the trends
+    # should change significantly having a matched compendia vs non-matched.
     simulated_data = simulate_expression_data.simulate_by_latent_transformation(
         num_simulated_experiments,
         input_file,
@@ -346,11 +372,15 @@ def experiment_effect_simulation(
 ):
     """
     This function performs runs series of scripts that performs the following steps:
-    1. Simulate gene expression data, keeping track of which sample is associated
-        with a given experiment
+    1. Simulate gene expression data, with one experiment per partition
     2. Add varying numbers of technical variation
     3. Compare the similarity of the gene expression structure between the simulated data
         vs simulated data + technical variation.
+    2. Using the same simulated data, add varying numbers of technical variation and apply
+        noise correction
+    3. Compare the similarity of the gene expression structure between the simulated data
+        vs simulated data + noise corrected.
+    
 
     Arguments
     ----------
@@ -411,14 +441,8 @@ def experiment_effect_simulation(
         Similarity score comparing the permuted data to the simulated data per run
     """
     # Generate simulated data
-    # Note: We are simulating the data twice - once for the uncorrected and once for
-    # the corrected steps (i.e. the 2-experiment compendia used for the baseline
-    # for the uncorrected comparison will not be the same 2-experiment compendia
-    # used for the corrected comparison, so different 2 experiments).
-    # In this case we would ideally like to use the same compendia
-    # But because of the way the code was originally structured, this would required
-    # a major refactor. However we don't believe the trends should change significantly
-    # having a matched compendia vs non-matched.
+    # Note: Unlike the other simulations, we are using the same simulated dataset
+    # for the uncorrected and corrected analysis.
     np.random.seed(run * 3)
     simulated_data = simulate_expression_data.simulate_by_latent_transformation(
         num_simulated_experiments,
@@ -431,13 +455,6 @@ def experiment_effect_simulation(
         local_dir,
         base_dir,
     )
-    print(f"simulated data with {num_simulated_experiments} to START run {run}")
-    print(f"{num_simulated_experiments} to START run {run}", simulated_data.shape)
-    print(
-        f"{num_simulated_experiments} to START run {run}",
-        simulated_data["experiment_id"].unique(),
-    )
-    print(f"{num_simulated_experiments} to START run {run}", simulated_data.head())
 
     # Permute simulated data to be used as a negative control
     permuted_data = generate_data_parallel.permute_data(simulated_data)

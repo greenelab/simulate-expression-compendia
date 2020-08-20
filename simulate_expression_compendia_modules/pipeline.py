@@ -50,7 +50,9 @@ def transpose_data(data_file, out_file):
 
 def run_simulation(config_file, input_data_file, corrected, experiment_ids_file=None):
     """
-    Runs simulation experiment without applying correction method
+    Runs simulation experiment: either sample-level or experiment-level; with or without
+    correction. The simulation experiment that is run depends on the parameters passed
+    and specified in the config file
 
     Arguments
     ----------
@@ -233,7 +235,9 @@ def run_experiment_effect_simulation(
     experiment_ids_file=None,
 ):
     """
-    Runs simulation experiment without applying correction method
+    Runs experiment-level simulation keeping the size of partitions
+    fixed (i.e. one experiment per partition). This script examines
+    the contribution of individual experiments in signal detection.
 
     Arguments
     ----------

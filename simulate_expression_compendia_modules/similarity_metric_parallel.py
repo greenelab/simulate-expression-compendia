@@ -118,8 +118,8 @@ def sim_svcca_io(
 
     Briefly, SVCCA uses Singular Value Decomposition (SVD) to extract the components explaining 99% of the variation.
     This is done to remove potential dimensions described by noise. Next, SVCCA performs a Canonical Correlation Analysis (CCA)
-     on the SVD matrices to identify maximum correlations of linear combinations of both input matrices.
-     The algorithm will identify the canonical correlations of highest magnitude across and within algorithms of the same dimensionality.
+    on the SVD matrices to identify maximum correlations of linear combinations of both input matrices.
+    The algorithm will identify the canonical correlations of highest magnitude across and within algorithms of the same dimensionality.
 
     Arguments
     ----------
