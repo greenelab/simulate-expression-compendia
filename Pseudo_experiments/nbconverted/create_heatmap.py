@@ -3,7 +3,18 @@
 
 # ## Visualize heatmaps of differentially expressed genes
 # 
-# Visualize a heatmap of the differentially expressed genes using the original E-GEOD-51409 expression data versus the simulated expression data for the same experiment
+# Visualize a heatmap of the differentially expressed genes using the original E-GEOD-51409 expression data versus the simulated expression data for the same experiment.
+# 
+# Specifically, we are comparing the pattern of the top 14 DEGs found in 4 different experiments:
+# * The original real experiment (E-GEOD-51409) (original experiment)
+# * Simulated experiment created by taking the same experiment and applying VAE compression (VAE compressed experiment)
+# * Simulated experiment created by taking the and applying VAE compression + latent space transformation (experiment-level simulated experiment)
+# * Simulated experiment created by taking the and applying VAE compression + randomly sampling form the latent space (sample-level simulated experiment)
+# 
+# We want to examine the retention of the original differential expression signature by comparing the set of differentially expressed genes (DEGs) found in the original experiments versus the other simulated experiments:
+# * The VAE compressed experiment had the same sample grouping as the original. However, only a subset of the DEGs found in the VAE compressed were also found in the original experiment. We found that the correlation between genes, based on log fold change values, is high (R2 = 0.822) between the original and the VAE compressed only experiment as expected. The VAE compression step adds some noise to the expression signal in the original experiment, as expected, since the data is being compressed into a low dimensional space.
+# * The samples in the original and experiment-level simulated experiment have consistent clustering of samples (. However the genes that were differentially expressed were different between the two experiments. The correlation between genes in the original and the experiment-level experiment are lower, R2 = 0.230, since they represent unique experiments. The residual similarity is likely due to commonly differentially expressed genes that have been observed previously (Powers et. al. 2018, Crow et. al. 2019).  
+# * Looking at the sample-level simulated experiment, the correlation between genes in the original and sample-level experiment is non-existent, R2 = -0.055, since we did not account for experiment structure in the sample-level simulation.
 
 # In[1]:
 

@@ -13,7 +13,7 @@
 # 2. In the second experiment, we test the effect of sampling from the VAE latent space to simulate gene expression data (i.e. [sample-level-simulation](../Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb) approach). 
 # 3. In the third experiment, we test the effect of the latent space shifting (i.e. [experiment-level simulation](../Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb) approach).
 # 
-# **Conclusion:** The VAE is minimally contributes the the reduced variance. Most of the reduced variance is due to the sampling of the latent space due to the Normal constraint of the latent space.
+# **Conclusion:** The VAE is minimally contributes the the reduced variance. Most of the reduced variance is a result of the compressed representation from the VAE due to the normal constraint of the latent space. So sampling from the latent space produced the most significant reduction in variance.
 
 # In[1]:
 
