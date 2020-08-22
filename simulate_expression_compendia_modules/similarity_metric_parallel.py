@@ -21,8 +21,6 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fxn()
 
-np.random.seed(123)
-
 
 def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysis_name):
     """
@@ -57,13 +55,14 @@ def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysi
     """
 
     if "experiment_id" in list(simulated_data.columns):
-        simulated_data.drop(columns="experiment_id", inplace=True)
+        simulated_data_numeric = simulated_data.drop(columns="experiment_id")
 
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir, "partition_simulated", dataset_name + "_" + analysis_name
         )
     else:
+        simulated_data_numeric = simulated_data.copy()
         # Compendium directory
         compendium_dir = os.path.join(
             local_dir, "experiment_simulated", dataset_name + "_" + analysis_name
@@ -81,7 +80,7 @@ def read_data(simulated_data, file_prefix, run, local_dir, dataset_name, analysi
     if file_prefix.split("_")[-1] == "corrected":
         compendium_1 = compendium_1.T
 
-    return [simulated_data, compendium_dir, compendium_1]
+    return [simulated_data_numeric, compendium_dir, compendium_1]
 
 
 def sim_svcca_io(
@@ -119,8 +118,8 @@ def sim_svcca_io(
 
     Briefly, SVCCA uses Singular Value Decomposition (SVD) to extract the components explaining 99% of the variation.
     This is done to remove potential dimensions described by noise. Next, SVCCA performs a Canonical Correlation Analysis (CCA)
-     on the SVD matrices to identify maximum correlations of linear combinations of both input matrices.
-     The algorithm will identify the canonical correlations of highest magnitude across and within algorithms of the same dimensionality.
+    on the SVD matrices to identify maximum correlations of linear combinations of both input matrices.
+    The algorithm will identify the canonical correlations of highest magnitude across and within algorithms of the same dimensionality.
 
     Arguments
     ----------
@@ -216,16 +215,15 @@ def sim_svcca_io(
             original_data_df = pd.DataFrame(
                 original_data_PCAencoded, index=compendium_1.index
             )
-            # Use trained model to encode expression data into SAME latent space
-            noisy_original_data_PCAencoded = pca.fit_transform(compendium_other)
+            # Train new PCA model to encode expression data into DIFFERENT latent space
+            pca_new = PCA(n_components=num_PCs)
+            noisy_original_data_PCAencoded = pca_new.fit_transform(compendium_other)
             noisy_original_data_df = pd.DataFrame(
                 noisy_original_data_PCAencoded, index=compendium_other.index
             )
-        else:
-            # Use trained model to encode expression data into SAME latent space
-            original_data_df = compendium_1
 
-            # Use trained model to encode expression data into SAME latent space
+        else:
+            original_data_df = compendium_1
             noisy_original_data_df = compendium_other
 
         # SVCCA
@@ -237,12 +235,14 @@ def sim_svcca_io(
 
     # SVCCA of permuted data
     if use_pca:
+        pca = PCA(n_components=num_PCs)
         simulated_data_PCAencoded = pca.fit_transform(simulated_data)
         simulated_data_PCAencoded_df = pd.DataFrame(
             simulated_data_PCAencoded, index=simulated_data.index
         )
 
-        shuffled_data_PCAencoded = pca.fit_transform(permuted_simulated_data)
+        pca_new = PCA(n_components=num_PCs)
+        shuffled_data_PCAencoded = pca_new.fit_transform(permuted_simulated_data)
         shuffled_data_PCAencoded_df = pd.DataFrame(
             shuffled_data_PCAencoded, index=permuted_simulated_data.index
         )
