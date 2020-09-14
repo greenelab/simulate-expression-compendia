@@ -37,9 +37,21 @@ There are 2 analyses using Pseudomonas dataset in the `Pseudomonas` directory an
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
 First you need to set up your local repository: 
-1. Clone the `simulate-expression-compendia` repository
-2. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
-3. Set up conda environment by running the following command in the terminal:
+1. Clone the `simulate-expression-compendia` repository by running the following command in the terminal:
+```
+git clone https://github.com/greenelab/simulate-expression-compendia.git
+```
+2. Download and install git extension for large files (git-lfs tracked files) for [windows](https://git-lfs.github.com/) or [mac/linux](https://brew.sh/)
+3. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+4. Navigate into cloned repo by running the following command in the terminal:
+```
+cd simulate-expression-compendia
+```
+5. Load all git-lfs tracked files by running the following command in the terminal:
+```
+git lfs fetch
+```
+6. Set up conda environment by running the following command in the terminal:
 ```bash
 # conda version 4.6.12
 conda env create -f environment.yml
@@ -48,7 +60,7 @@ conda activate simulate_expression_compendia
 
 pip install -e .
 ```
-4. Navigate to either the `Pseudomonas` or `Human` directories and run the notebooks.
+7. Navigate to either the `Pseudomonas` or `Human` directories and run the notebooks.
 
 
 ## How to run using your own data
@@ -56,9 +68,21 @@ pip install -e .
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
 First you need to set up your local repository and environment: 
-1. Clone the `simulate-expression-compendia` repository
-2. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
-3. Set up conda environment by running the following command in the terminal:
+1. Clone the `simulate-expression-compendia` repository by running the following command in the terminal:
+```
+git clone https://github.com/greenelab/simulate-expression-compendia.git
+```
+2. Download and install git extension for large files (git-lfs tracked files) for [windows](https://git-lfs.github.com/) or [mac/linux](https://brew.sh/)
+3. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+4. Navigate into cloned repo by running the following command in the terminal:
+```
+cd simulate-expression-compendia
+```
+5. Load all git-lfs tracked files by running the following command in the terminal:
+```
+git lfs fetch
+```
+6. Set up conda environment by running the following command in the terminal:
 ```bash
 # conda version 4.6.12
 conda env create -f environment.yml
@@ -67,9 +91,9 @@ conda activate simulate_expression_compendia
 
 pip install -e .
 ```
-4. Create a new analysis folder in the main directory. This is equivalent to the `Pseudomonas` directory
-5. Copy `Pseudomonas_sample_lvl_sim.ipynb` or `Pseudomonas_experiment_lvl_sim.ipynb` into your analysis folder depending on if you would like to use the sample level(see [simulate_by_random_sampling()](https://github.com/greenelab/ponyo/blob/master/ponyo/simulate_expression_data.py)) or experiment level simulation (see [simulate_by_latent_transformation()](https://github.com/greenelab/ponyo/blob/master/ponyo/simulate_expression_data.py))approach. 
-6. Within your analysis folder create `data/` directory and `input/`, `metadata/` subdirectories
+7. Create a new analysis folder in the main directory. This is equivalent to the `Pseudomonas` directory
+8. Copy `Pseudomonas_sample_lvl_sim.ipynb` or `Pseudomonas_experiment_lvl_sim.ipynb` into your analysis folder depending on if you would like to use the sample level(see [simulate_by_random_sampling()](https://github.com/greenelab/ponyo/blob/master/ponyo/simulate_expression_data.py)) or experiment level simulation (see [simulate_by_latent_transformation()](https://github.com/greenelab/ponyo/blob/master/ponyo/simulate_expression_data.py))approach. 
+9. Within your analysis folder create `data/` directory and `input/`, `metadata/` subdirectories
 
 Next we need to modify the code for your analysis:
 1. Create a configuration file in `configs/` using the parameters outlined below.
