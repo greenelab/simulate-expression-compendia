@@ -34,6 +34,8 @@ There are 2 analyses using Pseudomonas dataset in the `Pseudomonas` directory an
 
 ## How to run notebooks from simulate-expression-compendia
 
+**Operating Systems:** Mac OS, Linux
+
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
 First you need to set up your local repository: 
@@ -41,7 +43,7 @@ First you need to set up your local repository:
 ```
 git clone https://github.com/greenelab/simulate-expression-compendia.git
 ```
-2. Download and install git extension for large files (git-lfs tracked files) for [windows](https://git-lfs.github.com/) or [mac/linux](https://brew.sh/)
+2. Download and install [git extension](https://brew.sh/) for large files (git-lfs tracked files)
 3. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 4. Navigate into cloned repo by running the following command in the terminal:
 ```
@@ -52,9 +54,20 @@ cd simulate-expression-compendia
 git lfs fetch
 ```
 6. Set up conda environment by running the following command in the terminal:
+(for linux)
 ```bash
 # conda version 4.6.12
 conda env create -f environment.yml
+
+conda activate simulate_expression_compendia
+
+pip install -e .
+```
+(for mac)
+Set up conda environment by running the following command in the terminal (for linux):
+```bash
+# conda version 4.6.12
+conda env create -f environment_mac.yml
 
 conda activate simulate_expression_compendia
 
@@ -72,7 +85,7 @@ First you need to set up your local repository and environment:
 ```
 git clone https://github.com/greenelab/simulate-expression-compendia.git
 ```
-2. Download and install git extension for large files (git-lfs tracked files) for [windows](https://git-lfs.github.com/) or [mac/linux](https://brew.sh/)
+2. Download and install [git extension](https://brew.sh/) for large files (git-lfs tracked files)
 3. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 4. Navigate into cloned repo by running the following command in the terminal:
 ```
@@ -83,9 +96,20 @@ cd simulate-expression-compendia
 git lfs fetch
 ```
 6. Set up conda environment by running the following command in the terminal:
+(for linux)
 ```bash
 # conda version 4.6.12
 conda env create -f environment.yml
+
+conda activate simulate_expression_compendia
+
+pip install -e .
+```
+(for mac)
+Set up conda environment by running the following command in the terminal (for linux):
+```bash
+# conda version 4.6.12
+conda env create -f environment_mac.yml
 
 conda activate simulate_expression_compendia
 

@@ -1,0 +1,32 @@
+name: simulate_expression_compendia
+channels:
+- conda-forge
+- r
+- bioconda
+dependencies:
+- r::r-base=3.6.0
+- bioconda::bioconductor-limma
+- bioconda::bioconductor-sva
+- conda-forge::python=3.7
+- conda-forge::pandas=0.24.2
+- conda-forge::seaborn=0.8.1
+- conda-forge::numexpr
+- conda-forge::scikit-learn
+- conda-forge::scipy=1.1.0
+- conda-forge::hdf5
+- conda-forge::umap-learn
+- conda-forge::plotnine
+- conda-forge::ipykernel=5.1.1
+- conda-forge::nb_conda_kernels
+- conda-forge::clang_osx-64
+- conda-forge::rpy2
+- conda-forge::libiconv=1.15
+- conda-forge::joblib=0.13.2
+- anaconda::protobuf
+- pip=19.2.1
+- pip:
+  - torch>=0.4.0
+  - matplotlib==3.0.0
+  - pillow
+  - requests
+  - ponyo
