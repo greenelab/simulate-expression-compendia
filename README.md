@@ -85,7 +85,7 @@ First you need to set up your local repository and environment:
 ```
 git clone https://github.com/greenelab/simulate-expression-compendia.git
 ```
-2. Download and install [git extension](https://git-lfs.github.com/) for large files (git-lfs tracked files)
+2. Download and install [github's large file tracker](https://git-lfs.github.com/).
 3. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 4. Navigate into cloned repo by running the following command in the terminal:
 ```
