@@ -45,7 +45,7 @@ jobs:
           python-version: 3.8
 
       - name: Setup conda environment
-      - uses: goanpeca/setup-miniconda@v1
+        uses: goanpeca/setup-miniconda@v1
         with:
           activate-environment: simulate_expression_compendia
           environment-file: environment.yml
