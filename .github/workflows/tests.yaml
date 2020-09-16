@@ -59,7 +59,6 @@ jobs:
 
       - name: Run analysis notebooks
         run: |
-          export R_HOME=`$CONDA/bin/R RHOME`
           pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_limma.ipynb
           pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_combat.ipynb
           pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
