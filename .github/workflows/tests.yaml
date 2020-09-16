@@ -4,15 +4,14 @@ on: [push, pull_request]
 
 jobs:
   run-analysis:
-    name: Test analysis notebooks
+    name: Test analysis notebooks on ubuntu
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
@@ -32,4 +31,3 @@ jobs:
           $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
           $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
           $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
-      
