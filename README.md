@@ -54,20 +54,9 @@ cd simulate-expression-compendia
 git lfs fetch
 ```
 6. Set up conda environment by running the following command in the terminal:
-(for linux)
 ```bash
 # conda version 4.6.12
 conda env create -f environment.yml
-
-conda activate simulate_expression_compendia
-
-pip install -e .
-```
-(for mac)
-Set up conda environment by running the following command in the terminal (for linux):
-```bash
-# conda version 4.6.12
-conda env create -f environment_mac.yml
 
 conda activate simulate_expression_compendia
 
@@ -96,20 +85,9 @@ cd simulate-expression-compendia
 git lfs fetch
 ```
 6. Set up conda environment by running the following command in the terminal:
-(for linux)
 ```bash
 # conda version 4.6.12
 conda env create -f environment.yml
-
-conda activate simulate_expression_compendia
-
-pip install -e .
-```
-(for mac)
-Set up conda environment by running the following command in the terminal (for linux):
-```bash
-# conda version 4.6.12
-conda env create -f environment_mac.yml
 
 conda activate simulate_expression_compendia
 

@@ -3,7 +3,7 @@ name: Test analysis notebooks
 on: [push, pull_request]
 
 jobs:
-  run-analysis-1:
+  run-analysis:
     name: Test analysis notebooks on ubuntu
     runs-on: ubuntu-latest
     steps:
@@ -31,37 +31,3 @@ jobs:
           $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
           $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
           $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
-
-  run-analysis-2:
-    name: Test analysis notebooks on mac
-    runs-on: macos-latest
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Setup conda environment
-        uses: goanpeca/setup-miniconda@v1
-        with:
-          activate-environment: simulate_expression_compendia
-          environment-file: environment.yml
-
-      - name: Install test libraries
-        run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          pip install .
-          pip install pytest
-          pip install nbval
-
-      - name: Run analysis notebooks
-        run: |
-          pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_limma.ipynb
-          pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_combat.ipynb
-          pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
-          pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
-          pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
-      
