@@ -18,7 +18,6 @@ dependencies:
 - conda-forge::plotnine
 - conda-forge::ipykernel=5.1.1
 - conda-forge::nb_conda_kernels
-- conda-forge::gxx_linux-64
 - conda-forge::rpy2
 - conda-forge::libiconv=1.15
 - conda-forge::joblib=0.13.2

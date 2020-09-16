@@ -5,7 +5,10 @@ on: [push, pull_request]
 jobs:
   run-analysis:
     name: Test analysis notebooks
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - name: Check out Git repository
