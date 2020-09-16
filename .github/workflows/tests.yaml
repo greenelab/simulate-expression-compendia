@@ -5,11 +5,11 @@ on: [push, pull_request]
 jobs:
   run-analysis:
     name: Test analysis notebooks
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-
+        containers: [1, 2]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
