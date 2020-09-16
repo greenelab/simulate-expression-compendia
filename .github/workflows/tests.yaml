@@ -4,12 +4,37 @@ on: [push, pull_request]
 
 jobs:
   run-analysis:
-    name: Test analysis notebooks
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        containers: [1, 2]
-    runs-on: ${{ matrix.os }}
+    name: Test analysis notebooks on ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Setup conda environment
+        run: |
+          # $CONDA is an environment variable pointing to the root of the miniconda directory
+          $CONDA/bin/conda env update --file environment.yml --name base
+          $CONDA/bin/pip install .
+          $CONDA/bin/pip install pytest
+          $CONDA/bin/pip install nbval
+
+      - name: Run analysis notebooks
+        run: |
+          export R_HOME=`$CONDA/bin/R RHOME`
+          $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_limma.ipynb
+          $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_combat.ipynb
+          $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
+          $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
+          $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
+
+  run-analysis:
+    name: Test analysis notebooks on mac
+    runs-on: macos-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
