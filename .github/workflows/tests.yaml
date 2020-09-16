@@ -49,6 +49,8 @@ jobs:
         with:
           activate-environment: simulate_expression_compendia
           environment-file: environment.yml
+
+      - name: Install test libraries
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
           pip install .
