@@ -3,7 +3,7 @@ name: Test analysis notebooks
 on: [push, pull_request]
 
 jobs:
-  run-analysis:
+  run-analysis-1:
     name: Test analysis notebooks on ubuntu
     runs-on: ubuntu-latest
     steps:
@@ -32,7 +32,7 @@ jobs:
           $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
           $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
 
-  run-analysis:
+  run-analysis-2:
     name: Test analysis notebooks on mac
     runs-on: macos-latest
     steps:
