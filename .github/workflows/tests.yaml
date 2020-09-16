@@ -45,19 +45,22 @@ jobs:
           python-version: 3.8
 
       - name: Setup conda environment
+      - uses: goanpeca/setup-miniconda@v1
+        with:
+          activate-environment: simulate_expression_compendia
+          environment-file: environment.yml
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
-          $CONDA/bin/conda env update --file environment.yml --name base
-          $CONDA/bin/pip install .
-          $CONDA/bin/pip install pytest
-          $CONDA/bin/pip install nbval
+          pip install .
+          pip install pytest
+          pip install nbval
 
       - name: Run analysis notebooks
         run: |
           export R_HOME=`$CONDA/bin/R RHOME`
-          $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_limma.ipynb
-          $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_combat.ipynb
-          $CONDA/bin/pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
-          $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
-          $CONDA/bin/pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
+          pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_limma.ipynb
+          pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_sample_combat.ipynb
+          pytest -v --nbval-lax --current-env Pseudomonas_tests/Pseudomonas_experiment_limma.ipynb
+          pytest -v --nbval-lax --current-env Human_tests/Human_sample_limma.ipynb
+          pytest -v --nbval-lax --current-env Human_tests/Human_experiment_limma.ipynb
       
