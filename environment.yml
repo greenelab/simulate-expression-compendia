@@ -28,4 +28,6 @@ dependencies:
   - matplotlib==3.0.0
   - pillow
   - requests
-  - ponyo
+  - ponyo==0.1
+  - h5py<3
+  
