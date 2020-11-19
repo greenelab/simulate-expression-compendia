@@ -18,7 +18,8 @@ This repository stores data and analysis modules to simulate compendia of gene e
 
 **Conclusion:** When combining some sources of technical variation, it is best to perform batch correction. However, as the number of sources increases, batch correction becomes unnecessary and indeed harms our ability to extract biological patterns.
 
-For more details about the analysis, see our [paper published in GigaScience](https://academic.oup.com/gigascience/article/9/11/giaa117/5952607). The paper should be cited as:
+**Citation:**
+For more details about the analysis, see our paper published in GigaScience. The paper should be cited as:
 > Alexandra J Lee, YoSon Park, Georgia Doing, Deborah A Hogan, Casey S Greene, Correcting for experiment-specific variability in expression compendia can remove underlying signals, GigaScience, Volume 9, Issue 11, November 2020, giaa117, https://doi.org/10.1093/gigascience/giaa117
 
 ## Analysis Modules
