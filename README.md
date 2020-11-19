@@ -2,23 +2,21 @@
 
 **Alexandra J Lee, YoSon Park, Georgia Doing, Deborah A Hogan and Casey S Greene**
 
-**January 2020**
-
-**University of Pennsylvania**
+**University of Pennsylvania, Dartmouth College**
 
 [![DOI:10.1101/2020.05.03.066597v1](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://www.biorxiv.org/content/10.1101/2020.05.03.066597v1)
 
 This repository stores data and analysis modules to simulate compendia of gene expression data and measure the effect of technical sources of variation on our ability to extract an underlying biological signal.  
 
-*Motivation:* In the last two decades, scientists working in different labs have assayed gene expression from millions of samples. These experiments can be combined into a compendium and used to extract novel biological patterns. However, combining different experiments introduces technical variance, which could distort biological patterns and lead to misinterpretation. As the scale and prevalence of these compendia increases, it becomes crucial to evaluate how integrating multiple experiments affects our ability to detect biological patterns.
+**Motivation:** In the last two decades, scientists working in different labs have assayed gene expression from millions of samples. These experiments can be combined into a compendium and used to extract novel biological patterns. However, combining different experiments introduces technical variance, which could distort biological patterns and lead to misinterpretation. As the scale and prevalence of these compendia increases, it becomes crucial to evaluate how integrating multiple experiments affects our ability to detect biological patterns.
 
-*Objective:* To determine the extent to which underlying biological structures are masked by technical variants via simulation of a multi-experiment compendia.
+**Objective:** To determine the extent to which underlying biological structures are masked by technical variants via simulation of a multi-experiment compendia.
 
-*Method:* We used a generative multi-layer neural network to simulate a compendium of P. aeruginosa gene expression experiments. We performed a pairwise comparison of the simulated compendium versus the simulated compendium containing varying number of sources of technical variation.
+**Method:** We used a generative multi-layer neural network to simulate a compendium of P. aeruginosa gene expression experiments. We performed a pairwise comparison of the simulated compendium versus the simulated compendium containing varying number of sources of technical variation.
 
-*Results:* We found that it was difficult to detect the original biological structure of interest in a compendium containing some sources of technical variation unless we applied batch correction. Interestingly, as the number of sources of variation increased, it became easier to detect the original biological structure without correction. Furthermore, when we applied batch correction, it reduced our power to detect the biological structure of interest.     
+**Results:** We found that it was difficult to detect the original biological structure of interest in a compendium containing some sources of technical variation unless we applied batch correction. Interestingly, as the number of sources of variation increased, it became easier to detect the original biological structure without correction. Furthermore, when we applied batch correction, it reduced our power to detect the biological structure of interest.     
 
-*Conclusion:* When combining some sources of technical variation, it is best to perform batch correction. However, as the number of sources increases, batch correction becomes unnecessary and indeed harms our ability to extract biological patterns.
+**Conclusion:** When combining some sources of technical variation, it is best to perform batch correction. However, as the number of sources increases, batch correction becomes unnecessary and indeed harms our ability to extract biological patterns.
 
 ## Analysis Modules
 
@@ -32,9 +30,11 @@ There are 2 analyses using Pseudomonas dataset in the `Pseudomonas` directory an
 | [Human_experiment_lvl_sim](Human/Human_experiment_lvl_sim.ipynb) | Human experiment-level gene expression simulation|
 
 
-## How to run notebooks from simulate-expression-compendia
+## Usage
 
-**Operating Systems:** Mac OS, Linux
+**How to run notebooks from simulate-expression-compendia**
+
+*Operating Systems:* Mac OS, Linux
 
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
@@ -62,7 +62,7 @@ pip install -e .
 6. Navigate to either the `Pseudomonas` or `Human` directories and run the notebooks.
 
 
-## How to run using your own data
+**How to run using your own data**
 
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
@@ -98,14 +98,14 @@ Next we need to modify the code for your analysis:
 4. Add your metadata file to `data/metadata/` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
 5. Run notebooks
 
-## Additional customization
+**Additional customization**
 
 Further customization can be accomplished by doing the following:
 
 1. The `apply_correction_io` function in the `generate_data_parallel.py` file can be modified to use a different correction method.
 2. If there are additional pre-processing specific to your data, these can be added as modules in the `pipeline.py` file and called in the analysis notebook
 
-## Configuration file
+**Configuration file**
 
 The tables lists parameters required to run the analysis in this repository.
 
