@@ -4,7 +4,7 @@
 
 **University of Pennsylvania, Dartmouth College**
 
-[![DOI:10.1101/2020.05.03.066597v1](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://www.biorxiv.org/content/10.1101/2020.05.03.066597v1)
+[![PDF Manuscript](https://img.shields.io/badge/manuscript-PDF-blue.svg)](https://academic.oup.com/gigascience/article/9/11/giaa117/5952607)
 
 This repository stores data and analysis modules to simulate compendia of gene expression data and measure the effect of technical sources of variation on our ability to extract an underlying biological signal.  
 
@@ -17,6 +17,9 @@ This repository stores data and analysis modules to simulate compendia of gene e
 **Results:** We found that it was difficult to detect the original biological structure of interest in a compendium containing some sources of technical variation unless we applied batch correction. Interestingly, as the number of sources of variation increased, it became easier to detect the original biological structure without correction. Furthermore, when we applied batch correction, it reduced our power to detect the biological structure of interest.     
 
 **Conclusion:** When combining some sources of technical variation, it is best to perform batch correction. However, as the number of sources increases, batch correction becomes unnecessary and indeed harms our ability to extract biological patterns.
+
+For more details about the analysis, see our [paper published in GigaScience](https://academic.oup.com/gigascience/article/9/11/giaa117/5952607). The paper should be cited as:
+> Alexandra J Lee, YoSon Park, Georgia Doing, Deborah A Hogan, Casey S Greene, Correcting for experiment-specific variability in expression compendia can remove underlying signals, GigaScience, Volume 9, Issue 11, November 2020, giaa117, https://doi.org/10.1093/gigascience/giaa117
 
 ## Analysis Modules
 
