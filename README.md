@@ -28,10 +28,10 @@ There are 2 analyses using Pseudomonas dataset in the `Pseudomonas` directory an
 
 | Name | Description |
 | :--- | :---------- |
-| [Pseudomonas_sample_lvl_sim](Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb) | Pseudomonas sample-level gene expression simulation|
-| [Pseudomonas_experiment_lvl_sim](Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb) | Pseudomonas experiment-level gene expression simulation|
-| [Human_sample_lvl_sim](Human/Human_sample_lvl_sim.ipynb) | Human sample-level gene expression simulation|
-| [Human_experiment_lvl_sim](Human/Human_experiment_lvl_sim.ipynb) | Human experiment-level gene expression simulation|
+| [Pseudomonas_sample_lvl_sim](Pseudomonas/Pseudomonas_sample_lvl_sim.ipynb) | Analysis notebook applying sample-level gene expression simulation to *P. aeruginosa* data|
+| [Pseudomonas_experiment_lvl_sim](Pseudomonas/Pseudomonas_experiment_lvl_sim.ipynb) | Analysis notebook applying experiment-level gene expression simulation to *P. aeruginosa* data|
+| [Human_sample_lvl_sim](Human/Human_sample_lvl_sim.ipynb) | Analysis notebook applying sample-level gene expression simulation to human (recount2) data|
+| [Human_experiment_lvl_sim](Human/Human_experiment_lvl_sim.ipynb) | Analysis notebook applying experiment-level gene expression simulation to human (recount2) data|
 
 
 ## Usage
@@ -66,7 +66,7 @@ pip install -e .
 6. Navigate to either the `Pseudomonas` or `Human` directories and run the notebooks.
 
 
-**How to run using your own data**
+**How to analyze your own data**
 
 In order to run this simulation on your own gene expression data the following steps should be performed:
 
