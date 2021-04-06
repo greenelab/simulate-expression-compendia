@@ -14,6 +14,7 @@ dependencies:
 - conda-forge::scikit-learn
 - conda-forge::scipy=1.1.0
 - conda-forge::hdf5
+- conda-forge::notebook
 - conda-forge::umap-learn
 - conda-forge::plotnine
 - conda-forge::ipykernel=5.1.1
