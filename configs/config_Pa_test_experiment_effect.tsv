@@ -18,3 +18,4 @@ correction_method	'limma'
 metadata_colname	'ml_data_source'
 iterations	range(5)
 num_cores	5
+validation_frac	0.1
