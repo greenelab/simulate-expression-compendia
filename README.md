@@ -118,7 +118,7 @@ Note: Some of these parameters are required by the imported [ponyo](https://gith
 | Name | Description |
 | :--- | :---------- |
 | local_dir| str: Parent directory on local machine to store intermediate results.|
-| scaler_transform_file| str: File name to store mapping from normalized to raw gene expression range. This is an intermediate file that gets generated.|
+| scaler_transform_file| str: File name to store mapping from normalized to raw gene expression range. This is an intermediate file that gets generated. This file is generated in the `normalize_expression_data()` function from this [ponyo script](https://github.com/greenelab/ponyo/blob/master/ponyo/train_vae_modules.py).|
 | dataset_name| str: Name for analysis directory. Either "Human" or "Pseudomonas". If you created a new analysis directory this is the name of that new directory created in step 6 above.|
 | simulation_type | str: "sample_lvl_sim" (simulated based on randomly sampling the latent space) or "experiment_lvl_sim" (simulation based on shifting in the latent space).|
 | NN_architecture | str: Name of neural network architecture to use. Format 'NN_<intermediate layer>_<latent layer>'.|
