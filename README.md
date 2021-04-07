@@ -131,7 +131,7 @@ Note: Some of these parameters are required by the imported [ponyo](https://gith
 | epsilon_std | float: Standard deviation of Normal distribution to sample latent space.|
 | validation_frac | float: Fraction of input samples to use to validate for VAE training.|
 | num_simulated_samples | int: Simulate a compendia with this number of samples. Used if simulateion_type == "sample_lvl_sample"|
-| num_simulated_experiments| int: Simulate a compendia with this number of experiments. Used if simulateion_type == "experiment_lvl_sample"|
+| num_simulated_experiments| int: Simulate a compendium with this number of experiments. Used if simulation_type == "experiment_lvl_sample"|
 | lst_num_experiments | list:  List of different numbers of experiments to add to simulated compendium.  These are the number of sources of technical variation that are added to the simulated compendium.|
 | lst_num_partitions | list:  List of different numbers of partitions to add to simulated compendium.  These are the number of sources of technical variation that are added to the simulated compendium.|
 | use_pca | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity.|
