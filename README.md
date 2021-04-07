@@ -98,7 +98,7 @@ pip install -e .
 Next we need to modify the code for your analysis:
 1. Create a configuration file in `configs/` using the parameters outlined below.
 2. Update the analysis notebooks to use your config file (see below) and input file
-3. Add your gene expression data file to the `data/input/` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py)
+3. Add your gene expression data file to the `data/input/` directory.  Your data is expected to be stored as a tab-delimited dataset with samples as rows and genes as columns. Your input data is also expected to be 0-1 normalized per gene. If your data needs to be normalized or transposed, there are functions to do this in [ponyo/utils](https://github.com/greenelab/ponyo/blob/master/ponyo/utils.py).
 4. Add your metadata file to `data/metadata/` directory.  Your metadata is expected to be stored as a tab-delimited with sample ids matching the gene expression dataset as one column and experiment ids as another. 
 5. Run notebooks
 
@@ -117,29 +117,29 @@ Note: Some of these parameters are required by the imported [ponyo](https://gith
 
 | Name | Description |
 | :--- | :---------- |
-| local_dir| str: Parent directory on local machine to store intermediate results|
-| scaler_transform_file| str: File to store mapping from normalized to raw gene expression range|
-| dataset_name| str: Name for analysis directory. Either "Human" or "Pseudomonas"|
-| simulation_type | str: "sample_lvl_sim" or "experiment_lvl_sim"|
-| NN_architecture | str: Name of neural network architecture to use. Format 'NN_<intermediate layer>_<latent layer>'|
-| learning_rate| float: Step size used for gradient descent. In other words, it's how quickly the  methods is learning|
-| batch_size | str: Training is performed in batches. So this determines the number of samples to consider at a given time|
-| epochs | int: Number of times to train over the entire input dataset|
-| kappa | float: How fast to linearly ramp up KL loss|
-| intermediate_dim| int: Size of the hidden layer|
-| latent_dim | int: Size of the bottleneck layer|
-| epsilon_std | float: Standard deviation of Normal distribution to sample latent space|
-| validation_frac | float: Fraction of input samples to use to validate for VAE training|
-| num_simulated_samples | int: Simulate a compendia with these many samples|
-| num_simulated_experiments| int: Simulate a compendia with these many experiments|
-| lst_num_experiments | list:  List of different numbers of experiments to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
-| lst_num_partitions | list:  List of different numbers of partitions to add to simulated data.  These are the number of sources of technical variation that are added to the simulated data|
-| use_pca | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity|
-| num_PCs | int: Number of top PCs to use to represent expression data|
-| correction_method | str: Noise correction method to use. Either "limma" or "combat"|
-| metadata_colname | str: Column header that contains sample id that maps expression data and metadata|
-| iterations | int: Number of simulations to run|
-| num_cores | int: Number of processing cores to use|
+| local_dir| str: Parent directory on local machine to store intermediate results.|
+| scaler_transform_file| str: File name to store mapping from normalized to raw gene expression range. This is an intermediate file that gets generated. This file is generated in the `normalize_expression_data()` function from this [ponyo script](https://github.com/greenelab/ponyo/blob/master/ponyo/train_vae_modules.py).|
+| dataset_name| str: Name for analysis directory. Either "Human" or "Pseudomonas". If you created a new analysis directory this is the name of that new directory created in step 6 above.|
+| simulation_type | str: "sample_lvl_sim" (simulated based on randomly sampling the latent space) or "experiment_lvl_sim" (simulation based on shifting in the latent space).|
+| NN_architecture | str: Name of neural network architecture to use. Format 'NN_<intermediate layer>_<latent layer>'.|
+| learning_rate| float: Step size used for gradient descent. In other words, it's how quickly the  methods is learning.|
+| batch_size | str: Training is performed in batches. So this determines the number of samples to consider at a given time.|
+| epochs | int: Number of times to train over the entire input dataset.|
+| kappa | float: How fast to linearly ramp up KL loss.|
+| intermediate_dim| int: Size of the hidden layer.|
+| latent_dim | int: Size of the bottleneck layer.|
+| epsilon_std | float: Standard deviation of Normal distribution to sample latent space.|
+| validation_frac | float: Fraction of input samples to use to validate for VAE training.|
+| num_simulated_samples | int: Simulate a compendium with this number of samples. Used if simulation_type == "sample_lvl_sample"|
+| num_simulated_experiments| int: Simulate a compendium with this number of experiments. Used if simulation_type == "experiment_lvl_sample"|
+| lst_num_experiments | list:  List of different numbers of experiments to add to simulated compendium.  These are the number of sources of technical variation that are added to the simulated compendium.|
+| lst_num_partitions | list:  List of different numbers of partitions to add to simulated compendium.  These are the number of sources of technical variation that are added to the simulated compendium.|
+| use_pca | bool: True if want to represent expression data in top PCs before calculating SVCCA similarity.|
+| num_PCs | int: Number of top PCs to use to represent expression data. If use_pca == True.|
+| correction_method | str: Noise correction method to use. Either "limma" or "combat".|
+| metadata_colname | str: Column header that contains sample id that maps expression data and metadata.|
+| iterations | int: Number of simulations to run.|
+| num_cores | int: Number of processing cores to use.|
 
 ## Acknowledgements
 We would like to thank YoSon Park, David Nicholson, Ben Heil and Ariel Hippen-Anderson for insightful discussions and code review
